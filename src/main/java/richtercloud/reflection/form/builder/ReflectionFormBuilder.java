@@ -83,7 +83,7 @@ public class ReflectionFormBuilder<E> {
         Class<?> hierarchyPointer = entityClass;
         while(!hierarchyPointer.equals(Object.class)) {
             retValue.addAll(Arrays.asList(entityClass.getDeclaredFields()));
-            hierarchyPointer = entityClass.getSuperclass();
+            hierarchyPointer = hierarchyPointer.getSuperclass();
         }
         ListIterator<Field> entityClassFieldsIt = retValue.listIterator();
         while(entityClassFieldsIt.hasNext()) {
@@ -110,10 +110,10 @@ public class ReflectionFormBuilder<E> {
         return retValue;
     }
 
-    public JPanel transform(Class<? extends E> entityClass) throws NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+    public ReflectionFormPanel transform(Class<? extends E> entityClass) throws NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
         final Map<Field, JComponent> fieldMapping = new HashMap<>();
         E instance = entityClass.getConstructor().newInstance();
-        JPanel retValue = new ReflectionFormPanel(fieldMapping, instance, valueRetrieverMapping);
+        ReflectionFormPanel retValue = new ReflectionFormPanel(fieldMapping, instance, valueRetrieverMapping);
         this.entityClassFields = retrieveRelevantFields(entityClass);
 
         GroupLayout retValueLayout = new GroupLayout(retValue);
