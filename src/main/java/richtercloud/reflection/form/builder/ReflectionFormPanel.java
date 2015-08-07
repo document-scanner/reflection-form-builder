@@ -5,22 +5,21 @@
  */
 package richtercloud.reflection.form.builder;
 
-import java.awt.LayoutManager;
 import java.lang.reflect.Field;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import javax.swing.GroupLayout;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 
 /**
  *
  * @author richter
+ * @param <E> a generic type for the entity class
  */
-public class ReflectionFormPanel extends javax.swing.JPanel {
+public class ReflectionFormPanel<E> extends javax.swing.JPanel {
     private static final long serialVersionUID = 1L;
     private Map<Field, JComponent> fieldMapping = new HashMap<>();
+    private Map<Class<? extends JComponent>, ValueRetriever<?, ?>> valueRetrieverMapping;
+    private E instance;
 
     /**
      * Creates new form ReflectionFormPanel
@@ -29,13 +28,37 @@ public class ReflectionFormPanel extends javax.swing.JPanel {
         initComponents();
     }
 
-    public ReflectionFormPanel(Map<Field, JComponent> fieldMapping) {
+    public ReflectionFormPanel(Map<Field, JComponent> fieldMapping, E instance, Map<Class<? extends JComponent>, ValueRetriever<?, ?>> valueRetrieverMapping) {
         this();
+        if(instance == null) {
+            throw new IllegalArgumentException("instance mustn't be null");
+        }
         this.fieldMapping = fieldMapping;
+        this.valueRetrieverMapping = valueRetrieverMapping;
+        this.instance = instance;
     }
 
     public JComponent getComponentByField(Field field) {
         return this.fieldMapping.get(field);
+    }
+
+    public void updateInstance() throws IllegalArgumentException, IllegalAccessException {
+        for(Field field : fieldMapping.keySet()) {
+            JComponent comp = fieldMapping.get(field);
+            //figure out what type comp is supposed to deliver
+            ValueRetriever valueRetriever = this.valueRetrieverMapping.get(comp);
+            Object value = valueRetriever.retrieve(comp);
+            field.set(instance, value);
+        }
+    }
+
+    public E retrieveInstance() throws IllegalArgumentException, IllegalAccessException {
+        updateInstance();
+        return instance;
+    }
+
+    public Map<Class<? extends JComponent>, ValueRetriever<?, ?>> getValueRetrieverMapping() {
+        return valueRetrieverMapping;
     }
 
     /**

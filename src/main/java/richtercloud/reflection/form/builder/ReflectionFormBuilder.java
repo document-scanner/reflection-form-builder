@@ -27,8 +27,11 @@ import java.util.Map;
 import javax.swing.GroupLayout;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
+import richtercloud.reflection.form.builder.retriever.SpinnerRetriever;
+import richtercloud.reflection.form.builder.retriever.TextFieldRetriever;
 
 /**
  *
@@ -43,21 +46,36 @@ public class ReflectionFormBuilder<E> {
         classMappingDefault0.put(Number.class, JSpinner.class);
         CLASS_MAPPING_DEFAULT = Collections.unmodifiableMap(classMappingDefault0);
     }
+    public static final Map<Class<? extends JComponent>, ValueRetriever<?, ?>> VALUE_RETRIEVER_MAPPING_DEFAULT;
+    static {
+        Map<Class<? extends JComponent>, ValueRetriever<?, ?>> valueRetrieverMapping0 = new HashMap<>();
+        valueRetrieverMapping0.put(JTextField.class, TextFieldRetriever.getInstance());
+        valueRetrieverMapping0.put(JSpinner.class, SpinnerRetriever.getInstance());
+        VALUE_RETRIEVER_MAPPING_DEFAULT = Collections.unmodifiableMap(valueRetrieverMapping0);
+    }
     private Map<Class<?>, Class<? extends JComponent>> classMapping;
+    private Map<Class<? extends JComponent>, ValueRetriever<?, ?>> valueRetrieverMapping;
     private List<Field> entityClassFields;
 
     public ReflectionFormBuilder() {
-        this(CLASS_MAPPING_DEFAULT);
+        this(CLASS_MAPPING_DEFAULT, VALUE_RETRIEVER_MAPPING_DEFAULT);
     }
 
-    public ReflectionFormBuilder(Map<Class<?>, Class<? extends JComponent>> classMapping) {
+    public ReflectionFormBuilder(Map<Class<?>, Class<? extends JComponent>> classMapping, Map<Class<? extends JComponent>, ValueRetriever<?, ?>> valueRetrieverMapping) {
         if(classMapping == null) {
             throw new IllegalArgumentException("classMapping mustn't be null");
         }
         if(classMapping.values().contains(null)) {
             throw new IllegalArgumentException(String.format("classMapping mustn't contain null values"));
         }
+        if(valueRetrieverMapping == null) {
+            throw new IllegalArgumentException("valueRetrieverMapping mustn't be null");
+        }
+        if(valueRetrieverMapping.values().contains(null)) {
+            throw new IllegalArgumentException("valueRetrieverMapping mustn't contain null values");
+        }
         this.classMapping = classMapping;
+        this.valueRetrieverMapping = valueRetrieverMapping;
     }
 
     public List<Field> retrieveRelevantFields(Class<? extends E> entityClass) {
@@ -92,9 +110,10 @@ public class ReflectionFormBuilder<E> {
         return retValue;
     }
 
-    public ReflectionFormPanel transform(Class<? extends E> entityClass) throws NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+    public JPanel transform(Class<? extends E> entityClass) throws NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
         final Map<Field, JComponent> fieldMapping = new HashMap<>();
-        ReflectionFormPanel retValue = new ReflectionFormPanel(fieldMapping);
+        E instance = entityClass.getConstructor().newInstance();
+        JPanel retValue = new ReflectionFormPanel(fieldMapping, instance, valueRetrieverMapping);
         this.entityClassFields = retrieveRelevantFields(entityClass);
 
         GroupLayout retValueLayout = new GroupLayout(retValue);
