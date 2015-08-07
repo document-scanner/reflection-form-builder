@@ -97,14 +97,14 @@ public class ReflectionFormBuilder<E> {
         return retValue;
     }
 
-    protected  JComponent getClassComponent(Class<?> type) throws NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-        Class<? extends JComponent> clazz = classMapping.get(type);
+    protected  JComponent getClassComponent(Field field) throws NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+        Class<? extends JComponent> clazz = classMapping.get(field.getType());
         JComponent retValue;
         if(clazz == null) {
-            clazz = ReflectionFormBuilder.CLASS_MAPPING_DEFAULT.get(type);
+            clazz = ReflectionFormBuilder.CLASS_MAPPING_DEFAULT.get(field.getType());
         }
         if(clazz == null) {
-            retValue = new JLabel(type.getSimpleName());
+            retValue = new JLabel(field.getType().getSimpleName());
         } else {
             retValue = clazz.getConstructor().newInstance();
         }
@@ -121,7 +121,7 @@ public class ReflectionFormBuilder<E> {
         retValueLayout.setAutoCreateGaps(true);
         retValueLayout.setAutoCreateContainerGaps(true);
         for(Field field : this.entityClassFields) {
-            JComponent comp = getClassComponent(field.getType());
+            JComponent comp = getClassComponent(field);
             JLabel label = new JLabel(field.getName());
             retValueLayout.setHorizontalGroup(
                     retValueLayout.createSequentialGroup()
