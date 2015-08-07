@@ -14,6 +14,7 @@
  */
 package richtercloud.reflection.form.builder;
 
+import richtercloud.reflection.form.builder.retriever.ValueRetriever;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
@@ -112,7 +113,7 @@ public class ReflectionFormBuilder<E> {
 
     public ReflectionFormPanel transform(Class<? extends E> entityClass) throws NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
         final Map<Field, JComponent> fieldMapping = new HashMap<>();
-        E instance = entityClass.getConstructor().newInstance();
+        E instance = entityClass.getDeclaredConstructor().newInstance();
         ReflectionFormPanel retValue = new ReflectionFormPanel(fieldMapping, instance, valueRetrieverMapping);
         this.entityClassFields = retrieveRelevantFields(entityClass);
 

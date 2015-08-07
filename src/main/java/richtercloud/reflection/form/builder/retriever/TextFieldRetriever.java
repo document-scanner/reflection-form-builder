@@ -6,7 +6,6 @@
 package richtercloud.reflection.form.builder.retriever;
 
 import javax.swing.JTextField;
-import richtercloud.reflection.form.builder.ValueRetriever;
 
 /**
  *

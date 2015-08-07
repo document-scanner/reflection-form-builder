@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package richtercloud.reflection.form.builder;
+package richtercloud.reflection.form.builder.retriever;
 
 import javax.swing.JComponent;
 

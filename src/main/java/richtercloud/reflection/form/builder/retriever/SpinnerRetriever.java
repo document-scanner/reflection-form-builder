@@ -6,7 +6,6 @@
 package richtercloud.reflection.form.builder.retriever;
 
 import javax.swing.JSpinner;
-import richtercloud.reflection.form.builder.ValueRetriever;
 
 /**
  *
