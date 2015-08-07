@@ -12,23 +12,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package richtercloud.relection.form.builder;
+package richtercloud.reflection.form.builder;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import javax.persistence.EntityManager;
-import javax.persistence.Transient;
 import javax.swing.GroupLayout;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 
@@ -38,13 +36,31 @@ import javax.swing.JTextField;
  * @param <E> a generic type for the entity class
  */
 public class ReflectionFormBuilder<E> {
-    private static final Map<Class<?>, Class<? extends JComponent>> CLASS_MAPPING_DEFAULT = new HashMap<>();
+    public static final Map<Class<?>, Class<? extends JComponent>> CLASS_MAPPING_DEFAULT;
     static {
-        CLASS_MAPPING_DEFAULT.put(String.class, JTextField.class);
-        CLASS_MAPPING_DEFAULT.put(Number.class, JSpinner.class);
+        Map<Class<?>, Class<? extends JComponent>> classMappingDefault0 = new HashMap<>();
+        classMappingDefault0.put(String.class, JTextField.class);
+        classMappingDefault0.put(Number.class, JSpinner.class);
+        CLASS_MAPPING_DEFAULT = Collections.unmodifiableMap(classMappingDefault0);
+    }
+    private Map<Class<?>, Class<? extends JComponent>> classMapping;
+    private List<Field> entityClassFields;
+
+    public ReflectionFormBuilder() {
+        this(CLASS_MAPPING_DEFAULT);
     }
 
-    public static <E> List<Field> retrieveRelevantFields(Class<? extends E> entityClass) {
+    public ReflectionFormBuilder(Map<Class<?>, Class<? extends JComponent>> classMapping) {
+        if(classMapping == null) {
+            throw new IllegalArgumentException("classMapping mustn't be null");
+        }
+        if(classMapping.values().contains(null)) {
+            throw new IllegalArgumentException(String.format("classMapping mustn't contain null values"));
+        }
+        this.classMapping = classMapping;
+    }
+
+    public List<Field> retrieveRelevantFields(Class<? extends E> entityClass) {
         List<Field> retValue = new LinkedList<>();
         Class<?> hierarchyPointer = entityClass;
         while(!hierarchyPointer.equals(Object.class)) {
@@ -54,9 +70,6 @@ public class ReflectionFormBuilder<E> {
         ListIterator<Field> entityClassFieldsIt = retValue.listIterator();
         while(entityClassFieldsIt.hasNext()) {
             Field entityClassFieldsNxt = entityClassFieldsIt.next();
-            if(entityClassFieldsNxt.getAnnotation(Transient.class) != null) {
-                entityClassFieldsIt.remove();
-            }
             if(Modifier.isStatic(entityClassFieldsNxt.getModifiers())) {
                 entityClassFieldsIt.remove();
             }
@@ -64,45 +77,31 @@ public class ReflectionFormBuilder<E> {
         }
         return retValue;
     }
-    private Map<Class<?>, Class<? extends JComponent>> classMapping;
-    private EntityManager entityManager;
 
-    public ReflectionFormBuilder(EntityManager entityManager) {
-        this(CLASS_MAPPING_DEFAULT, entityManager);
+    protected  JComponent getClassComponent(Class<?> type) throws NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+        Class<? extends JComponent> clazz = classMapping.get(type);
+        JComponent retValue;
+        if(clazz == null) {
+            clazz = ReflectionFormBuilder.CLASS_MAPPING_DEFAULT.get(type);
+        }
+        if(clazz == null) {
+            retValue = new JLabel(type.getSimpleName());
+        } else {
+            retValue = clazz.getConstructor().newInstance();
+        }
+        return retValue;
     }
 
-    public ReflectionFormBuilder(Map<Class<?>, Class<? extends JComponent>> classMapping, EntityManager entityManager) {
-        if(classMapping == null) {
-            throw new IllegalArgumentException("classMapping mustn't be null");
-        }
-        if(entityManager == null) {
-            throw new IllegalArgumentException("entityManager mustn't be null");
-        }
-        if(classMapping.values().contains(null)) {
-            throw new IllegalArgumentException(String.format("classMapping mustn't contain null values"));
-        }
-        this.classMapping = classMapping;
-        this.entityManager = entityManager;
-    }
-    
-    public  JPanel transform(Class<? extends E> entityClass) throws NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-        JPanel retValue = new JPanel();
-        List<Field> entityClassFields = retrieveRelevantFields(entityClass);
-        
+    public ReflectionFormPanel transform(Class<? extends E> entityClass) throws NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+        final Map<Field, JComponent> fieldMapping = new HashMap<>();
+        ReflectionFormPanel retValue = new ReflectionFormPanel(fieldMapping);
+        this.entityClassFields = retrieveRelevantFields(entityClass);
+
         GroupLayout retValueLayout = new GroupLayout(retValue);
         retValueLayout.setAutoCreateGaps(true);
         retValueLayout.setAutoCreateContainerGaps(true);
-        for(Field field : entityClassFields) {
-            Class<? extends JComponent> clazz = this.classMapping.get(field.getType());
-            JComponent comp;
-            if(clazz == null) {
-                clazz = CLASS_MAPPING_DEFAULT.get(field.getType());
-            }
-            if(clazz == null) {
-                comp = new QueryPanel<>(this.entityManager, entityClass);
-            } else {
-                comp = clazz.getConstructor().newInstance();
-            }
+        for(Field field : this.entityClassFields) {
+            JComponent comp = getClassComponent(field.getType());
             JLabel label = new JLabel(field.getName());
             retValueLayout.setHorizontalGroup(
                     retValueLayout.createSequentialGroup()
@@ -119,8 +118,23 @@ public class ReflectionFormBuilder<E> {
 //            comp.setPreferredSize(new Dimension(100, comp.getPreferredSize().height));
             retValue.add(label);
             retValue.add(comp);
+            fieldMapping.put(field, comp);
         }
+
         return retValue;
     }
-    
+
+    public Map<Class<?>, Class<? extends JComponent>> getClassMapping() {
+        return classMapping;
+    }
+
+    /**
+     * the initial list of entity class fields created with
+     * {@link #retrieveRelevantFields(java.lang.Class) }
+     * @return
+     */
+    public List<Field> getEntityClassFields() {
+        return entityClassFields;
+    }
+
 }
