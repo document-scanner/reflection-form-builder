@@ -14,6 +14,8 @@
  */
 package richtercloud.reflection.form.builder;
 
+import java.awt.GridLayout;
+import java.lang.reflect.Constructor;
 import richtercloud.reflection.form.builder.retriever.ValueRetriever;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -44,6 +46,14 @@ public class ReflectionFormBuilder<E> {
     static {
         Map<Class<?>, Class<? extends JComponent>> classMappingDefault0 = new HashMap<>();
         classMappingDefault0.put(String.class, JTextField.class);
+        classMappingDefault0.put(float.class, JSpinner.class);
+        classMappingDefault0.put(Float.class, JSpinner.class);
+        classMappingDefault0.put(int.class, JSpinner.class);
+        classMappingDefault0.put(Integer.class, JSpinner.class);
+        classMappingDefault0.put(double.class, JSpinner.class);
+        classMappingDefault0.put(Double.class, JSpinner.class);
+        classMappingDefault0.put(long.class, JSpinner.class);
+        classMappingDefault0.put(Long.class, JSpinner.class);
         classMappingDefault0.put(Number.class, JSpinner.class);
         CLASS_MAPPING_DEFAULT = Collections.unmodifiableMap(classMappingDefault0);
     }
@@ -106,41 +116,29 @@ public class ReflectionFormBuilder<E> {
         if(clazz == null) {
             retValue = new JLabel(field.getType().getSimpleName());
         } else {
-            retValue = clazz.getConstructor().newInstance();
+            Constructor<? extends JComponent> clazzConstructor = clazz.getDeclaredConstructor();
+            retValue = clazzConstructor.newInstance();
         }
         return retValue;
     }
 
     public ReflectionFormPanel transform(Class<? extends E> entityClass) throws NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
         final Map<Field, JComponent> fieldMapping = new HashMap<>();
-        E instance = entityClass.getDeclaredConstructor().newInstance();
+        Constructor<? extends E> entityClassConstructor = entityClass.getDeclaredConstructor();
+        entityClassConstructor.setAccessible(true);
+        E instance = entityClassConstructor.newInstance();
         ReflectionFormPanel retValue = new ReflectionFormPanel(fieldMapping, instance, valueRetrieverMapping);
         this.entityClassFields = retrieveRelevantFields(entityClass);
 
-        GroupLayout retValueLayout = new GroupLayout(retValue);
-        retValueLayout.setAutoCreateGaps(true);
-        retValueLayout.setAutoCreateContainerGaps(true);
+        GridLayout retValueLayout = new GridLayout(entityClassFields.size(), 2, 5, 5);
+        retValue.setLayout(retValueLayout);
         for(Field field : this.entityClassFields) {
             JComponent comp = getClassComponent(field);
             JLabel label = new JLabel(field.getName());
-            retValueLayout.setHorizontalGroup(
-                    retValueLayout.createSequentialGroup()
-                            .addComponent(label)
-                            .addComponent(comp)
-            );
-            retValueLayout.setVerticalGroup(
-                    retValueLayout.createSequentialGroup()
-                            .addGroup(retValueLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                    .addComponent(label)
-                                    .addComponent(comp))
-            );
-//            label.setPreferredSize(new Dimension(100, label.getPreferredSize().height));
-//            comp.setPreferredSize(new Dimension(100, comp.getPreferredSize().height));
             retValue.add(label);
             retValue.add(comp);
             fieldMapping.put(field, comp);
         }
-
         return retValue;
     }
 
