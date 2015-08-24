@@ -15,6 +15,7 @@
 package richtercloud.reflection.form.builder;
 
 import java.awt.GridLayout;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -28,16 +29,12 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
-import richtercloud.reflection.form.builder.components.OCRResultPanel;
-import richtercloud.reflection.form.builder.components.OCRResultPanelRetriever;
-import richtercloud.reflection.form.builder.components.ScanResultPanel;
-import richtercloud.reflection.form.builder.components.ScanResultPanelRetriever;
-import richtercloud.reflection.form.builder.components.annotations.OCRResult;
-import richtercloud.reflection.form.builder.components.annotations.ScanResult;
+import org.apache.commons.lang3.tuple.Pair;
 import richtercloud.reflection.form.builder.retriever.SpinnerRetriever;
 import richtercloud.reflection.form.builder.retriever.TextFieldRetriever;
 import richtercloud.reflection.form.builder.retriever.ValueRetriever;
@@ -78,14 +75,28 @@ public class ReflectionFormBuilder<E> {
     private Map<Class<?>, Class<? extends JComponent>> classMapping;
     private Map<Class<? extends JComponent>, ValueRetriever<?, ?>> valueRetrieverMapping;
     private List<Field> entityClassFields;
-    private OCRResultPanelRetriever oCRResultPanelRetriever;
-    private ScanResultPanelRetriever scanResultPanelRetriever;
 
-    public ReflectionFormBuilder(OCRResultPanelRetriever oCRResultPanelRetriever, ScanResultPanelRetriever scanResultPanelRetriever) {
-        this(CLASS_MAPPING_DEFAULT, VALUE_RETRIEVER_MAPPING_DEFAULT, oCRResultPanelRetriever, scanResultPanelRetriever);
+    /**
+     * the order in the list defines the precedence of annotations
+     */
+    /*
+    internal implementation notes:
+    - maps to a Callable<? extends JComponent> because some instances require
+    constructor arguments
+    */
+    private List<Pair<Class<? extends Annotation>, Callable<? extends JComponent>>> annotationMapping;
+
+    /*
+    internal implementation notes:
+    - maps to a Callable<? extends JComponent> because some instances require
+    constructor arguments (this makes it impossible to provide a default
+    mapping and thus passing the argument is enforced in constructor)
+    */
+    public ReflectionFormBuilder(List<Pair<Class<? extends Annotation>, Callable<? extends JComponent>>> annotationMapping) {
+        this(CLASS_MAPPING_DEFAULT, VALUE_RETRIEVER_MAPPING_DEFAULT, annotationMapping);
     }
 
-    public ReflectionFormBuilder(Map<Class<?>, Class<? extends JComponent>> classMapping, Map<Class<? extends JComponent>, ValueRetriever<?, ?>> valueRetrieverMapping, OCRResultPanelRetriever oCRResultPanelRetriever, ScanResultPanelRetriever scanResultPanelRetriever) {
+    public ReflectionFormBuilder(Map<Class<?>, Class<? extends JComponent>> classMapping, Map<Class<? extends JComponent>, ValueRetriever<?, ?>> valueRetrieverMapping, List<Pair<Class<? extends Annotation>, Callable<? extends JComponent>>> annotationMapping) {
         if(classMapping == null) {
             throw new IllegalArgumentException("classMapping mustn't be null");
         }
@@ -100,7 +111,7 @@ public class ReflectionFormBuilder<E> {
         }
         this.classMapping = classMapping;
         this.valueRetrieverMapping = valueRetrieverMapping;
-        this.oCRResultPanelRetriever = oCRResultPanelRetriever;
+        this.annotationMapping = annotationMapping;
     }
 
     /**
@@ -154,14 +165,18 @@ public class ReflectionFormBuilder<E> {
         if(clazz == null) {
             clazz = ReflectionFormBuilder.CLASS_MAPPING_DEFAULT.get(field.getType());
         }
-        if(clazz == null) {
-            if(field.getAnnotation(OCRResult.class) != null) {
-                retValue = new OCRResultPanel(this.oCRResultPanelRetriever);
-            } else if(field.getAnnotation(ScanResult.class) != null) {
-                retValue = new ScanResultPanel(this.scanResultPanelRetriever);
-            } else {
-                retValue = new JLabel(field.getType().getSimpleName());
+        for(Pair<Class<? extends Annotation>, Callable<? extends JComponent>> pair : annotationMapping) {
+            if(field.getAnnotation(pair.getKey()) != null) {
+                try {
+                    retValue = pair.getValue().call();
+                    return retValue;
+                } catch (Exception ex) {
+                    throw new RuntimeException(ex);
+                }
             }
+        }
+        if(clazz == null) {
+            retValue = new JLabel(field.getType().getSimpleName());
         } else {
             Constructor<? extends JComponent> clazzConstructor = clazz.getDeclaredConstructor();
             retValue = clazzConstructor.newInstance();

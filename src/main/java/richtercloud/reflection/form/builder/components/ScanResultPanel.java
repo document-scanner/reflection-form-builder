@@ -49,7 +49,7 @@ public class ScanResultPanel extends javax.swing.JPanel {
         scanResultLabel = new javax.swing.JLabel();
         scanResultDeleteButton = new javax.swing.JButton();
 
-        scanResultScanButton.setText("Scan");
+        scanResultScanButton.setText("Save image data");
         scanResultScanButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 scanResultScanButtonActionPerformed(evt);
@@ -71,7 +71,7 @@ public class ScanResultPanel extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(scanResultLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 253, Short.MAX_VALUE)
+                .addComponent(scanResultLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(scanResultScanButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
