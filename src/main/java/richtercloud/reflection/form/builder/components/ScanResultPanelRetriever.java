@@ -12,27 +12,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package richtercloud.reflection.form.builder.retriever;
-
-import javax.swing.JSpinner;
+package richtercloud.reflection.form.builder.components;
 
 /**
  *
  * @author richter
  */
-public class SpinnerRetriever implements ValueRetriever<Number, JSpinner>{
-    private final static SpinnerRetriever instance = new SpinnerRetriever();
-
-    public static SpinnerRetriever getInstance() {
-        return instance;
-    }
-
-    protected SpinnerRetriever() {
-    }
-
-    @Override
-    public Number retrieve(JSpinner comp) {
-        return (Number) comp.getValue();
-    }
-
+public interface ScanResultPanelRetriever {
+    byte[] retrieve();
 }

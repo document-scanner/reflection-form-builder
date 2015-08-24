@@ -16,7 +16,6 @@ package richtercloud.reflection.form.builder;
 
 import java.awt.GridLayout;
 import java.lang.reflect.Constructor;
-import richtercloud.reflection.form.builder.retriever.ValueRetriever;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
@@ -27,14 +26,19 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import javax.swing.GroupLayout;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
+import richtercloud.reflection.form.builder.components.OCRResultPanel;
+import richtercloud.reflection.form.builder.components.OCRResultPanelRetriever;
+import richtercloud.reflection.form.builder.components.ScanResultPanel;
+import richtercloud.reflection.form.builder.components.ScanResultPanelRetriever;
+import richtercloud.reflection.form.builder.components.annotations.OCRResult;
+import richtercloud.reflection.form.builder.components.annotations.ScanResult;
 import richtercloud.reflection.form.builder.retriever.SpinnerRetriever;
 import richtercloud.reflection.form.builder.retriever.TextFieldRetriever;
+import richtercloud.reflection.form.builder.retriever.ValueRetriever;
 
 /**
  *
@@ -43,6 +47,7 @@ import richtercloud.reflection.form.builder.retriever.TextFieldRetriever;
  */
 public class ReflectionFormBuilder<E> {
     public static final Map<Class<?>, Class<? extends JComponent>> CLASS_MAPPING_DEFAULT;
+    public static final Map<Class<? extends JComponent>, ValueRetriever<?, ?>> VALUE_RETRIEVER_MAPPING_DEFAULT;
     static {
         Map<Class<?>, Class<? extends JComponent>> classMappingDefault0 = new HashMap<>();
         classMappingDefault0.put(String.class, JTextField.class);
@@ -57,7 +62,6 @@ public class ReflectionFormBuilder<E> {
         classMappingDefault0.put(Number.class, JSpinner.class);
         CLASS_MAPPING_DEFAULT = Collections.unmodifiableMap(classMappingDefault0);
     }
-    public static final Map<Class<? extends JComponent>, ValueRetriever<?, ?>> VALUE_RETRIEVER_MAPPING_DEFAULT;
     static {
         Map<Class<? extends JComponent>, ValueRetriever<?, ?>> valueRetrieverMapping0 = new HashMap<>();
         valueRetrieverMapping0.put(JTextField.class, TextFieldRetriever.getInstance());
@@ -67,12 +71,14 @@ public class ReflectionFormBuilder<E> {
     private Map<Class<?>, Class<? extends JComponent>> classMapping;
     private Map<Class<? extends JComponent>, ValueRetriever<?, ?>> valueRetrieverMapping;
     private List<Field> entityClassFields;
+    private OCRResultPanelRetriever oCRResultPanelRetriever;
+    private ScanResultPanelRetriever scanResultPanelRetriever;
 
-    public ReflectionFormBuilder() {
-        this(CLASS_MAPPING_DEFAULT, VALUE_RETRIEVER_MAPPING_DEFAULT);
+    public ReflectionFormBuilder(OCRResultPanelRetriever oCRResultPanelRetriever, ScanResultPanelRetriever scanResultPanelRetriever) {
+        this(CLASS_MAPPING_DEFAULT, VALUE_RETRIEVER_MAPPING_DEFAULT, oCRResultPanelRetriever, scanResultPanelRetriever);
     }
 
-    public ReflectionFormBuilder(Map<Class<?>, Class<? extends JComponent>> classMapping, Map<Class<? extends JComponent>, ValueRetriever<?, ?>> valueRetrieverMapping) {
+    public ReflectionFormBuilder(Map<Class<?>, Class<? extends JComponent>> classMapping, Map<Class<? extends JComponent>, ValueRetriever<?, ?>> valueRetrieverMapping, OCRResultPanelRetriever oCRResultPanelRetriever, ScanResultPanelRetriever scanResultPanelRetriever) {
         if(classMapping == null) {
             throw new IllegalArgumentException("classMapping mustn't be null");
         }
@@ -87,8 +93,14 @@ public class ReflectionFormBuilder<E> {
         }
         this.classMapping = classMapping;
         this.valueRetrieverMapping = valueRetrieverMapping;
+        this.oCRResultPanelRetriever = oCRResultPanelRetriever;
     }
 
+    /**
+     * recursively retrieves all fields from the inheritance hierachy of {@code entityClass}, except {@code static} fields.
+     * @param entityClass
+     * @return
+     */
     public List<Field> retrieveRelevantFields(Class<? extends E> entityClass) {
         List<Field> retValue = new LinkedList<>();
         Class<?> hierarchyPointer = entityClass;
@@ -108,13 +120,19 @@ public class ReflectionFormBuilder<E> {
     }
 
     protected  JComponent getClassComponent(Field field) throws NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-        Class<? extends JComponent> clazz = classMapping.get(field.getType());
+        Class<? extends JComponent> clazz = this.classMapping.get(field.getType());
         JComponent retValue;
         if(clazz == null) {
             clazz = ReflectionFormBuilder.CLASS_MAPPING_DEFAULT.get(field.getType());
         }
         if(clazz == null) {
-            retValue = new JLabel(field.getType().getSimpleName());
+            if(field.getAnnotation(OCRResult.class) != null) {
+                return new OCRResultPanel(this.oCRResultPanelRetriever);
+            } else if(field.getAnnotation(ScanResult.class) != null) {
+                return new ScanResultPanel(this.scanResultPanelRetriever);
+            } else {
+                retValue = new JLabel(field.getType().getSimpleName());
+            }
         } else {
             Constructor<? extends JComponent> clazzConstructor = clazz.getDeclaredConstructor();
             retValue = clazzConstructor.newInstance();
@@ -122,18 +140,18 @@ public class ReflectionFormBuilder<E> {
         return retValue;
     }
 
-    public ReflectionFormPanel transform(Class<? extends E> entityClass) throws NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+    public ReflectionFormPanel<?> transform(Class<? extends E> entityClass) throws NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
         final Map<Field, JComponent> fieldMapping = new HashMap<>();
         Constructor<? extends E> entityClassConstructor = entityClass.getDeclaredConstructor();
         entityClassConstructor.setAccessible(true);
         E instance = entityClassConstructor.newInstance();
-        ReflectionFormPanel retValue = new ReflectionFormPanel(fieldMapping, instance, valueRetrieverMapping);
-        this.entityClassFields = retrieveRelevantFields(entityClass);
+        ReflectionFormPanel<?> retValue = new ReflectionFormPanel<>(fieldMapping, instance, this.valueRetrieverMapping);
+        this.entityClassFields = this.retrieveRelevantFields(entityClass);
 
-        GridLayout retValueLayout = new GridLayout(entityClassFields.size(), 2, 5, 5);
+        GridLayout retValueLayout = new GridLayout(this.entityClassFields.size(), 2, 5, 5);
         retValue.setLayout(retValueLayout);
         for(Field field : this.entityClassFields) {
-            JComponent comp = getClassComponent(field);
+            JComponent comp = this.getClassComponent(field);
             JLabel label = new JLabel(field.getName());
             retValue.add(label);
             retValue.add(comp);
@@ -143,7 +161,7 @@ public class ReflectionFormBuilder<E> {
     }
 
     public Map<Class<?>, Class<? extends JComponent>> getClassMapping() {
-        return classMapping;
+        return Collections.unmodifiableMap(this.classMapping);
     }
 
     /**
@@ -152,7 +170,7 @@ public class ReflectionFormBuilder<E> {
      * @return
      */
     public List<Field> getEntityClassFields() {
-        return entityClassFields;
+        return Collections.unmodifiableList(this.entityClassFields);
     }
 
 }
