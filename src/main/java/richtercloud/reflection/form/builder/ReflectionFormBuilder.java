@@ -97,6 +97,16 @@ public class ReflectionFormBuilder<E> {
         return retValue;
     }
 
+    /**
+     * Retrieves the associated {@link JComponent} to be displayed in the form.
+     * @param field
+     * @return
+     * @throws NoSuchMethodException
+     * @throws InstantiationException
+     * @throws IllegalAccessException
+     * @throws IllegalArgumentException
+     * @throws InvocationTargetException
+     */
     protected  JComponent getClassComponent(Field field) throws NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
         Class<? extends JComponent> clazz = classMapping.get(field.getType());
         JComponent retValue;
