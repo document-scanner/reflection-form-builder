@@ -22,10 +22,12 @@ import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Set;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JSpinner;
@@ -46,6 +48,11 @@ import richtercloud.reflection.form.builder.retriever.ValueRetriever;
  * @param <E> a generic type for the entity class
  */
 public class ReflectionFormBuilder<E> {
+    /*
+    internal implementation notes:
+    - see ValueRetriever's class comment in order to understand why there's no
+    subclassing of JComponent
+    */
     public static final Map<Class<?>, Class<? extends JComponent>> CLASS_MAPPING_DEFAULT;
     public static final Map<Class<? extends JComponent>, ValueRetriever<?, ?>> VALUE_RETRIEVER_MAPPING_DEFAULT;
     static {
@@ -101,6 +108,11 @@ public class ReflectionFormBuilder<E> {
      * @param entityClass
      * @return
      */
+    /*
+    internal implementation notes:
+    - return a List in order to be able to modify order (it'd be nice to have
+    @Id annotated property first9
+    */
     public List<Field> retrieveRelevantFields(Class<? extends E> entityClass) {
         List<Field> retValue = new LinkedList<>();
         Class<?> hierarchyPointer = entityClass;
@@ -108,12 +120,19 @@ public class ReflectionFormBuilder<E> {
             retValue.addAll(Arrays.asList(entityClass.getDeclaredFields()));
             hierarchyPointer = hierarchyPointer.getSuperclass();
         }
+        Set<Field> seenEntityClassFields = new HashSet<>();
         ListIterator<Field> entityClassFieldsIt = retValue.listIterator();
         while(entityClassFieldsIt.hasNext()) {
             Field entityClassFieldsNxt = entityClassFieldsIt.next();
             if(Modifier.isStatic(entityClassFieldsNxt.getModifiers())) {
                 entityClassFieldsIt.remove();
+                continue;
             }
+            if(seenEntityClassFields.contains(entityClassFieldsNxt)) {
+                entityClassFieldsIt.remove();
+                continue;
+            }
+            seenEntityClassFields.add(entityClassFieldsNxt);
             entityClassFieldsNxt.setAccessible(true);
         }
         return retValue;
@@ -122,7 +141,7 @@ public class ReflectionFormBuilder<E> {
     /**
      * Retrieves the associated {@link JComponent} to be displayed in the form.
      * @param field
-     * @return
+     * @return a {@link JComponent}, never {@code null}
      * @throws NoSuchMethodException
      * @throws InstantiationException
      * @throws IllegalAccessException
@@ -137,9 +156,9 @@ public class ReflectionFormBuilder<E> {
         }
         if(clazz == null) {
             if(field.getAnnotation(OCRResult.class) != null) {
-                return new OCRResultPanel(this.oCRResultPanelRetriever);
+                retValue = new OCRResultPanel(this.oCRResultPanelRetriever);
             } else if(field.getAnnotation(ScanResult.class) != null) {
-                return new ScanResultPanel(this.scanResultPanelRetriever);
+                retValue = new ScanResultPanel(this.scanResultPanelRetriever);
             } else {
                 retValue = new JLabel(field.getType().getSimpleName());
             }
