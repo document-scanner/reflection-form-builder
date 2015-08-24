@@ -1,15 +1,25 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package richtercloud.reflection.form.builder;
 
-import richtercloud.reflection.form.builder.retriever.ValueRetriever;
 import java.lang.reflect.Field;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JComponent;
+import richtercloud.reflection.form.builder.retriever.ValueRetriever;
 
 /**
  *
@@ -26,7 +36,7 @@ public class ReflectionFormPanel<E> extends javax.swing.JPanel {
      * Creates new form ReflectionFormPanel
      */
     public ReflectionFormPanel() {
-        initComponents();
+        this.initComponents();
     }
 
     public ReflectionFormPanel(Map<Field, JComponent> fieldMapping, E instance, Map<Class<? extends JComponent>, ValueRetriever<?, ?>> valueRetrieverMapping) {
@@ -44,22 +54,22 @@ public class ReflectionFormPanel<E> extends javax.swing.JPanel {
     }
 
     public void updateInstance() throws IllegalArgumentException, IllegalAccessException {
-        for(Field field : fieldMapping.keySet()) {
-            JComponent comp = fieldMapping.get(field);
+        for(Field field : this.fieldMapping.keySet()) {
+            JComponent comp = this.fieldMapping.get(field);
             //figure out what type comp is supposed to deliver
             ValueRetriever valueRetriever = this.valueRetrieverMapping.get(comp);
             Object value = valueRetriever.retrieve(comp);
-            field.set(instance, value);
+            field.set(this.instance, value);
         }
     }
 
     public E retrieveInstance() throws IllegalArgumentException, IllegalAccessException {
-        updateInstance();
-        return instance;
+        this.updateInstance();
+        return this.instance;
     }
 
     public Map<Class<? extends JComponent>, ValueRetriever<?, ?>> getValueRetrieverMapping() {
-        return valueRetrieverMapping;
+        return Collections.unmodifiableMap(this.valueRetrieverMapping);
     }
 
     /**
