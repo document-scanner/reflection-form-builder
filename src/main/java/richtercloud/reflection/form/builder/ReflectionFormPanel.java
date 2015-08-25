@@ -14,15 +14,12 @@
  */
 package richtercloud.reflection.form.builder;
 
-import java.awt.Dimension;
-import java.awt.Rectangle;
 import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JComponent;
-import javax.swing.Scrollable;
-import javax.swing.SwingConstants;
+import javax.swing.JPanel;
 import richtercloud.reflection.form.builder.retriever.ValueRetriever;
 
 /**
@@ -30,12 +27,12 @@ import richtercloud.reflection.form.builder.retriever.ValueRetriever;
  * @author richter
  * @param <E> a generic type for the entity class
  */
-public class ReflectionFormPanel<E> extends javax.swing.JPanel implements Scrollable {
+public class ReflectionFormPanel<E> extends javax.swing.JPanel {
     private static final long serialVersionUID = 1L;
     private Map<Field, JComponent> fieldMapping = new HashMap<>();
     private Map<Class<? extends JComponent>, ValueRetriever<?, ?>> valueRetrieverMapping;
     private E instance;
-    private int maxUnitIncrement = 100;
+    private Class<? extends E> entityClass;
 
     /**
      * Creates new form ReflectionFormPanel
@@ -44,7 +41,7 @@ public class ReflectionFormPanel<E> extends javax.swing.JPanel implements Scroll
         this.initComponents();
     }
 
-    public ReflectionFormPanel(Map<Field, JComponent> fieldMapping, E instance, Map<Class<? extends JComponent>, ValueRetriever<?, ?>> valueRetrieverMapping) {
+    public ReflectionFormPanel(Map<Field, JComponent> fieldMapping, E instance, Class<? extends E> entityClass, Map<Class<? extends JComponent>, ValueRetriever<?, ?>> valueRetrieverMapping) {
         this();
         if(instance == null) {
             throw new IllegalArgumentException("instance mustn't be null");
@@ -52,6 +49,7 @@ public class ReflectionFormPanel<E> extends javax.swing.JPanel implements Scroll
         this.fieldMapping = fieldMapping;
         this.valueRetrieverMapping = valueRetrieverMapping;
         this.instance = instance;
+        this.entityClass = entityClass;
     }
 
     public JComponent getComponentByField(Field field) {
@@ -63,6 +61,9 @@ public class ReflectionFormPanel<E> extends javax.swing.JPanel implements Scroll
             JComponent comp = this.fieldMapping.get(field);
             //figure out what type comp is supposed to deliver
             ValueRetriever valueRetriever = this.valueRetrieverMapping.get(comp.getClass());
+            if(valueRetriever == null) {
+                throw new IllegalArgumentException(String.format("valueRetriever mapped to component '%s' class is null", comp.getClass().getName()));
+            }
             Object value = valueRetriever.retrieve(comp);
             field.set(this.instance, value);
         }
@@ -77,6 +78,10 @@ public class ReflectionFormPanel<E> extends javax.swing.JPanel implements Scroll
         return Collections.unmodifiableMap(this.valueRetrieverMapping);
     }
 
+    public Map<Field, JComponent> getFieldMapping() {
+        return fieldMapping;
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -86,68 +91,54 @@ public class ReflectionFormPanel<E> extends javax.swing.JPanel implements Scroll
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        mainPanelScrollPane = new javax.swing.JScrollPane();
+        mainPanel = new javax.swing.JPanel();
+
+        javax.swing.GroupLayout mainPanelLayout = new javax.swing.GroupLayout(mainPanel);
+        mainPanel.setLayout(mainPanelLayout);
+        mainPanelLayout.setHorizontalGroup(
+            mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 398, Short.MAX_VALUE)
+        );
+        mainPanelLayout.setVerticalGroup(
+            mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 298, Short.MAX_VALUE)
+        );
+
+        mainPanelScrollPane.setViewportView(mainPanel);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addComponent(mainPanelScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+            .addComponent(mainPanelScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel mainPanel;
+    private javax.swing.JScrollPane mainPanelScrollPane;
     // End of variables declaration//GEN-END:variables
 
-    @Override
-    public Dimension getPreferredScrollableViewportSize() {
-        return this.getPreferredSize(); //as suggested by
-            //https://docs.oracle.com/javase/8/docs/api/javax/swing/Scrollable.html
+    /**
+     * returns the pointer to the instance field (to be used in subclasses). An
+     * updated version of the instance can only be retrieved with {@link #retrieveInstance() }.
+     * @return 
+     */
+    public E getInstance() {
+        return instance;
     }
 
-    @Override
-    public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
-        //Get the current position.
-        int currentPosition = 0;
-        if (orientation == SwingConstants.HORIZONTAL) {
-            currentPosition = visibleRect.x;
-        } else {
-            currentPosition = visibleRect.y;
-        }
-
-        //Return the number of pixels between currentPosition
-        //and the nearest tick mark in the indicated direction.
-        if (direction < 0) {
-            int newPosition = currentPosition -
-                             (currentPosition / maxUnitIncrement)
-                              * maxUnitIncrement;
-            return (newPosition == 0) ? maxUnitIncrement : newPosition;
-        } else {
-            return ((currentPosition / maxUnitIncrement) + 1)
-                     * maxUnitIncrement
-                     - currentPosition;
-        }
+    public JPanel getMainPanel() {
+        return mainPanel;
     }
 
-    @Override
-    public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
-        if (orientation == SwingConstants.HORIZONTAL) {
-            return visibleRect.width - maxUnitIncrement;
-        } else {
-            return visibleRect.height - maxUnitIncrement;
-        }
-    }
-
-    @Override
-    public boolean getScrollableTracksViewportWidth() {
-        return false;
-    }
-
-    @Override
-    public boolean getScrollableTracksViewportHeight() {
-        return false;
+    public Class<? extends E> getEntityClass() {
+        return entityClass;
     }
 }

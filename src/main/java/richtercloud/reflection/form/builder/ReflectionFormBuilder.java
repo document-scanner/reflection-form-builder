@@ -14,7 +14,6 @@
  */
 package richtercloud.reflection.form.builder;
 
-import java.awt.GridLayout;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -22,6 +21,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -30,13 +30,21 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Group;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import org.apache.commons.lang3.tuple.Pair;
+import richtercloud.reflection.form.builder.components.SqlDatePicker;
+import richtercloud.reflection.form.builder.components.UtilDatePicker;
+import richtercloud.reflection.form.builder.retriever.CheckBoxRetriever;
 import richtercloud.reflection.form.builder.retriever.SpinnerRetriever;
+import richtercloud.reflection.form.builder.retriever.SqlDatePickerRetriever;
 import richtercloud.reflection.form.builder.retriever.TextFieldRetriever;
+import richtercloud.reflection.form.builder.retriever.UtilDatePickerRetriever;
 import richtercloud.reflection.form.builder.retriever.ValueRetriever;
 
 /**
@@ -64,12 +72,19 @@ public class ReflectionFormBuilder<E> {
         classMappingDefault0.put(long.class, JSpinner.class);
         classMappingDefault0.put(Long.class, JSpinner.class);
         classMappingDefault0.put(Number.class, JSpinner.class);
+        classMappingDefault0.put(boolean.class, JCheckBox.class);
+        classMappingDefault0.put(Boolean.class, JCheckBox.class);
+        classMappingDefault0.put(Date.class, UtilDatePicker.class);
+        classMappingDefault0.put(java.sql.Date.class, SqlDatePicker.class);
         CLASS_MAPPING_DEFAULT = Collections.unmodifiableMap(classMappingDefault0);
     }
     static {
         Map<Class<? extends JComponent>, ValueRetriever<?, ?>> valueRetrieverMapping0 = new HashMap<>();
         valueRetrieverMapping0.put(JTextField.class, TextFieldRetriever.getInstance());
         valueRetrieverMapping0.put(JSpinner.class, SpinnerRetriever.getInstance());
+        valueRetrieverMapping0.put(JCheckBox.class, CheckBoxRetriever.getInstance());
+        valueRetrieverMapping0.put(UtilDatePicker.class, UtilDatePickerRetriever.getInstance());
+        valueRetrieverMapping0.put(SqlDatePicker.class, SqlDatePickerRetriever.getInstance());
         VALUE_RETRIEVER_MAPPING_DEFAULT = Collections.unmodifiableMap(valueRetrieverMapping0);
     }
     private Map<Class<?>, Class<? extends JComponent>> classMapping;
@@ -109,6 +124,9 @@ public class ReflectionFormBuilder<E> {
         if(valueRetrieverMapping.values().contains(null)) {
             throw new IllegalArgumentException("valueRetrieverMapping mustn't contain null values");
         }
+        if(annotationMapping == null) {
+            throw new IllegalArgumentException("annotationMapping mustn't be null");
+        }
         this.classMapping = classMapping;
         this.valueRetrieverMapping = valueRetrieverMapping;
         this.annotationMapping = annotationMapping;
@@ -128,7 +146,7 @@ public class ReflectionFormBuilder<E> {
         List<Field> retValue = new LinkedList<>();
         Class<?> hierarchyPointer = entityClass;
         while(!hierarchyPointer.equals(Object.class)) {
-            retValue.addAll(Arrays.asList(entityClass.getDeclaredFields()));
+            retValue.addAll(Arrays.asList(hierarchyPointer.getDeclaredFields()));
             hierarchyPointer = hierarchyPointer.getSuperclass();
         }
         Set<Field> seenEntityClassFields = new HashSet<>();
@@ -184,23 +202,55 @@ public class ReflectionFormBuilder<E> {
         return retValue;
     }
 
-    public ReflectionFormPanel<?> transform(Class<? extends E> entityClass) throws NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+    /**
+     *
+     * @param entityClass
+     * @return
+     * @throws InstantiationException
+     * @throws IllegalAccessException
+     * @throws IllegalArgumentException
+     * @throws InvocationTargetException
+     * @throws NoSuchMethodException
+     * @throws IllegalArgumentException if {@code entityClass} doesn't provide
+     * a zero-argument-constructor
+     */
+    public ReflectionFormPanel<E> transform(Class<? extends E> entityClass) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException {
         final Map<Field, JComponent> fieldMapping = new HashMap<>();
-        Constructor<? extends E> entityClassConstructor = entityClass.getDeclaredConstructor();
+       Constructor<? extends E> entityClassConstructor = null;
+       try {
+           entityClassConstructor = entityClass.getDeclaredConstructor();
+       }catch(NoSuchMethodException ex) {
+           throw new IllegalArgumentException("entityClass doesn't provide a zero-argument-constructor (see nested exception for details)", ex);
+       }
         entityClassConstructor.setAccessible(true);
         E instance = entityClassConstructor.newInstance();
-        ReflectionFormPanel<?> retValue = new ReflectionFormPanel<>(fieldMapping, instance, this.valueRetrieverMapping);
+        ReflectionFormPanel<E> retValue = new ReflectionFormPanel<>(fieldMapping, instance, entityClass, this.valueRetrieverMapping);
         this.entityClassFields = this.retrieveRelevantFields(entityClass);
 
-        GridLayout retValueLayout = new GridLayout(this.entityClassFields.size(), 2, 5, 5);
-        retValue.setLayout(retValueLayout);
+        GroupLayout layout = new GroupLayout(retValue.getMainPanel());
+        retValue.getMainPanel().setLayout(layout);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+        Group horizontalSequentialGroup = layout.createSequentialGroup();
+        Group horizontalLabelParallelGroup = layout.createParallelGroup(GroupLayout.Alignment.LEADING);
+        Group horizontalCompParallelGroup = layout.createParallelGroup(GroupLayout.Alignment.LEADING);
+        Group verticalSequentialGroup = layout.createSequentialGroup();
         for(Field field : this.entityClassFields) {
             JComponent comp = this.getClassComponent(field);
             JLabel label = new JLabel(field.getName());
-            retValue.add(label);
-            retValue.add(comp);
+            horizontalLabelParallelGroup.addComponent(label);
+            horizontalCompParallelGroup.addComponent(comp);
+            Group fieldGroup = layout.createParallelGroup(GroupLayout.Alignment.BASELINE);
+            fieldGroup.addComponent(label);
+            fieldGroup.addComponent(comp);
+            verticalSequentialGroup.addGroup(fieldGroup);
             fieldMapping.put(field, comp);
         }
+        horizontalSequentialGroup.addGroup(horizontalLabelParallelGroup).addGroup(horizontalCompParallelGroup);
+        layout.setHorizontalGroup(horizontalSequentialGroup);
+        layout.setVerticalGroup(verticalSequentialGroup);
+        retValue.getMainPanel().validate();
+        retValue.validate();
         return retValue;
     }
 
