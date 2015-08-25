@@ -14,11 +14,15 @@
  */
 package richtercloud.reflection.form.builder;
 
+import java.awt.Dimension;
+import java.awt.Rectangle;
 import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JComponent;
+import javax.swing.Scrollable;
+import javax.swing.SwingConstants;
 import richtercloud.reflection.form.builder.retriever.ValueRetriever;
 
 /**
@@ -26,11 +30,12 @@ import richtercloud.reflection.form.builder.retriever.ValueRetriever;
  * @author richter
  * @param <E> a generic type for the entity class
  */
-public class ReflectionFormPanel<E> extends javax.swing.JPanel {
+public class ReflectionFormPanel<E> extends javax.swing.JPanel implements Scrollable {
     private static final long serialVersionUID = 1L;
     private Map<Field, JComponent> fieldMapping = new HashMap<>();
     private Map<Class<? extends JComponent>, ValueRetriever<?, ?>> valueRetrieverMapping;
     private E instance;
+    private int maxUnitIncrement = 100;
 
     /**
      * Creates new form ReflectionFormPanel
@@ -57,7 +62,7 @@ public class ReflectionFormPanel<E> extends javax.swing.JPanel {
         for(Field field : this.fieldMapping.keySet()) {
             JComponent comp = this.fieldMapping.get(field);
             //figure out what type comp is supposed to deliver
-            ValueRetriever valueRetriever = this.valueRetrieverMapping.get(comp);
+            ValueRetriever valueRetriever = this.valueRetrieverMapping.get(comp.getClass());
             Object value = valueRetriever.retrieve(comp);
             field.set(this.instance, value);
         }
@@ -96,4 +101,53 @@ public class ReflectionFormPanel<E> extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public Dimension getPreferredScrollableViewportSize() {
+        return this.getPreferredSize(); //as suggested by
+            //https://docs.oracle.com/javase/8/docs/api/javax/swing/Scrollable.html
+    }
+
+    @Override
+    public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
+        //Get the current position.
+        int currentPosition = 0;
+        if (orientation == SwingConstants.HORIZONTAL) {
+            currentPosition = visibleRect.x;
+        } else {
+            currentPosition = visibleRect.y;
+        }
+
+        //Return the number of pixels between currentPosition
+        //and the nearest tick mark in the indicated direction.
+        if (direction < 0) {
+            int newPosition = currentPosition -
+                             (currentPosition / maxUnitIncrement)
+                              * maxUnitIncrement;
+            return (newPosition == 0) ? maxUnitIncrement : newPosition;
+        } else {
+            return ((currentPosition / maxUnitIncrement) + 1)
+                     * maxUnitIncrement
+                     - currentPosition;
+        }
+    }
+
+    @Override
+    public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
+        if (orientation == SwingConstants.HORIZONTAL) {
+            return visibleRect.width - maxUnitIncrement;
+        } else {
+            return visibleRect.height - maxUnitIncrement;
+        }
+    }
+
+    @Override
+    public boolean getScrollableTracksViewportWidth() {
+        return false;
+    }
+
+    @Override
+    public boolean getScrollableTracksViewportHeight() {
+        return false;
+    }
 }
