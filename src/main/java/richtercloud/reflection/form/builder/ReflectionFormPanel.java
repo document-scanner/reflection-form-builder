@@ -81,6 +81,8 @@ public class ReflectionFormPanel<E> extends javax.swing.JPanel {
             if(valueRetriever == null) {
                 if(this.classMapping.get(field.getType()) == null) {
                     LOGGER.debug("skipping update of instance for field '%s' of class '%s' because no component is mapped in class mapping", field.getName(), field.getDeclaringClass().getName());
+                    return;
+
                 }else {
                     throw new IllegalArgumentException(String.format("valueRetriever mapped to component '%s' class is null", comp.getClass().getName()));
                 }
@@ -149,7 +151,7 @@ public class ReflectionFormPanel<E> extends javax.swing.JPanel {
     /**
      * returns the pointer to the instance field (to be used in subclasses). An
      * updated version of the instance can only be retrieved with {@link #retrieveInstance() }.
-     * @return 
+     * @return
      */
     public E getInstance() {
         return instance;
