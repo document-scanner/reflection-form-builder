@@ -216,15 +216,15 @@ public class ReflectionFormBuilder<E> {
      */
     public ReflectionFormPanel<E> transform(Class<? extends E> entityClass) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException {
         final Map<Field, JComponent> fieldMapping = new HashMap<>();
-       Constructor<? extends E> entityClassConstructor = null;
-       try {
-           entityClassConstructor = entityClass.getDeclaredConstructor();
-       }catch(NoSuchMethodException ex) {
-           throw new IllegalArgumentException("entityClass doesn't provide a zero-argument-constructor (see nested exception for details)", ex);
-       }
+        Constructor<? extends E> entityClassConstructor = null;
+        try {
+            entityClassConstructor = entityClass.getDeclaredConstructor();
+        }catch(NoSuchMethodException ex) {
+            throw new IllegalArgumentException("entityClass doesn't provide a zero-argument-constructor (see nested exception for details)", ex);
+        }
         entityClassConstructor.setAccessible(true);
         E instance = entityClassConstructor.newInstance();
-        ReflectionFormPanel<E> retValue = new ReflectionFormPanel<>(fieldMapping, instance, entityClass, this.valueRetrieverMapping);
+        ReflectionFormPanel<E> retValue = new ReflectionFormPanel<>(fieldMapping, instance, entityClass, this.valueRetrieverMapping, classMapping);
         this.entityClassFields = this.retrieveRelevantFields(entityClass);
 
         GroupLayout layout = new GroupLayout(retValue.getMainPanel());

@@ -21,10 +21,10 @@ import javax.swing.JSpinner;
  * @author richter
  */
 public class SpinnerRetriever implements ValueRetriever<Number, JSpinner>{
-    private final static SpinnerRetriever instance = new SpinnerRetriever();
+    private final static SpinnerRetriever INSTANCE = new SpinnerRetriever();
 
     public static SpinnerRetriever getInstance() {
-        return instance;
+        return INSTANCE;
     }
 
     protected SpinnerRetriever() {

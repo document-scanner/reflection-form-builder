@@ -21,10 +21,10 @@ import javax.swing.JTextField;
  * @author richter
  */
 public class TextFieldRetriever implements ValueRetriever<String, JTextField>{
-    private final static TextFieldRetriever instance = new TextFieldRetriever();
+    private final static TextFieldRetriever INSTANCE = new TextFieldRetriever();
 
     public static TextFieldRetriever getInstance() {
-        return instance;
+        return INSTANCE;
     }
 
     protected TextFieldRetriever() {

@@ -20,6 +20,8 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import richtercloud.reflection.form.builder.retriever.ValueRetriever;
 
 /**
@@ -29,8 +31,10 @@ import richtercloud.reflection.form.builder.retriever.ValueRetriever;
  */
 public class ReflectionFormPanel<E> extends javax.swing.JPanel {
     private static final long serialVersionUID = 1L;
+    private final static Logger LOGGER = LoggerFactory.getLogger(ReflectionFormPanel.class);
     private Map<Field, JComponent> fieldMapping = new HashMap<>();
     private Map<Class<? extends JComponent>, ValueRetriever<?, ?>> valueRetrieverMapping;
+    private Map<Class<?>, Class<? extends JComponent>> classMapping;
     private E instance;
     private Class<? extends E> entityClass;
 
@@ -41,13 +45,26 @@ public class ReflectionFormPanel<E> extends javax.swing.JPanel {
         this.initComponents();
     }
 
-    public ReflectionFormPanel(Map<Field, JComponent> fieldMapping, E instance, Class<? extends E> entityClass, Map<Class<? extends JComponent>, ValueRetriever<?, ?>> valueRetrieverMapping) {
+    public ReflectionFormPanel(Map<Field, JComponent> fieldMapping, E instance, Class<? extends E> entityClass, Map<Class<? extends JComponent>, ValueRetriever<?, ?>> valueRetrieverMapping, Map<Class<?>, Class<? extends JComponent>> classMapping) {
         this();
         if(instance == null) {
             throw new IllegalArgumentException("instance mustn't be null");
         }
+        if(fieldMapping == null) {
+            throw new IllegalArgumentException("fieldMapping mustn't be null");
+        }
+        if(valueRetrieverMapping == null) {
+            throw new IllegalArgumentException("valueRetrieverMapping mustn't be null");
+        }
+        if(classMapping == null) {
+            throw new IllegalArgumentException("classMapping mustn't be null");
+        }
+        if(entityClass == null) {
+            throw new IllegalArgumentException("entityClass mustn't be null");
+        }
         this.fieldMapping = fieldMapping;
         this.valueRetrieverMapping = valueRetrieverMapping;
+        this.classMapping = classMapping;
         this.instance = instance;
         this.entityClass = entityClass;
     }
@@ -62,7 +79,11 @@ public class ReflectionFormPanel<E> extends javax.swing.JPanel {
             //figure out what type comp is supposed to deliver
             ValueRetriever valueRetriever = this.valueRetrieverMapping.get(comp.getClass());
             if(valueRetriever == null) {
-                throw new IllegalArgumentException(String.format("valueRetriever mapped to component '%s' class is null", comp.getClass().getName()));
+                if(this.classMapping.get(field.getType()) == null) {
+                    LOGGER.debug("skipping update of instance for field '%s' of class '%s' because no component is mapped in class mapping", field.getName(), field.getDeclaringClass().getName());
+                }else {
+                    throw new IllegalArgumentException(String.format("valueRetriever mapped to component '%s' class is null", comp.getClass().getName()));
+                }
             }
             Object value = valueRetriever.retrieve(comp);
             field.set(this.instance, value);
@@ -140,5 +161,9 @@ public class ReflectionFormPanel<E> extends javax.swing.JPanel {
 
     public Class<? extends E> getEntityClass() {
         return entityClass;
+    }
+
+    public Map<Class<?>, Class<? extends JComponent>> getClassMapping() {
+        return classMapping;
     }
 }
