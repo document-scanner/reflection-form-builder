@@ -170,6 +170,7 @@ public class ReflectionFormBuilder<E> {
     /**
      * Retrieves the associated {@link JComponent} to be displayed in the form.
      * @param field
+     * @param entityClass
      * @return a {@link JComponent}, never {@code null}
      * @throws NoSuchMethodException
      * @throws InstantiationException
@@ -177,7 +178,7 @@ public class ReflectionFormBuilder<E> {
      * @throws IllegalArgumentException
      * @throws InvocationTargetException
      */
-    protected  JComponent getClassComponent(Field field) throws NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+    protected  JComponent getClassComponent(Field field, Class<?> entityClass) throws NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
         Class<? extends JComponent> clazz = this.classMapping.get(field.getType());
         JComponent retValue;
         if(clazz == null) {
@@ -236,7 +237,7 @@ public class ReflectionFormBuilder<E> {
         Group horizontalCompParallelGroup = layout.createParallelGroup(GroupLayout.Alignment.LEADING);
         Group verticalSequentialGroup = layout.createSequentialGroup();
         for(Field field : this.entityClassFields) {
-            JComponent comp = this.getClassComponent(field);
+            JComponent comp = this.getClassComponent(field, entityClass);
             JLabel label = new JLabel(field.getName());
             horizontalLabelParallelGroup.addComponent(label);
             horizontalCompParallelGroup.addComponent(comp);

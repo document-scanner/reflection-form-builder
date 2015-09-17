@@ -62,8 +62,9 @@ public class ReflectionFormBuilderTest {
     public void testGetClassComponent() throws Exception {
         List<Pair<Class<? extends Annotation>, Callable<? extends JComponent>>> annotationMapping = new LinkedList<>();
         ReflectionFormBuilder<?> instance = new ReflectionFormBuilder<>(annotationMapping);
-        Field field = TestEntity.class.getDeclaredField("a");
-        JComponent result = instance.getClassComponent(field);
+        Class<?> entityClass = TestEntity.class;
+        Field field = entityClass.getDeclaredField("a");
+        JComponent result = instance.getClassComponent(field, entityClass);
         assertEquals(JTextField.class, result.getClass());
     }
 

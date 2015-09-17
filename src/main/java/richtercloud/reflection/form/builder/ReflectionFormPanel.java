@@ -32,6 +32,14 @@ import richtercloud.reflection.form.builder.retriever.ValueRetriever;
 public class ReflectionFormPanel<E> extends javax.swing.JPanel {
     private static final long serialVersionUID = 1L;
     private final static Logger LOGGER = LoggerFactory.getLogger(ReflectionFormPanel.class);
+
+    public static String generateExceptionMessage(Throwable ex) {
+        String retValue = ex.getMessage();
+        if(ex.getCause() != null) {
+            retValue = String.format("%s (caused by '%s')", retValue, ex.getCause().getMessage());
+        }
+        return retValue;
+    }
     private Map<Field, JComponent> fieldMapping = new HashMap<>();
     private Map<Class<? extends JComponent>, ValueRetriever<?, ?>> valueRetrieverMapping;
     private Map<Class<?>, Class<? extends JComponent>> classMapping;
@@ -81,7 +89,7 @@ public class ReflectionFormPanel<E> extends javax.swing.JPanel {
             if(valueRetriever == null) {
                 if(this.classMapping.get(field.getType()) == null) {
                     LOGGER.debug("skipping update of instance for field '%s' of class '%s' because no component is mapped in class mapping", field.getName(), field.getDeclaringClass().getName());
-                    return;
+                    continue;
 
                 }else {
                     throw new IllegalArgumentException(String.format("valueRetriever mapped to component '%s' class is null", comp.getClass().getName()));
