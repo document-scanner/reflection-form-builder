@@ -14,14 +14,13 @@
  */
 package richtercloud.reflection.form.builder.components;
 
-import org.jdatepicker.JDatePicker;
-import org.jdatepicker.SqlDateModel;
+import org.jdatepicker.JSqlDatePicker;
 
 /**
  *
  * @author richter
  */
-public class SqlDatePicker extends JDatePicker<SqlDateModel> {
+public class SqlDatePicker extends JSqlDatePicker {
     private static final long serialVersionUID = 1L;
     
 }

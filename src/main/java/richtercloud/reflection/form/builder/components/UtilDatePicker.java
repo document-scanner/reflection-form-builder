@@ -14,14 +14,13 @@
  */
 package richtercloud.reflection.form.builder.components;
 
-import org.jdatepicker.JDatePicker;
-import org.jdatepicker.UtilDateModel;
+import org.jdatepicker.JUtilDatePicker;
 
 /**
  *
  * @author richter
  */
-public class UtilDatePicker extends JDatePicker<UtilDateModel> {
+public class UtilDatePicker extends JUtilDatePicker {
     private static final long serialVersionUID = 1L;
     
 }
