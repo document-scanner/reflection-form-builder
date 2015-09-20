@@ -20,7 +20,7 @@ import javax.swing.JCheckBox;
  *
  * @author richter
  */
-public class CheckBoxRetriever implements ValueRetriever<Boolean, JCheckBox>{
+public class CheckBoxRetriever implements ValueRetriever<Boolean, JCheckBox> {
     private final static CheckBoxRetriever INSTANCE = new CheckBoxRetriever();
 
     public static CheckBoxRetriever getInstance() {
@@ -35,5 +35,5 @@ public class CheckBoxRetriever implements ValueRetriever<Boolean, JCheckBox>{
         Boolean retValue = comp.isSelected();
         return retValue;
     }
-    
+
 }

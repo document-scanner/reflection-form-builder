@@ -15,6 +15,8 @@
 package richtercloud.reflection.form.builder;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,9 +29,8 @@ import richtercloud.reflection.form.builder.retriever.ValueRetriever;
 /**
  *
  * @author richter
- * @param <E> a generic type for the entity class
  */
-public class ReflectionFormPanel<E> extends javax.swing.JPanel {
+public class ReflectionFormPanel extends javax.swing.JPanel {
     private static final long serialVersionUID = 1L;
     private final static Logger LOGGER = LoggerFactory.getLogger(ReflectionFormPanel.class);
 
@@ -42,9 +43,9 @@ public class ReflectionFormPanel<E> extends javax.swing.JPanel {
     }
     private Map<Field, JComponent> fieldMapping = new HashMap<>();
     private Map<Class<? extends JComponent>, ValueRetriever<?, ?>> valueRetrieverMapping;
-    private Map<Class<?>, Class<? extends JComponent>> classMapping;
-    private E instance;
-    private Class<? extends E> entityClass;
+    private Map<Type, FieldHandler> classMapping;
+    private Object instance;
+    private Class<?> entityClass;
 
     /**
      * Creates new form ReflectionFormPanel
@@ -54,10 +55,10 @@ public class ReflectionFormPanel<E> extends javax.swing.JPanel {
     }
 
     public ReflectionFormPanel(Map<Field, JComponent> fieldMapping,
-            E instance,
-            Class<? extends E> entityClass,
+            Object instance,
+            Class<?> entityClass,
             Map<Class<? extends JComponent>, ValueRetriever<?, ?>> valueRetrieverMapping,
-            Map<Class<?>, Class<? extends JComponent>> classMapping) {
+            Map<Type, FieldHandler> classMapping) {
         this();
         if(instance == null) {
             throw new IllegalArgumentException("instance mustn't be null");
@@ -92,7 +93,7 @@ public class ReflectionFormPanel<E> extends javax.swing.JPanel {
             ValueRetriever valueRetriever = this.valueRetrieverMapping.get(comp.getClass());
             if(valueRetriever == null) {
                 if(this.classMapping.get(field.getType()) == null) {
-                    LOGGER.debug("skipping update of instance for field '%s' of class '%s' because no component is mapped in class mapping", field.getName(), field.getDeclaringClass().getName());
+                    LOGGER.debug("skipping update of instance for field '{}' of class '{}' because no component is mapped in class mapping", field.getName(), field.getDeclaringClass().getName());
                     continue;
 
                 }else {
@@ -104,7 +105,7 @@ public class ReflectionFormPanel<E> extends javax.swing.JPanel {
         }
     }
 
-    public E retrieveInstance() throws IllegalArgumentException, IllegalAccessException {
+    public Object retrieveInstance() throws IllegalArgumentException, IllegalAccessException {
         this.updateInstance();
         return this.instance;
     }
@@ -122,7 +123,7 @@ public class ReflectionFormPanel<E> extends javax.swing.JPanel {
      * updated version of the instance can only be retrieved with {@link #retrieveInstance() }.
      * @return
      */
-    public E getInstance() {
+    public Object getInstance() {
         return instance;
     }
 
@@ -130,12 +131,12 @@ public class ReflectionFormPanel<E> extends javax.swing.JPanel {
         return mainPanel;
     }
 
-    public Class<? extends E> getEntityClass() {
+    public Class<?> getEntityClass() {
         return entityClass;
     }
 
-    public Map<Class<?>, Class<? extends JComponent>> getClassMapping() {
-        return classMapping;
+    public Map<Type, FieldHandler> getClassMapping() {
+        return Collections.unmodifiableMap(classMapping);
     }
 
     /**

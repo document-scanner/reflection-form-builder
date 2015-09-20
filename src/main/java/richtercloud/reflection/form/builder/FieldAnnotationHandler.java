@@ -12,15 +12,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package richtercloud.reflection.form.builder.components;
+package richtercloud.reflection.form.builder;
 
-import org.jdatepicker.JUtilDatePicker;
+import javax.swing.JComponent;
 
 /**
  *
  * @author richter
  */
-public class UtilDatePicker extends JUtilDatePicker {
-    private static final long serialVersionUID = 1L;
+public interface FieldAnnotationHandler {
 
+    JComponent handle(Class<?> clazz, Object entity, ReflectionFormBuilder reflectionFormBuilder);
 }

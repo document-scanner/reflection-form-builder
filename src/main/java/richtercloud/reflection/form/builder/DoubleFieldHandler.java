@@ -12,29 +12,33 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package richtercloud.reflection.form.builder.retriever;
+package richtercloud.reflection.form.builder;
 
-import java.util.Date;
-import richtercloud.reflection.form.builder.components.UtilDatePicker;
+import java.lang.reflect.Field;
+import java.lang.reflect.Type;
+import javax.swing.JComponent;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
 
 /**
  *
  * @author richter
  */
-public class UtilDatePickerRetriever implements ValueRetriever<Date, UtilDatePicker> {
-    private final static UtilDatePickerRetriever INSTANCE = new UtilDatePickerRetriever();
+public class DoubleFieldHandler implements FieldHandler {
+    private final static DoubleFieldHandler INSTANCE = new DoubleFieldHandler();
 
-    public static UtilDatePickerRetriever getInstance() {
+    public static DoubleFieldHandler getInstance() {
         return INSTANCE;
     }
 
-    protected UtilDatePickerRetriever() {
+    protected DoubleFieldHandler() {
     }
 
     @Override
-    public Date retrieve(UtilDatePicker comp) {
-        Date retValue = comp.getModel().getValue();
-        return retValue;
+    public JComponent handle(Type type, ReflectionFormBuilder reflectionFormBuilder) {
+        //@TODO: handle validaton annotations (should cover all cases, so no
+        // need to develop own annotations
+        return new JSpinner(new SpinnerNumberModel(0.0, Double.MIN_VALUE, Double.MAX_VALUE, 0.1));
     }
 
 }

@@ -14,18 +14,29 @@
  */
 package richtercloud.reflection.form.builder;
 
+import java.lang.reflect.Type;
+import javax.swing.JComponent;
+
 /**
  *
  * @author richter
  */
 /*
 internal implementation notes:
-- needs to be a proper class in order to have a constructor in reflection API
+- Don't pass Field argument to handle in order to allow inspection of
+annotations, etc. -> let the caller retrieve information and enforce them as
+parameter or consider introducing a variable constraint type as argument. This
+allows the FieldHandler to be used not only for fields, but nested generic types
+as well.
 */
-class TestEntity {
-    private String a = "a";
+public interface FieldHandler {
 
-    TestEntity() {
-    }
-
+    /**
+     *
+     * @param type
+     * @param reflectionFormBuilder a {@link ReflectionFormBuilder} used for
+     * recursion
+     * @return
+     */
+    JComponent handle(Type type, ReflectionFormBuilder reflectionFormBuilder);
 }

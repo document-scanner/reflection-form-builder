@@ -12,20 +12,30 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package richtercloud.reflection.form.builder.components.annotations;
+package richtercloud.reflection.form.builder;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.reflect.Field;
+import java.lang.reflect.Type;
+import javax.swing.JComponent;
+import javax.swing.JTextField;
 
 /**
- * Used to annotate {@code String} properties to indicate special reflection
- * form components.
+ *
  * @author richter
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.FIELD)
-public @interface OCRResult {
-    
+public class StringFieldHandler implements FieldHandler {
+    private final static StringFieldHandler INSTANCE = new StringFieldHandler();
+
+    public static StringFieldHandler getInstance() {
+        return INSTANCE;
+    }
+
+    protected StringFieldHandler() {
+    }
+
+    @Override
+    public JComponent handle(Type type, ReflectionFormBuilder reflectionFormBuilder) {
+        return new JTextField();
+    }
+
 }

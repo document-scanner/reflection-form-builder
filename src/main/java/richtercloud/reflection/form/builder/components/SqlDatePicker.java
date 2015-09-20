@@ -22,5 +22,5 @@ import org.jdatepicker.JSqlDatePicker;
  */
 public class SqlDatePicker extends JSqlDatePicker {
     private static final long serialVersionUID = 1L;
-    
+
 }

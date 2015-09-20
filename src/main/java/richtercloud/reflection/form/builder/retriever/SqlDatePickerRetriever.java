@@ -36,5 +36,5 @@ public class SqlDatePickerRetriever implements ValueRetriever<Date, SqlDatePicke
         Date retValue = comp.getModel().getValue();
         return retValue;
     }
-    
+
 }

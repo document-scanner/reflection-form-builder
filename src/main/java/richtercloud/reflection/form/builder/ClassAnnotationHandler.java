@@ -12,12 +12,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package richtercloud.reflection.form.builder.components;
+package richtercloud.reflection.form.builder;
+
+import java.lang.reflect.Field;
+import java.util.List;
+import javax.swing.JComponent;
 
 /**
  *
  * @author richter
  */
-public interface ScanResultPanelRetriever {
-    byte[] retrieve();
+public interface ClassAnnotationHandler {
+
+    JComponent handle(List<Field> entityClassFields, Class<?> clazz);
 }

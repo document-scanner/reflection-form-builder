@@ -12,19 +12,30 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package richtercloud.reflection.form.builder.components.annotations;
+package richtercloud.reflection.form.builder;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.reflect.Field;
+import java.lang.reflect.Type;
+import javax.swing.JComponent;
+import richtercloud.reflection.form.builder.components.SqlDatePicker;
 
 /**
  *
  * @author richter
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.FIELD)
-public @interface ScanResult {
-    
+public class SqlDateFieldHandler implements FieldHandler {
+    private final static SqlDateFieldHandler INSTANCE = new SqlDateFieldHandler();
+
+    public static SqlDateFieldHandler getInstance() {
+        return INSTANCE;
+    }
+
+    protected SqlDateFieldHandler() {
+    }
+
+    @Override
+    public JComponent handle(Type type, ReflectionFormBuilder reflectionFormBuilder) {
+        return new SqlDatePicker();
+    }
+
 }
