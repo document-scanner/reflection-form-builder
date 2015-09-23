@@ -14,27 +14,16 @@
  */
 package richtercloud.reflection.form.builder;
 
-import java.lang.reflect.Type;
-import javax.swing.JComponent;
-import richtercloud.reflection.form.builder.components.SqlDatePicker;
-
 /**
  *
  * @author richter
+ * @param <E> the type of the event
  */
-public class SqlDateFieldHandler implements FieldHandler {
-    private final static SqlDateFieldHandler INSTANCE = new SqlDateFieldHandler();
+public interface UpdateListener<E extends UpdateEvent<?>> {
 
-    public static SqlDateFieldHandler getInstance() {
-        return INSTANCE;
-    }
-
-    protected SqlDateFieldHandler() {
-    }
-
-    @Override
-    public JComponent handle(Type type, UpdateListener updateListener, ReflectionFormBuilder reflectionFormBuilder) {
-        return new SqlDatePicker();
-    }
-
+    /**
+     * Called if a component is updated.
+     * @param event
+     */
+    void onUpdate(E event);
 }

@@ -14,7 +14,10 @@
  */
 package richtercloud.reflection.form.builder;
 
-import java.lang.reflect.Field;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.lang.reflect.Type;
 import javax.swing.JComponent;
 import javax.swing.JSpinner;
@@ -24,7 +27,8 @@ import javax.swing.SpinnerNumberModel;
  *
  * @author richter
  */
-public class FloatFieldHandler implements FieldHandler {
+public class FloatFieldHandler implements FieldHandler<FloatFieldUpdateEvent> {
+
     private final static FloatFieldHandler INSTANCE = new FloatFieldHandler();
 
     public static FloatFieldHandler getInstance() {
@@ -35,9 +39,28 @@ public class FloatFieldHandler implements FieldHandler {
     }
 
     @Override
-    public JComponent handle(Type type, ReflectionFormBuilder reflectionFormBuilder) {
+    public JComponent handle(Type type, final UpdateListener<FloatFieldUpdateEvent> updateListener, ReflectionFormBuilder reflectionFormBuilder) {
         //@TODO: handle validaton annotations (should cover all cases, so no
         // need to develop own annotations
-        return new JSpinner(new SpinnerNumberModel(0.0, Double.MIN_VALUE, Double.MAX_VALUE, 0.1));
+        final JSpinner retValue = new JSpinner(new SpinnerNumberModel((Float) 0.0f,
+                (Float) (-10.0f),
+                (Float) 10.0f,
+                (Float) 0.1f));//the cast to Float is necessary otherwise Doubles are retrieved from component later
+        retValue.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                updateListener.onUpdate(new FloatFieldUpdateEvent((Float) retValue.getValue()));
+            }
+        });
+        retValue.addKeyListener(new KeyAdapter() {
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                updateListener.onUpdate(new FloatFieldUpdateEvent((Float) retValue.getValue()));
+            }
+
+        });
+        return retValue;
     }
 }

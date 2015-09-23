@@ -14,7 +14,6 @@
  */
 package richtercloud.reflection.form.builder;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import javax.swing.JComponent;
 import javax.swing.JSpinner;
@@ -35,7 +34,7 @@ public class IntegerFieldHandler implements FieldHandler {
     }
 
     @Override
-    public JComponent handle(Type type, ReflectionFormBuilder reflectionFormBuilder) {
+    public JComponent handle(Type type, UpdateListener updateListener, ReflectionFormBuilder reflectionFormBuilder) {
         //@TODO: handle validaton annotations (should cover all cases, so no
         // need to develop own annotations
         return new JSpinner(new SpinnerNumberModel(0, Integer.MIN_VALUE, Integer.MAX_VALUE, 1));

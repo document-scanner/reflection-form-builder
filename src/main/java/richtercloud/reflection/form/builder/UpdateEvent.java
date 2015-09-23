@@ -14,27 +14,17 @@
  */
 package richtercloud.reflection.form.builder;
 
-import java.lang.reflect.Type;
-import javax.swing.JComponent;
-import richtercloud.reflection.form.builder.components.SqlDatePicker;
-
 /**
  *
  * @author richter
+ * @param <T> the type of the field value to be set after an update
  */
-public class SqlDateFieldHandler implements FieldHandler {
-    private final static SqlDateFieldHandler INSTANCE = new SqlDateFieldHandler();
+public interface UpdateEvent<T> {
 
-    public static SqlDateFieldHandler getInstance() {
-        return INSTANCE;
-    }
-
-    protected SqlDateFieldHandler() {
-    }
-
-    @Override
-    public JComponent handle(Type type, UpdateListener updateListener, ReflectionFormBuilder reflectionFormBuilder) {
-        return new SqlDatePicker();
-    }
-
+    /**
+     * The new value to be to the field. The field is most likely only known
+     * by the creator of listeners working with this event type.
+     * @return
+     */
+    T getNewValue();
 }

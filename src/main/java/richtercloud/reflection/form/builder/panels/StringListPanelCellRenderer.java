@@ -12,30 +12,29 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package richtercloud.reflection.form.builder;
+package richtercloud.reflection.form.builder.panels;
 
-import java.lang.reflect.Type;
-import javax.swing.JComponent;
+import java.awt.Component;
 import javax.swing.JSpinner;
+import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 
 /**
  *
  * @author richter
  */
-public class LongFieldHandler implements FieldHandler {
-    private final static LongFieldHandler INSTANCE = new LongFieldHandler();
+public class StringListPanelCellRenderer extends ListPanelTableCellRenderer {
 
-    public static LongFieldHandler getInstance() {
-        return INSTANCE;
-    }
-
-    protected LongFieldHandler() {
+    public StringListPanelCellRenderer() {
+        super(new JTextField());
     }
 
     @Override
-    public JComponent handle(Type type, UpdateListener updateListener, ReflectionFormBuilder reflectionFormBuilder) {
-        return new JSpinner(new SpinnerNumberModel((Long)0L, (Long)Long.MIN_VALUE, (Long)Long.MAX_VALUE, (Long)1L)); //the cast to Long is necessary otherwise Doubles are retrieved from component later
+    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+        ((JTextField)this.getComponent()).setText((String) value);
+        Component retValue = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+        return retValue;
     }
 
 }

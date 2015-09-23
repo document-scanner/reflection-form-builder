@@ -15,10 +15,8 @@
 package richtercloud.reflection.form.builder;
 
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 /**
  *
@@ -27,7 +25,8 @@ import java.util.Set;
 public class TestEntityCollection {
     private String a = "a";
     private List<Integer> bs = new LinkedList<>(Arrays.asList(1));
-    private List<Set<Boolean>> gs = new LinkedList<Set<Boolean>>(Arrays.asList(new HashSet<>(Arrays.asList(Boolean.TRUE))));
+//    private List<Set<Boolean>> gs = new LinkedList<Set<Boolean>>(Arrays.asList(new HashSet<>(Arrays.asList(Boolean.TRUE))));
+    private List<Boolean> gs = new LinkedList<>(Arrays.asList(Boolean.TRUE));
     private List<TestEntity> testEntitys = new LinkedList<>(Arrays.asList(new TestEntity()));
 
     public TestEntityCollection() {

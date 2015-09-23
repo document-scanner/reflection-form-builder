@@ -14,28 +14,31 @@
  */
 package richtercloud.reflection.form.builder;
 
-import java.lang.reflect.Type;
-import javax.swing.JComponent;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
+import java.util.List;
 
 /**
- *
+ * The event doesn't care about the list added because a caller is most likely
+ only interested in updating the field with the passed listreference.
  * @author richter
  */
-public class LongFieldHandler implements FieldHandler {
-    private final static LongFieldHandler INSTANCE = new LongFieldHandler();
+public class GenericListFieldUpdateEvent implements UpdateEvent<List<?>> {
+    public final static int EVENT_TYPE_ADDED = 1;
+    public final static int EVENT_TYPE_REMOVED = 2;
+    public final static int EVENT_TYPE_CHANGED = 4;
+    private int eventType;
+    private List<?> newValue;
 
-    public static LongFieldHandler getInstance() {
-        return INSTANCE;
+    public GenericListFieldUpdateEvent(int eventType, List<?> newValue) {
+        this.eventType = eventType;
+        this.newValue = newValue;
     }
 
-    protected LongFieldHandler() {
+    public int getEventType() {
+        return eventType;
     }
 
     @Override
-    public JComponent handle(Type type, UpdateListener updateListener, ReflectionFormBuilder reflectionFormBuilder) {
-        return new JSpinner(new SpinnerNumberModel((Long)0L, (Long)Long.MIN_VALUE, (Long)Long.MAX_VALUE, (Long)1L)); //the cast to Long is necessary otherwise Doubles are retrieved from component later
+    public List<?> getNewValue() {
+        return newValue;
     }
-
 }

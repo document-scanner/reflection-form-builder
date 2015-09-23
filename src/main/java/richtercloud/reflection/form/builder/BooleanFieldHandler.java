@@ -14,7 +14,6 @@
  */
 package richtercloud.reflection.form.builder;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -34,7 +33,7 @@ public class BooleanFieldHandler implements FieldHandler {
     }
 
     @Override
-    public JComponent handle(Type type, ReflectionFormBuilder reflectionFormBuilder) {
+    public JComponent handle(Type type, UpdateListener updateListener, ReflectionFormBuilder reflectionFormBuilder) {
         return new JCheckBox();
     }
 

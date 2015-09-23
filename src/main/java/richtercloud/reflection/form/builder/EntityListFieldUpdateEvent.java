@@ -14,28 +14,22 @@
  */
 package richtercloud.reflection.form.builder;
 
-import java.lang.reflect.Type;
-import javax.swing.JComponent;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
+import java.util.List;
 
 /**
  *
  * @author richter
  */
-public class LongFieldHandler implements FieldHandler {
-    private final static LongFieldHandler INSTANCE = new LongFieldHandler();
+public class EntityListFieldUpdateEvent implements UpdateEvent<List<?>>{
+    private List<?> newValue;
 
-    public static LongFieldHandler getInstance() {
-        return INSTANCE;
-    }
-
-    protected LongFieldHandler() {
+    public EntityListFieldUpdateEvent(List<?> newValue) {
+        this.newValue = newValue;
     }
 
     @Override
-    public JComponent handle(Type type, UpdateListener updateListener, ReflectionFormBuilder reflectionFormBuilder) {
-        return new JSpinner(new SpinnerNumberModel((Long)0L, (Long)Long.MIN_VALUE, (Long)Long.MAX_VALUE, (Long)1L)); //the cast to Long is necessary otherwise Doubles are retrieved from component later
+    public List<?> getNewValue() {
+        return newValue;
     }
 
 }

@@ -72,44 +72,16 @@ public class ReflectionFormBuilder {
     - separate class mapping and primitive mapping because a primitive can't be
     used in TypeToken and if primitive mapping is checked to contain primitives
     as keys only, then there's no need to deal with precedences and overwriting
-    - Rather than mapping static class types maps factory instances because that
+    - Rather than mapping static class types map factory instances because that
     allows to cover generic types (which require argument like the generic type
-    to be evaluated) with the same mechanism (this is not necessary for the
-    primitive mapping). This allows to set default values on components as well
-    easily (can't be done by specifying a subclass of the component).
+    to be evaluated) with the same mechanism (this is necessary for the
+    primitive mapping as soon as component ought to be responsible to manage
+    properties of instances autonomously). This allows to set default values on
+    components as well easily (can't be done by specifying a subclass of the
+    component).
     */
-    public static final Map<Type, FieldHandler> CLASS_MAPPING_DEFAULT;
-    public static final Map<Class<?>, Class<? extends JComponent>> PRIMITIVE_MAPPING_DEFAULT;
+    public static final Map<Type, FieldHandler<?>> CLASS_MAPPING_DEFAULT;
     public static final Map<Class<? extends JComponent>, ValueRetriever<?, ?>> VALUE_RETRIEVER_MAPPING_DEFAULT;
-    /*
-    internal implementation notes:
-    - can' suppress serial warning lower than on class level because using a
-    method causes "might not have been intialized" error for map(s) (asked
-    http://stackoverflow.com/questions/32666745/how-to-suppress-serial-warning-for-a-static-block-where-a-final-static-variable for input)
-    */
-    static {
-        Map<Type, FieldHandler> classMappingDefault0 = new HashMap<>();
-        classMappingDefault0.put(new TypeToken<String>(){}.getType(), StringFieldHandler.getInstance());
-        classMappingDefault0.put(new TypeToken<Float>(){}.getType(), FloatFieldHandler.getInstance());
-        classMappingDefault0.put(new TypeToken<Integer>(){}.getType(), IntegerFieldHandler.getInstance());
-        classMappingDefault0.put(new TypeToken<Double>(){}.getType(), DoubleFieldHandler.getInstance());
-        classMappingDefault0.put(new TypeToken<Long>(){}.getType(), LongFieldHandler.getInstance());
-        classMappingDefault0.put(new TypeToken<Number>(){}.getType(), NumberFieldHandler.getInstance());
-        classMappingDefault0.put(new TypeToken<Boolean>(){}.getType(), BooleanFieldHandler.getInstance());
-        classMappingDefault0.put(new TypeToken<Date>(){}.getType(), DateFieldHandler.getInstance());
-        classMappingDefault0.put(new TypeToken<java.sql.Date>(){}.getType(), SqlDateFieldHandler.getInstance());
-        classMappingDefault0.put(new TypeToken<List<AnyType>>(){}.getType(), GenericListFieldHandler.getInstance());
-        CLASS_MAPPING_DEFAULT = Collections.unmodifiableMap(classMappingDefault0);
-    }
-    static {
-        Map<Class<?>, Class<? extends JComponent>> primitiveMappingDefault0 = new HashMap<>();
-        primitiveMappingDefault0.put(float.class, JSpinner.class);
-        primitiveMappingDefault0.put(int.class, JSpinner.class);
-        primitiveMappingDefault0.put(double.class, JSpinner.class);
-        primitiveMappingDefault0.put(long.class, JSpinner.class);
-        primitiveMappingDefault0.put(boolean.class, JCheckBox.class);
-        PRIMITIVE_MAPPING_DEFAULT = Collections.unmodifiableMap(primitiveMappingDefault0);
-    }
     static {
         Map<Class<? extends JComponent>, ValueRetriever<?, ?>> valueRetrieverMapping0 = new HashMap<>();
         valueRetrieverMapping0.put(JTextField.class, TextFieldRetriever.getInstance());
@@ -119,12 +91,108 @@ public class ReflectionFormBuilder {
         valueRetrieverMapping0.put(SqlDatePicker.class, SqlDatePickerRetriever.getInstance());
         VALUE_RETRIEVER_MAPPING_DEFAULT = Collections.unmodifiableMap(valueRetrieverMapping0);
     }
+    static {
+        Map<Type, FieldHandler<?>> classMappingDefault0 = new HashMap<>();
+        classMappingDefault0.put(createStringTypeToken(), StringFieldHandler.getInstance());
+        classMappingDefault0.put(createFloatTypeToken(), FloatFieldHandler.getInstance());
+        classMappingDefault0.put(createIntegerTypetoken(), IntegerFieldHandler.getInstance());
+        classMappingDefault0.put(createDoubleTypeToken(), DoubleFieldHandler.getInstance());
+        classMappingDefault0.put(createLongTypeToken(), LongFieldHandler.getInstance());
+        classMappingDefault0.put(createNumberTypeToken(), NumberFieldHandler.getInstance());
+        classMappingDefault0.put(createBooleanTypeToken(), BooleanFieldHandler.getInstance());
+        classMappingDefault0.put(createDateTypeToken(), DateFieldHandler.getInstance());
+        classMappingDefault0.put(createSqlDateTypeToken(), SqlDateFieldHandler.getInstance());
+        classMappingDefault0.put(createBooleanListTypeToken(), BooleanListFieldHandler.getInstance());
+        classMappingDefault0.put(createIntegerListTypeToken(), IntegerListFieldHandler.getInstance());
+        classMappingDefault0.put(createAnyTypeListTypeToken(), SimpleEntityListFieldHandler.getInstance());
+        classMappingDefault0.put(createStringListTypeToken(), StringListFieldHandler.getInstance());
+        CLASS_MAPPING_DEFAULT = Collections.unmodifiableMap(classMappingDefault0);
+    }
+    public static final Map<Class<?>, FieldHandler<?>> PRIMITIVE_MAPPING_DEFAULT;
+    static {
+        Map<Class<?>, FieldHandler<?>> primitiveMappingDefault0 = new HashMap<>();
+        primitiveMappingDefault0.put(float.class, FloatFieldHandler.getInstance());
+        primitiveMappingDefault0.put(int.class, IntegerFieldHandler.getInstance());
+        primitiveMappingDefault0.put(double.class, DoubleFieldHandler.getInstance());
+        primitiveMappingDefault0.put(long.class, LongFieldHandler.getInstance());
+        primitiveMappingDefault0.put(boolean.class, BooleanFieldHandler.getInstance());
+        PRIMITIVE_MAPPING_DEFAULT = Collections.unmodifiableMap(primitiveMappingDefault0);
+    }
     public static final List<Pair<Class<? extends Annotation>, FieldAnnotationHandler>> FIELD_ANNOTATION_MAPPING_DEFAULT = Collections.unmodifiableList(new LinkedList<Pair<Class<? extends Annotation>, FieldAnnotationHandler>>());
-    public static final List<Pair<Class<? extends Annotation>, ClassAnnotationHandler>> CLASS_ANNOTATION_MAPPING_DEFAULT = Collections.unmodifiableList(new LinkedList<Pair<Class<? extends Annotation>, ClassAnnotationHandler>>());
-    private Map<Type, FieldHandler> classMapping;
-    private Map<Class<?>, Class<? extends JComponent>> primitiveMapping;
+    public static final List<Pair<Class<? extends Annotation>, ClassAnnotationHandler<?>>> CLASS_ANNOTATION_MAPPING_DEFAULT = Collections.unmodifiableList(new LinkedList<Pair<Class<? extends Annotation>, ClassAnnotationHandler<?>>>());
+    private Map<Type, FieldHandler<?>> classMapping;
+    private Map<Class<?>, FieldHandler<?>> primitiveMapping;
     private Map<Class<? extends JComponent>, ValueRetriever<?, ?>> valueRetrieverMapping;
-    private List<Field> entityClassFields;
+
+    /*
+    internal implementation notes:
+    - creating in methos in order to be able to specify
+    @SuppressWarning("serial")
+    */
+    @SuppressWarnings("serial")
+    private static Type createStringTypeToken() {
+        return new TypeToken<String>(){}.getType();
+    }
+
+    @SuppressWarnings("serial")
+    private static Type createFloatTypeToken() {
+        return new TypeToken<Float>(){}.getType();
+    }
+
+    @SuppressWarnings("serial")
+    private static Type createIntegerTypetoken() {
+        return new TypeToken<Integer>(){}.getType();
+    }
+
+    @SuppressWarnings("serial")
+    private static Type createDoubleTypeToken() {
+        return new TypeToken<Double>(){}.getType();
+    }
+
+    @SuppressWarnings("serial")
+    private static Type createLongTypeToken() {
+        return new TypeToken<Long>(){}.getType();
+    }
+
+    @SuppressWarnings("serial")
+    private static Type createNumberTypeToken() {
+        return new TypeToken<Number>(){}.getType();
+    }
+
+    @SuppressWarnings("serial")
+    private static Type createBooleanTypeToken() {
+        return new TypeToken<Boolean>(){}.getType();
+    }
+
+    @SuppressWarnings("serial")
+    private static Type createDateTypeToken() {
+        return new TypeToken<Date>(){}.getType();
+    }
+
+    @SuppressWarnings("serial")
+    private static Type createSqlDateTypeToken() {
+        return new TypeToken<java.sql.Date>(){}.getType();
+    }
+
+    @SuppressWarnings("serial")
+    private static Type createBooleanListTypeToken() {
+        return new TypeToken<List<Boolean>>() {}.getType();
+    }
+
+    @SuppressWarnings("serial")
+    private static Type createIntegerListTypeToken() {
+        return new TypeToken<List<Integer>>() {}.getType();
+    }
+
+    @SuppressWarnings("serial")
+    private static Type createAnyTypeListTypeToken() {
+        return new TypeToken<List<AnyType>>(){}.getType();
+    }
+
+    @SuppressWarnings("serial")
+    private static Type createStringListTypeToken() {
+        return new TypeToken<List<String>>() {}.getType();
+    }
 
     /**
      * the order in the list defines the precedence of annotations
@@ -135,7 +203,11 @@ public class ReflectionFormBuilder {
     constructor arguments
     */
     private List<Pair<Class<? extends Annotation>, FieldAnnotationHandler>> fieldAnnotationMapping;
-    private List<Pair<Class<? extends Annotation>, ClassAnnotationHandler>> classAnnotationMapping;
+    private List<Pair<Class<? extends Annotation>, ClassAnnotationHandler<?>>> classAnnotationMapping;
+    /**
+     * A cache for return values of {@link #retrieveRelevantFields(java.lang.Class) }.
+     */
+    private Map<Class<?>, List<Field>> relevantFieldsCache = new HashMap<>();
 
     /*
     internal implementation notes:
@@ -143,15 +215,16 @@ public class ReflectionFormBuilder {
     constructor arguments (this makes it impossible to provide a default
     mapping and thus passing the argument is enforced in constructor)
     */
-    public ReflectionFormBuilder(List<Pair<Class<? extends Annotation>, FieldAnnotationHandler>> fieldAnnotationMapping, List<Pair<Class<? extends Annotation>, ClassAnnotationHandler>> classAnnotationMapping) {
+    public ReflectionFormBuilder(List<Pair<Class<? extends Annotation>, FieldAnnotationHandler>> fieldAnnotationMapping,
+            List<Pair<Class<? extends Annotation>, ClassAnnotationHandler<?>>> classAnnotationMapping) {
         this(CLASS_MAPPING_DEFAULT, PRIMITIVE_MAPPING_DEFAULT, VALUE_RETRIEVER_MAPPING_DEFAULT, fieldAnnotationMapping, classAnnotationMapping);
     }
 
-    public ReflectionFormBuilder(Map<Type, FieldHandler> classMapping,
-            Map<Class<?>, Class<? extends JComponent>> primitiveMapping,
+    public ReflectionFormBuilder(Map<Type, FieldHandler<?>> classMapping,
+            Map<Class<?>, FieldHandler<?>> primitiveMapping,
             Map<Class<? extends JComponent>, ValueRetriever<?, ?>> valueRetrieverMapping,
             List<Pair<Class<? extends Annotation>, FieldAnnotationHandler>> fieldAnnotationMapping,
-            List<Pair<Class<? extends Annotation>, ClassAnnotationHandler>> classAnnotationMapping) {
+            List<Pair<Class<? extends Annotation>, ClassAnnotationHandler<?>>> classAnnotationMapping) {
         if(classMapping == null) {
             throw new IllegalArgumentException("classMapping mustn't be null");
         }
@@ -195,7 +268,8 @@ public class ReflectionFormBuilder {
     }
 
     /**
-     * recursively retrieves all fields from the inheritance hierachy of {@code entityClass}, except {@code static} fields.
+     * recursively retrieves all fields from the inheritance hierachy of {@code entityClass}, except {@code static} and {@code transient} fields. Results are cached in order to
+     * ensure that future calls return the same result for the same argument value.
      * @param clazz
      * @return
      */
@@ -205,7 +279,11 @@ public class ReflectionFormBuilder {
     @Id annotated property first
      */
     public List<Field> retrieveRelevantFields(Class<?> clazz) {
-        List<Field> retValue = new LinkedList<>();
+        List<Field> retValue = this.relevantFieldsCache.get(clazz);
+        if(retValue != null) {
+            return retValue;
+        }
+        retValue = new LinkedList<>();
         Class<?> hierarchyPointer = clazz;
         while(!hierarchyPointer.equals(Object.class)) {
             retValue.addAll(Arrays.asList(hierarchyPointer.getDeclaredFields()));
@@ -219,6 +297,10 @@ public class ReflectionFormBuilder {
                 entityClassFieldsIt.remove();
                 continue;
             }
+            if(Modifier.isTransient(entityClassFieldsNxt.getModifiers())) {
+                entityClassFieldsIt.remove();
+                continue;
+            }
             if(seenEntityClassFields.contains(entityClassFieldsNxt)) {
                 entityClassFieldsIt.remove();
                 continue;
@@ -226,6 +308,7 @@ public class ReflectionFormBuilder {
             seenEntityClassFields.add(entityClassFieldsNxt);
             entityClassFieldsNxt.setAccessible(true);
         }
+        this.relevantFieldsCache.put(clazz, retValue);
         return retValue;
     }
 
@@ -233,6 +316,7 @@ public class ReflectionFormBuilder {
      * Retrieves the associated {@link JComponent} to be displayed in the form.
      * @param field
      * @param entityClass
+     * @param entity
      * @return a {@link JComponent}, never {@code null}
      * @throws NoSuchMethodException
      * @throws InstantiationException
@@ -243,53 +327,66 @@ public class ReflectionFormBuilder {
     /*
     internal implementation entityClass is added here for subclasses
     */
-    protected  JComponent getClassComponent(Field field, Class<?> entityClass) throws NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+    protected  JComponent getClassComponent(final Field field, Class<?> entityClass, final Object entity) throws NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+        if(!field.getDeclaringClass().isAssignableFrom(entityClass)) {
+            throw new IllegalArgumentException(String.format("field %s has to be declared by entityClass", field));
+        }
+        //create component
         JComponent retValue;
         // annotation have precedence
         // field annotations (have precedence over class annotations)
         for(Pair<Class<? extends Annotation>, FieldAnnotationHandler> pair : fieldAnnotationMapping) {
             if(field.getAnnotation(pair.getKey()) != null) {
-                try {
-                    Object entity;
-                    Constructor<?> entityClassConstructor = entityClass.getDeclaredConstructor();
-                    entityClassConstructor.setAccessible(true);
-                    entity = entityClassConstructor.newInstance();
-                    retValue = pair.getValue().handle(field.getType(), entity, this);
-                    return retValue;
-                } catch (IllegalAccessException | IllegalArgumentException | InstantiationException | NoSuchMethodException | SecurityException | InvocationTargetException ex) {
-                    throw new RuntimeException(ex);
-                }
+                retValue = pair.getValue().handle(field.getType(), entity, this);
+                return retValue;
             }
         }
         // class annotations
-        for(Pair<Class<? extends Annotation>, ClassAnnotationHandler> pair : classAnnotationMapping) {
+        for(Pair<Class<? extends Annotation>, ClassAnnotationHandler<?>> pair : classAnnotationMapping) {
             if(field.getType().getAnnotation(pair.getKey()) != null) {
                 try {
-                    retValue = pair.getValue().handle(entityClassFields, field.getType());
+                    retValue = pair.getValue().handle(field.getType(),
+                            new UpdateListener() {
+                                @Override
+                                public void onUpdate(UpdateEvent event) {
+                                    try {
+                                        field.set(entity, event.getNewValue());
+                                    } catch (IllegalArgumentException | IllegalAccessException ex) {
+                                        throw new RuntimeException(ex);
+                                    }
+                                }
+                            },
+                            this);
                     return retValue;
                 } catch (Exception ex) {
                     throw new RuntimeException(ex);
                 }
             }
         }
-        Class<? extends JComponent> clazz = null;
+        FieldHandler<?> fieldHandler;
         if(field.getType().isPrimitive()) {
-            clazz = primitiveMapping.get(field.getType());
-            if(clazz == null) {
-                clazz = ReflectionFormBuilder.PRIMITIVE_MAPPING_DEFAULT.get(field.getType());
+            fieldHandler = primitiveMapping.get(field.getType());
+            if(fieldHandler == null) {
+                fieldHandler = ReflectionFormBuilder.PRIMITIVE_MAPPING_DEFAULT.get(field.getType());
             }
+        }else {
+            // check exact type match
+            fieldHandler = retrieveFieldHandler(field.getGenericType());
         }
-        if(clazz != null) {
-            Constructor<? extends JComponent> clazzConstructor = clazz.getDeclaredConstructor();
-            retValue = clazzConstructor.newInstance();
-            return retValue;
-        }
-        // check exact type match
-        FieldHandler fieldHandler = retrieveFieldHandler(field.getGenericType());
         if(fieldHandler == null) {
             retValue = new JLabel(field.getType().getSimpleName());
         } else {
             retValue = fieldHandler.handle(field.getGenericType(), //very important to call with generic type in order to not confuse setup
+                    new UpdateListener() {
+                        @Override
+                        public void onUpdate(UpdateEvent event) {
+                            try {
+                                field.set(entity, event.getNewValue());
+                            } catch (IllegalArgumentException | IllegalAccessException ex) {
+                                throw new RuntimeException(ex);
+                            }
+                        }
+                    },
                     this);
         }
         return retValue;
@@ -318,18 +415,18 @@ public class ReflectionFormBuilder {
         entityClassConstructor.setAccessible(true);
         Object instance = entityClassConstructor.newInstance();
         ReflectionFormPanel retValue = new ReflectionFormPanel(fieldMapping, instance, entityClass, this.valueRetrieverMapping, classMapping);
-        this.entityClassFields = this.retrieveRelevantFields(entityClass);
+        List<Field> entityClassFields = this.retrieveRelevantFields(entityClass);
 
-        GroupLayout layout = new GroupLayout(retValue.getMainPanel());
-        retValue.getMainPanel().setLayout(layout);
+        GroupLayout layout = new GroupLayout(retValue);
+        retValue.setLayout(layout);
         layout.setAutoCreateGaps(true);
         layout.setAutoCreateContainerGaps(true);
         Group horizontalSequentialGroup = layout.createSequentialGroup();
         Group horizontalLabelParallelGroup = layout.createParallelGroup(GroupLayout.Alignment.LEADING);
         Group horizontalCompParallelGroup = layout.createParallelGroup(GroupLayout.Alignment.LEADING);
         Group verticalSequentialGroup = layout.createSequentialGroup();
-        for(Field field : this.entityClassFields) {
-            JComponent comp = this.getClassComponent(field, entityClass);
+        for(Field field : entityClassFields) {
+            JComponent comp = this.getClassComponent(field, entityClass, instance);
             JLabel label = new JLabel(field.getName());
             horizontalLabelParallelGroup.addComponent(label);
             horizontalCompParallelGroup.addComponent(comp);
@@ -342,7 +439,6 @@ public class ReflectionFormBuilder {
         horizontalSequentialGroup.addGroup(horizontalLabelParallelGroup).addGroup(horizontalCompParallelGroup);
         layout.setHorizontalGroup(horizontalSequentialGroup);
         layout.setVerticalGroup(verticalSequentialGroup);
-        retValue.getMainPanel().validate();
         retValue.validate();
         return retValue;
     }
@@ -428,7 +524,7 @@ public class ReflectionFormBuilder {
         return retValue;
     }
 
-    public Map<Type, FieldHandler> getClassMapping() {
+    public Map<Type, FieldHandler<?>> getClassMapping() {
         return Collections.unmodifiableMap(this.classMapping);
     }
 
@@ -436,17 +532,8 @@ public class ReflectionFormBuilder {
      *
      * @return an unmodifiable version of the class annotation mapping
      */
-    public List<Pair<Class<? extends Annotation>, ClassAnnotationHandler>> getClassAnnotationMapping() {
+    public List<Pair<Class<? extends Annotation>, ClassAnnotationHandler<?>>> getClassAnnotationMapping() {
         return Collections.unmodifiableList(classAnnotationMapping);
-    }
-
-    /**
-     * the initial list of entity class fields created with
-     * {@link #retrieveRelevantFields(java.lang.Class) }
-     * @return
-     */
-    public List<Field> getEntityClassFields() {
-        return Collections.unmodifiableList(this.entityClassFields);
     }
 
     /**
@@ -454,7 +541,7 @@ public class ReflectionFormBuilder {
      * @param fieldType always call with return value of {@link Field#getGenericType() } in order to be the correct match
      * @return
      */
-    protected FieldHandler retrieveFieldHandler(Type fieldType) {
+    public FieldHandler retrieveFieldHandler(Type fieldType) {
         Type classMappingKey = fieldType;
         if(fieldType instanceof ParameterizedType) {
             classMappingKey = retrieveClassMappingBestMatch((ParameterizedType) fieldType);

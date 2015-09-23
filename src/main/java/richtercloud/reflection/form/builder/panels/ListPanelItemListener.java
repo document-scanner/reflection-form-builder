@@ -12,29 +12,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package richtercloud.reflection.form.builder;
-
-import java.lang.reflect.Type;
-import javax.swing.JComponent;
-import richtercloud.reflection.form.builder.components.SqlDatePicker;
+package richtercloud.reflection.form.builder.panels;
 
 /**
  *
  * @author richter
  */
-public class SqlDateFieldHandler implements FieldHandler {
-    private final static SqlDateFieldHandler INSTANCE = new SqlDateFieldHandler();
+public interface ListPanelItemListener {
 
-    public static SqlDateFieldHandler getInstance() {
-        return INSTANCE;
-    }
+    void onItemChanged(ListPanelItemEvent event);
 
-    protected SqlDateFieldHandler() {
-    }
+    void onItemAdded(ListPanelItemEvent event);
 
-    @Override
-    public JComponent handle(Type type, UpdateListener updateListener, ReflectionFormBuilder reflectionFormBuilder) {
-        return new SqlDatePicker();
-    }
-
+    void onItemRemoved(ListPanelItemEvent event);
 }

@@ -33,6 +33,7 @@ import junit.framework.Assert;
 import org.apache.commons.lang3.tuple.Pair;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
+import richtercloud.reflection.form.builder.panels.BooleanListPanel;
 import richtercloud.reflection.form.builder.retriever.ValueRetriever;
 
 /**
@@ -50,7 +51,7 @@ public class ReflectionFormBuilderTest {
     public void testRetrieveRelevantFields() throws NoSuchFieldException {
         Class<?> entityClass = TestEntity.class;
         List<Pair<Class<? extends Annotation>, FieldAnnotationHandler>> fieldAnnotationMapping = new LinkedList<>();
-        List<Pair<Class<? extends Annotation>, ClassAnnotationHandler>> classAnnotationMapping = new LinkedList<>();
+        List<Pair<Class<? extends Annotation>, ClassAnnotationHandler<?>>> classAnnotationMapping = new LinkedList<>();
         try {
             new ReflectionFormBuilder(null, classAnnotationMapping);
             Assert.fail("IllegalArgumentException expected");
@@ -87,42 +88,47 @@ public class ReflectionFormBuilderTest {
     @SuppressWarnings("serial")
     public void testGetClassComponent() throws Exception {
         List<Pair<Class<? extends Annotation>, FieldAnnotationHandler>> fieldAnnotationMapping = new LinkedList<>();
-        List<Pair<Class<? extends Annotation>, ClassAnnotationHandler>> classAnnotationMapping = new LinkedList<>();
+        List<Pair<Class<? extends Annotation>, ClassAnnotationHandler<?>>> classAnnotationMapping = new LinkedList<>();
         ReflectionFormBuilder instance = new ReflectionFormBuilder(fieldAnnotationMapping, classAnnotationMapping);
-        Class<? extends TestEntity> entityClass = TestEntity.class;
+        Class<?> entityClass = TestEntity.class;
         Field field = entityClass.getDeclaredField("a");
-        JComponent result = instance.getClassComponent(field, entityClass);
+        TestEntity entity = TestEntity.class.getDeclaredConstructor().newInstance();
+        JComponent result = instance.getClassComponent(field, entityClass, entity);
         assertEquals(JTextField.class, result.getClass());
         //test that AnyType specifiecation is matched
-        Map<Type, FieldHandler> classMapping = new HashMap<>();
+        Map<Type, FieldHandler<?>> classMapping = new HashMap<>();
         Type listAnyType = new TypeToken<List<AnyType>>() {}.getType();
+        Type listBooleanType = new TypeToken<List<Boolean>>() {}.getType();
         classMapping.put(listAnyType, StringFieldHandler.getInstance());
-        Map<Class<?>, Class<? extends JComponent>> primitiveMapping = new HashMap<>();
+        classMapping.put(listBooleanType, BooleanListFieldHandler.getInstance());
+        Map<Class<?>, FieldHandler<?>> primitiveMapping = new HashMap<>();
         Map<Class<? extends JComponent>, ValueRetriever<?,?>> valueRetrieverMapping = new HashMap<>();
+        Class<? extends TestEntityCollection> entityClassCollection = TestEntityCollection.class;
+        TestEntityCollection entityCollection = TestEntityCollection.class.getDeclaredConstructor().newInstance();
         instance = new ReflectionFormBuilder(classMapping, primitiveMapping, valueRetrieverMapping, fieldAnnotationMapping, classAnnotationMapping);
         result = instance.getClassComponent(TestEntityCollection.class.getDeclaredField("gs"), //is a List<Set<Boolean>>
-                TestEntityCollection.class);
-        assertEquals(JTextField.class, result.getClass());
+                entityClassCollection, entityCollection);
+        assertEquals(BooleanListPanel.class, result.getClass());
     }
 
     @Test
     @SuppressWarnings("serial")
     public void testRetrieveClassMappingBestMatch() throws NoSuchFieldException {
         List<Pair<Class<? extends Annotation>, FieldAnnotationHandler>> fieldAnnotationMapping = new LinkedList<>();
-        List<Pair<Class<? extends Annotation>, ClassAnnotationHandler>> classAnnotationMapping = new LinkedList<>();
+        List<Pair<Class<? extends Annotation>, ClassAnnotationHandler<?>>> classAnnotationMapping = new LinkedList<>();
         Type type = TestEntityCollection.class.getDeclaredField("gs").getGenericType();
-        Map<Type, FieldHandler> classMapping = new HashMap<>();
+        Map<Type, FieldHandler<?>> classMapping = new HashMap<>();
         classMapping.put(type,
                 NumberFieldHandler.getInstance() //any handler
         );
         classMapping.put(new TypeToken<String>() {}.getType(), StringFieldHandler.getInstance()); //a type without common prefix
         classMapping.put(new TypeToken<List<String>>() {}.getType(), new FieldHandler() {
             @Override
-            public JComponent handle(Type type, ReflectionFormBuilder reflectionFormBuilder) {
+            public JComponent handle(Type type, UpdateListener updateListener, ReflectionFormBuilder reflectionFormBuilder) {
                 return new JPasswordField();
             }
         });// a type with common prefix
-        Map<Class<?>, Class<? extends JComponent>> primitiveMapping = new HashMap<>();
+        Map<Class<?>, FieldHandler<?>> primitiveMapping = new HashMap<>();
         Map<Class<? extends JComponent>, ValueRetriever<?,?>> valueRetrieverMapping = new HashMap<>();
         ReflectionFormBuilder instance = new ReflectionFormBuilder(classMapping, primitiveMapping, valueRetrieverMapping, fieldAnnotationMapping, classAnnotationMapping);
         Type result = instance.retrieveClassMappingBestMatch((ParameterizedType) type);
@@ -142,30 +148,33 @@ public class ReflectionFormBuilderTest {
      * @throws java.lang.Exception
      */
     @Test
+    @SuppressWarnings("serial")
     public void testTransform() throws Exception {
         //test entity without collection fields
         List<Pair<Class<? extends Annotation>, FieldAnnotationHandler>> fieldAnnotationMapping = new LinkedList<>();
-        List<Pair<Class<? extends Annotation>, ClassAnnotationHandler>> classAnnotationMapping = new LinkedList<>();
+        List<Pair<Class<? extends Annotation>, ClassAnnotationHandler<?>>> classAnnotationMapping = new LinkedList<>();
         ReflectionFormBuilder instance = new ReflectionFormBuilder(fieldAnnotationMapping, classAnnotationMapping);
         Class<?> entityClass = TestEntity.class;
         ReflectionFormPanel result = instance.transform(entityClass);
-        assertEquals(2, result.getMainPanel().getComponentCount());
+        assertEquals(2, result.getComponentCount());
         entityClass = TestEntitySubclass.class;
         result = instance.transform(entityClass);
-        assertEquals(4, result.getMainPanel().getComponentCount());
+        assertEquals(4, result.getComponentCount());
 
         //test entity with collection
-        instance = new ReflectionFormBuilder(fieldAnnotationMapping, classAnnotationMapping);
         entityClass = TestEntityCollection.class;
+        Map<Type, FieldHandler<?>> classMapping = new HashMap<>(ReflectionFormBuilder.CLASS_MAPPING_DEFAULT);
+        classMapping.put(new TypeToken<List<TestEntityCollection>>() {}.getType(), SimpleEntityListFieldHandler.getInstance());
+        instance = new ReflectionFormBuilder(classMapping, ReflectionFormBuilder.PRIMITIVE_MAPPING_DEFAULT, ReflectionFormBuilder.VALUE_RETRIEVER_MAPPING_DEFAULT, fieldAnnotationMapping, classAnnotationMapping);
         result = instance.transform(entityClass);
-        assertEquals(8, result.getMainPanel().getComponentCount());
+        assertEquals(8, result.getComponentCount());
     }
 
     @Test
     @SuppressWarnings("serial")
     public void testRetrieveAnyCountRecursively() {
         List<Pair<Class<? extends Annotation>, FieldAnnotationHandler>> fieldAnnotationMapping = new LinkedList<>();
-        List<Pair<Class<? extends Annotation>, ClassAnnotationHandler>> classAnnotationMapping = new LinkedList<>();
+        List<Pair<Class<? extends Annotation>, ClassAnnotationHandler<?>>> classAnnotationMapping = new LinkedList<>();
         ReflectionFormBuilder instance = new ReflectionFormBuilder(fieldAnnotationMapping, classAnnotationMapping);
         //test 0
         int result = instance.retrieveAnyCountRecursively((ParameterizedType) new TypeToken<List<Set<Integer>>>() {

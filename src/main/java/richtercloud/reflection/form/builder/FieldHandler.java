@@ -20,6 +20,7 @@ import javax.swing.JComponent;
 /**
  *
  * @author richter
+ * @param <E> the type of the update event
  */
 /*
 internal implementation notes:
@@ -28,15 +29,25 @@ annotations, etc. -> let the caller retrieve information and enforce them as
 parameter or consider introducing a variable constraint type as argument. This
 allows the FieldHandler to be used not only for fields, but nested generic types
 as well.
+- since JComponents don't expose changes to their value to
+PropertyChangeListener or VetoableChangeListener (both only for swing related
+properties) introduce UpdateListener in order to allow callers to specify a
+listener. This callback will be called in a listener in a listerner which the
+FieldHandler registers for each component individually.
+- A generic field handler for lists can't handle immutable types because
+changes to items can't be -> it is inevitable to provide custom field handler
+for immutable types (eventually it's possible to provide generic immutable type
+field handler)
 */
-public interface FieldHandler {
+public interface FieldHandler<E extends UpdateEvent<?>> {
 
     /**
      *
      * @param type
+     * @param updateListener
      * @param reflectionFormBuilder a {@link ReflectionFormBuilder} used for
      * recursion
      * @return
      */
-    JComponent handle(Type type, ReflectionFormBuilder reflectionFormBuilder);
+    JComponent handle(Type type, UpdateListener<E> updateListener, ReflectionFormBuilder reflectionFormBuilder);
 }

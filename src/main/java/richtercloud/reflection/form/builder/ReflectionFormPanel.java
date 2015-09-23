@@ -14,14 +14,16 @@
  */
 package richtercloud.reflection.form.builder;
 
+import java.awt.Dimension;
+import java.awt.Rectangle;
 import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JComponent;
-import javax.swing.JPanel;
+import javax.swing.Scrollable;
+import javax.swing.SwingConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import richtercloud.reflection.form.builder.retriever.ValueRetriever;
@@ -30,7 +32,7 @@ import richtercloud.reflection.form.builder.retriever.ValueRetriever;
  *
  * @author richter
  */
-public class ReflectionFormPanel extends javax.swing.JPanel {
+public class ReflectionFormPanel extends javax.swing.JPanel implements Scrollable {
     private static final long serialVersionUID = 1L;
     private final static Logger LOGGER = LoggerFactory.getLogger(ReflectionFormPanel.class);
 
@@ -43,9 +45,10 @@ public class ReflectionFormPanel extends javax.swing.JPanel {
     }
     private Map<Field, JComponent> fieldMapping = new HashMap<>();
     private Map<Class<? extends JComponent>, ValueRetriever<?, ?>> valueRetrieverMapping;
-    private Map<Type, FieldHandler> classMapping;
+    private Map<Type, FieldHandler<?>> classMapping;
     private Object instance;
     private Class<?> entityClass;
+    private final int maxUnitIncrement = 50;
 
     /**
      * Creates new form ReflectionFormPanel
@@ -58,7 +61,7 @@ public class ReflectionFormPanel extends javax.swing.JPanel {
             Object instance,
             Class<?> entityClass,
             Map<Class<? extends JComponent>, ValueRetriever<?, ?>> valueRetrieverMapping,
-            Map<Type, FieldHandler> classMapping) {
+            Map<Type, FieldHandler<?>> classMapping) {
         this();
         if(instance == null) {
             throw new IllegalArgumentException("instance mustn't be null");
@@ -115,7 +118,7 @@ public class ReflectionFormPanel extends javax.swing.JPanel {
     }
 
     public Map<Field, JComponent> getFieldMapping() {
-        return fieldMapping;
+        return Collections.unmodifiableMap(fieldMapping);
     }
 
     /**
@@ -127,15 +130,11 @@ public class ReflectionFormPanel extends javax.swing.JPanel {
         return instance;
     }
 
-    public JPanel getMainPanel() {
-        return mainPanel;
-    }
-
     public Class<?> getEntityClass() {
         return entityClass;
     }
 
-    public Map<Type, FieldHandler> getClassMapping() {
+    public Map<Type, FieldHandler<?>> getClassMapping() {
         return Collections.unmodifiableMap(classMapping);
     }
 
@@ -148,38 +147,68 @@ public class ReflectionFormPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        mainPanelScrollPane = new javax.swing.JScrollPane();
-        mainPanel = new javax.swing.JPanel();
-
-        javax.swing.GroupLayout mainPanelLayout = new javax.swing.GroupLayout(mainPanel);
-        mainPanel.setLayout(mainPanelLayout);
-        mainPanelLayout.setHorizontalGroup(
-            mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 398, Short.MAX_VALUE)
-        );
-        mainPanelLayout.setVerticalGroup(
-            mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 298, Short.MAX_VALUE)
-        );
-
-        mainPanelScrollPane.setViewportView(mainPanel);
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(mainPanelScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+            .addGap(0, 400, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(mainPanelScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
+            .addGap(0, 300, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel mainPanel;
-    private javax.swing.JScrollPane mainPanelScrollPane;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public Dimension getPreferredScrollableViewportSize() {
+        return getPreferredSize();
+    }
+
+    @Override
+    public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
+        //Get the current position.
+        int currentPosition;
+        if (orientation == SwingConstants.HORIZONTAL) {
+            currentPosition = visibleRect.x;
+        } else {
+            currentPosition = visibleRect.y;
+        }
+
+        //Return the number of pixels between currentPosition
+        //and the nearest tick mark in the indicated direction.
+        if (direction < 0) {
+            int newPosition = currentPosition -
+                             (currentPosition / maxUnitIncrement)
+                              * maxUnitIncrement;
+            return (newPosition == 0) ? maxUnitIncrement : newPosition;
+        } else {
+            return ((currentPosition / maxUnitIncrement) + 1)
+                     * maxUnitIncrement
+                     - currentPosition;
+        }
+    }
+
+    @Override
+    public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
+        if (orientation == SwingConstants.HORIZONTAL) {
+            return visibleRect.width - maxUnitIncrement;
+        } else {
+            return visibleRect.height - maxUnitIncrement;
+        }
+    }
+
+    @Override
+    public boolean getScrollableTracksViewportWidth() {
+        return false;
+    }
+
+    @Override
+    public boolean getScrollableTracksViewportHeight() {
+        return false;
+    }
 
 }

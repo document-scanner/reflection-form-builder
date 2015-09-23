@@ -12,29 +12,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package richtercloud.reflection.form.builder;
+package richtercloud.reflection.form.builder.panels;
 
-import java.lang.reflect.Type;
-import javax.swing.JComponent;
-import richtercloud.reflection.form.builder.components.SqlDatePicker;
+import java.awt.Component;
+import javax.swing.JCheckBox;
+import javax.swing.JTable;
 
 /**
  *
  * @author richter
  */
-public class SqlDateFieldHandler implements FieldHandler {
-    private final static SqlDateFieldHandler INSTANCE = new SqlDateFieldHandler();
+public class BooleanListPanelCellRenderer extends ListPanelTableCellRenderer {
 
-    public static SqlDateFieldHandler getInstance() {
-        return INSTANCE;
-    }
-
-    protected SqlDateFieldHandler() {
+    public BooleanListPanelCellRenderer() {
+        super(new JCheckBox("", false));
     }
 
     @Override
-    public JComponent handle(Type type, UpdateListener updateListener, ReflectionFormBuilder reflectionFormBuilder) {
-        return new SqlDatePicker();
+    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+        ((JCheckBox)this.getComponent()).setSelected((boolean) value);
+        Component retValue = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+        return retValue;
     }
 
 }

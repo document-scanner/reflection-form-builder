@@ -14,7 +14,6 @@
  */
 package richtercloud.reflection.form.builder;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import javax.swing.JComponent;
 import richtercloud.reflection.form.builder.components.UtilDatePicker;
@@ -34,7 +33,7 @@ public class DateFieldHandler implements FieldHandler {
     }
 
     @Override
-    public JComponent handle(Type type, ReflectionFormBuilder reflectionFormBuilder) {
+    public JComponent handle(Type type, UpdateListener updateListener, ReflectionFormBuilder reflectionFormBuilder) {
         return new UtilDatePicker();
     }
 
