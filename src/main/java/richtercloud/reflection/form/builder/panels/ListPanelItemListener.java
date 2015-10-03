@@ -18,11 +18,9 @@ package richtercloud.reflection.form.builder.panels;
  *
  * @author richter
  */
-public interface ListPanelItemListener {
+public interface ListPanelItemListener<T> {
 
-    void onItemChanged(ListPanelItemEvent event);
+    void onItemAdded(ListPanelItemEvent<T> event);
 
-    void onItemAdded(ListPanelItemEvent event);
-
-    void onItemRemoved(ListPanelItemEvent event);
+    void onItemRemoved(ListPanelItemEvent<T> event);
 }

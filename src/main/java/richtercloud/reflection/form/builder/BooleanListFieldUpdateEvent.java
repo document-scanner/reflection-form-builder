@@ -20,7 +20,7 @@ import java.util.List;
  *
  * @author richter
  */
-public class BooleanListFieldUpdateEvent implements UpdateEvent<List<Boolean>>{
+public class BooleanListFieldUpdateEvent implements FieldUpdateEvent<List<Boolean>>{
     private List<Boolean> newValue;
 
     public BooleanListFieldUpdateEvent(List<Boolean> newValue) {

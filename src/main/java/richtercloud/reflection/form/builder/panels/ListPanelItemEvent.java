@@ -14,13 +14,23 @@
  */
 package richtercloud.reflection.form.builder.panels;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
  *
  * @author richter
+ * @param <T> the type of values managed by the {@link AbstractListPanel} which
+ * produces this event
  */
-public class ListPanelItemEvent {
+/*
+internal implementation notes:
+- different types require different event types which dependent on the usage of lists:
+  - primitive lists which allow editing entries have event types (added, removed, edited) -> ListPanelItemEvent
+  - a query list panel for a list of references many-to-1 or many-to-many has added and removed only -> ListPanelItemEvent
+  - a query panel for one reference 1-to-1 or 1-to-many has a selection change event, but no editing event at all -> ListPanelSelectionEvent
+*/
+public class ListPanelItemEvent<T> {
     public final static int EVENT_TYPE_ADDED = 1;
     public final static int EVENT_TYPE_REMOVED = 2;
     public final static int EVENT_TYPE_CHANGED = 4;
@@ -33,9 +43,15 @@ public class ListPanelItemEvent {
      * but only equality comparison (e.g. wrappers).
      */
     private int index;
-    private List<?> item;
+    private List<T> item;
 
-    public ListPanelItemEvent(int eventType, int index, List<?> item) {
+    /**
+     *
+     * @param eventType
+     * @param index
+     * @param item automatically internally transformed into unmodifiable collection (i.e. there's no need for callers to do that transformation)
+     */
+    public ListPanelItemEvent(int eventType, int index, List<T> item) {
         this.eventType = eventType;
         this.index = index;
         this.item = item;
@@ -45,8 +61,8 @@ public class ListPanelItemEvent {
         return eventType;
     }
 
-    public List<?> getItem() {
-        return item;
+    public List<T> getItem() {
+        return Collections.unmodifiableList(item);
     }
 
     public int getIndex() {

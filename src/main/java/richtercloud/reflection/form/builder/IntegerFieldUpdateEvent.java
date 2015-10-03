@@ -18,15 +18,15 @@ package richtercloud.reflection.form.builder;
  *
  * @author richter
  */
-public class FloatFieldUpdateEvent implements FieldUpdateEvent<Float> {
-    private Float newValue;
+public class IntegerFieldUpdateEvent implements FieldUpdateEvent<Integer> {
+    private Integer newValue;
 
-    public FloatFieldUpdateEvent(Float newValue) {
+    public IntegerFieldUpdateEvent(Integer newValue) {
         this.newValue = newValue;
     }
 
     @Override
-    public Float getNewValue() {
+    public Integer getNewValue() {
         return newValue;
     }
 }

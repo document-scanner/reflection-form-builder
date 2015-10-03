@@ -20,7 +20,8 @@ import javax.swing.JComponent;
 /**
  *
  * @author richter
- * @param <E> the type of the update event
+ * @param <T> the type of the managed field
+ * @param <E> the type of event emitted on field updates
  */
 /*
 internal implementation notes:
@@ -31,7 +32,7 @@ allows the FieldHandler to be used not only for fields, but nested generic types
 as well.
 - since JComponents don't expose changes to their value to
 PropertyChangeListener or VetoableChangeListener (both only for swing related
-properties) introduce UpdateListener in order to allow callers to specify a
+properties) introduce FieldUpdateListener in order to allow callers to specify a
 listener. This callback will be called in a listener in a listerner which the
 FieldHandler registers for each component individually.
 - A generic field handler for lists can't handle immutable types because
@@ -39,15 +40,20 @@ changes to items can't be -> it is inevitable to provide custom field handler
 for immutable types (eventually it's possible to provide generic immutable type
 field handler)
 */
-public interface FieldHandler<E extends UpdateEvent<?>> {
+public interface FieldHandler<T, E extends FieldUpdateEvent<T>> {
 
     /**
      *
-     * @param type
-     * @param updateListener
+     * @param fieldType the {@link Type} of the field or the nested generic type
+     * @param fieldValue the value of the field or the nested generic property
+     * @param updateListener an {@link FieldUpdateListener} to notify on updates
      * @param reflectionFormBuilder a {@link ReflectionFormBuilder} used for
      * recursion
      * @return
+     * @throws java.lang.IllegalAccessException
      */
-    JComponent handle(Type type, UpdateListener<E> updateListener, ReflectionFormBuilder reflectionFormBuilder);
+    JComponent handle(Type fieldType,
+            T fieldValue,
+            FieldUpdateListener<E> updateListener,
+            ReflectionFormBuilder reflectionFormBuilder) throws IllegalArgumentException, IllegalAccessException;
 }

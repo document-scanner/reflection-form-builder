@@ -14,24 +14,31 @@
  */
 package richtercloud.reflection.form.builder;
 
+import java.lang.reflect.Type;
 import javax.swing.JComponent;
 
 /**
  * Used to produce a {@link JComponent} if a field is encountered whose type is
  * annotated (on the class basis).
  * @author richter
- * @param <E> the type of the {@link UpdateListener}
+ * @param <E> the type of the {@link FieldUpdateListener}
  */
-public interface ClassAnnotationHandler<E extends UpdateEvent<?>> {
+public interface ClassAnnotationHandler<T, E extends FieldUpdateEvent<T>> {
 
     /**
      *
-     * @param clazz
+     * @param fieldClass the type of the field
+     * @param fieldValue the value of the field
      * @param updateListener
      * @param reflectionFormBuilder
      * @return
      */
-    JComponent handle(Class<?> clazz,
-            UpdateListener<E> updateListener,
+    /*
+    internal implementation notes:
+    - type Type instead of Class causes much less trouble, change only if it makes sense
+    */
+    JComponent handle(Class<? extends T> fieldClass,
+            T fieldValue,
+            FieldUpdateListener<E> updateListener,
             ReflectionFormBuilder reflectionFormBuilder);
 }

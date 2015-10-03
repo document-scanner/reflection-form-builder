@@ -14,6 +14,8 @@
  */
 package richtercloud.reflection.form.builder;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.lang.reflect.Type;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -22,7 +24,7 @@ import javax.swing.JComponent;
  *
  * @author richter
  */
-public class BooleanFieldHandler implements FieldHandler {
+public class BooleanFieldHandler implements FieldHandler<Boolean, BooleanFieldUpdateEvent> {
     private final static BooleanFieldHandler INSTANCE = new BooleanFieldHandler();
 
     public static BooleanFieldHandler getInstance() {
@@ -33,8 +35,20 @@ public class BooleanFieldHandler implements FieldHandler {
     }
 
     @Override
-    public JComponent handle(Type type, UpdateListener updateListener, ReflectionFormBuilder reflectionFormBuilder) {
-        return new JCheckBox();
+    public JComponent handle(Type type,
+            Boolean fieldValue,
+            final FieldUpdateListener<BooleanFieldUpdateEvent> updateListener,
+            ReflectionFormBuilder reflectionFormBuilder) {
+        JCheckBox retValue = new JCheckBox("",
+                fieldValue);
+        retValue.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                updateListener.onUpdate(new BooleanFieldUpdateEvent(((JCheckBox)e.getSource()).isSelected()));
+            }
+        });
+        return retValue;
     }
 
 }

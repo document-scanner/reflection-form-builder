@@ -18,12 +18,14 @@ import java.lang.reflect.Type;
 import javax.swing.JComponent;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 /**
  *
  * @author richter
  */
-public class LongFieldHandler implements FieldHandler {
+public class LongFieldHandler implements FieldHandler<Long, LongFieldUpdateEvent> {
     private final static LongFieldHandler INSTANCE = new LongFieldHandler();
 
     public static LongFieldHandler getInstance() {
@@ -34,8 +36,18 @@ public class LongFieldHandler implements FieldHandler {
     }
 
     @Override
-    public JComponent handle(Type type, UpdateListener updateListener, ReflectionFormBuilder reflectionFormBuilder) {
-        return new JSpinner(new SpinnerNumberModel((Long)0L, (Long)Long.MIN_VALUE, (Long)Long.MAX_VALUE, (Long)1L)); //the cast to Long is necessary otherwise Doubles are retrieved from component later
+    public JComponent handle(Type type,
+            Long fieldValue,
+            final FieldUpdateListener<LongFieldUpdateEvent> updateListener, ReflectionFormBuilder reflectionFormBuilder) {
+        JSpinner retValue = new JSpinner(new SpinnerNumberModel(fieldValue, (Long)Long.MIN_VALUE, (Long)Long.MAX_VALUE, (Long)1L)); //the cast to Long is necessary otherwise Doubles are retrieved from component later
+        retValue.addChangeListener(new ChangeListener() {
+
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                updateListener.onUpdate(new LongFieldUpdateEvent((Long) ((JSpinner)e.getSource()).getValue()));
+            }
+        });
+        return retValue;
     }
 
 }

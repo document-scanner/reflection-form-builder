@@ -14,20 +14,18 @@
  */
 package richtercloud.reflection.form.builder;
 
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.lang.reflect.Type;
 import javax.swing.JComponent;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 /**
  *
  * @author richter
  */
-public class FloatFieldHandler implements FieldHandler<FloatFieldUpdateEvent> {
+public class FloatFieldHandler implements FieldHandler<Float, FloatFieldUpdateEvent> {
 
     private final static FloatFieldHandler INSTANCE = new FloatFieldHandler();
 
@@ -39,27 +37,22 @@ public class FloatFieldHandler implements FieldHandler<FloatFieldUpdateEvent> {
     }
 
     @Override
-    public JComponent handle(Type type, final UpdateListener<FloatFieldUpdateEvent> updateListener, ReflectionFormBuilder reflectionFormBuilder) {
+    public JComponent handle(Type type,
+            Float fieldValue,
+            final FieldUpdateListener<FloatFieldUpdateEvent> updateListener,
+            ReflectionFormBuilder reflectionFormBuilder) {
         //@TODO: handle validaton annotations (should cover all cases, so no
         // need to develop own annotations
-        final JSpinner retValue = new JSpinner(new SpinnerNumberModel((Float) 0.0f,
+        final JSpinner retValue = new JSpinner(new SpinnerNumberModel(fieldValue,
                 (Float) (-10.0f),
                 (Float) 10.0f,
                 (Float) 0.1f));//the cast to Float is necessary otherwise Doubles are retrieved from component later
-        retValue.addMouseListener(new MouseAdapter() {
+        retValue.addChangeListener(new ChangeListener() {
 
             @Override
-            public void mouseReleased(MouseEvent e) {
+            public void stateChanged(ChangeEvent e) {
                 updateListener.onUpdate(new FloatFieldUpdateEvent((Float) retValue.getValue()));
             }
-        });
-        retValue.addKeyListener(new KeyAdapter() {
-
-            @Override
-            public void keyReleased(KeyEvent e) {
-                updateListener.onUpdate(new FloatFieldUpdateEvent((Float) retValue.getValue()));
-            }
-
         });
         return retValue;
     }

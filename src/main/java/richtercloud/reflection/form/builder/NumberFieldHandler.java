@@ -18,12 +18,14 @@ import java.lang.reflect.Type;
 import javax.swing.JComponent;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 /**
  *
  * @author richter
  */
-public class NumberFieldHandler implements FieldHandler {
+public class NumberFieldHandler implements FieldHandler<Number, NumberFieldUpdateEvent> {
     private final static NumberFieldHandler INSTANCE = new NumberFieldHandler();
 
     public static NumberFieldHandler getInstance() {
@@ -34,10 +36,21 @@ public class NumberFieldHandler implements FieldHandler {
     }
 
     @Override
-    public JComponent handle(Type type, UpdateListener updateListener, ReflectionFormBuilder reflectionFormBuilder) {
+    public JComponent handle(Type type,
+            Number fieldValue,
+            final FieldUpdateListener<NumberFieldUpdateEvent> updateListener,
+            ReflectionFormBuilder reflectionFormBuilder) {
         //@TODO: handle validaton annotations (should cover all cases, so no
         // need to develop own annotations
-        return new JSpinner(new SpinnerNumberModel(0, null, null, 1));
+        JSpinner retValue = new JSpinner(new SpinnerNumberModel(fieldValue, null, null, 1));
+        retValue.addChangeListener(new ChangeListener() {
+
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                updateListener.onUpdate(new NumberFieldUpdateEvent((Number) ((JSpinner)e.getSource()).getValue()));
+            }
+        });
+        return retValue;
     }
 
 }

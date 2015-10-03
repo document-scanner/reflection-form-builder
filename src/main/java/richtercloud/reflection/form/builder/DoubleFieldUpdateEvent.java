@@ -14,22 +14,19 @@
  */
 package richtercloud.reflection.form.builder;
 
-import java.util.List;
-
 /**
  *
  * @author richter
  */
-public class EntityListFieldUpdateEvent implements UpdateEvent<List<?>>{
-    private List<?> newValue;
+public class DoubleFieldUpdateEvent implements FieldUpdateEvent<Double> {
+    private Double newValue;
 
-    public EntityListFieldUpdateEvent(List<?> newValue) {
+    public DoubleFieldUpdateEvent(Double newValue) {
         this.newValue = newValue;
     }
 
     @Override
-    public List<?> getNewValue() {
+    public Double getNewValue() {
         return newValue;
     }
-
 }

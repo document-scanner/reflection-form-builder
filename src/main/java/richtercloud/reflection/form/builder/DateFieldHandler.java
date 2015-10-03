@@ -14,15 +14,19 @@
  */
 package richtercloud.reflection.form.builder;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.lang.reflect.Type;
+import java.util.Date;
 import javax.swing.JComponent;
+import org.jdatepicker.JUtilDatePanel;
 import richtercloud.reflection.form.builder.components.UtilDatePicker;
 
 /**
  *
  * @author richter
  */
-public class DateFieldHandler implements FieldHandler {
+public class DateFieldHandler implements FieldHandler<Date, DateFieldUpdateEvent> {
     private final static DateFieldHandler INSTANCE = new DateFieldHandler();
 
     public static DateFieldHandler getInstance() {
@@ -33,8 +37,20 @@ public class DateFieldHandler implements FieldHandler {
     }
 
     @Override
-    public JComponent handle(Type type, UpdateListener updateListener, ReflectionFormBuilder reflectionFormBuilder) {
-        return new UtilDatePicker();
+    public JComponent handle(Type type,
+            Date fieldValue,
+            final FieldUpdateListener<DateFieldUpdateEvent> updateListener,
+            ReflectionFormBuilder reflectionFormBuilder) {
+        UtilDatePicker retValue = new UtilDatePicker(fieldValue);
+        retValue.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //e.getSource points to a org.jdatepicker.JUtilDatePanel (which isn't 100 % correct given the fact that the action listener is added to a JDatePicker)
+                updateListener.onUpdate(new DateFieldUpdateEvent(((JUtilDatePanel)e.getSource()).getModel().getValue()));
+            }
+        });
+        return retValue;
     }
 
 }

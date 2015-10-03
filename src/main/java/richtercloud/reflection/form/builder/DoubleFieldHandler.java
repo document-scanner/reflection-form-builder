@@ -18,12 +18,14 @@ import java.lang.reflect.Type;
 import javax.swing.JComponent;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 /**
  *
  * @author richter
  */
-public class DoubleFieldHandler implements FieldHandler {
+public class DoubleFieldHandler implements FieldHandler<Double, DoubleFieldUpdateEvent> {
     private final static DoubleFieldHandler INSTANCE = new DoubleFieldHandler();
 
     public static DoubleFieldHandler getInstance() {
@@ -34,10 +36,21 @@ public class DoubleFieldHandler implements FieldHandler {
     }
 
     @Override
-    public JComponent handle(Type type, UpdateListener updateListener, ReflectionFormBuilder reflectionFormBuilder) {
+    public JComponent handle(Type type,
+            Double fieldValue,
+            final FieldUpdateListener<DoubleFieldUpdateEvent> updateListener,
+            ReflectionFormBuilder reflectionFormBuilder) {
         //@TODO: handle validaton annotations (should cover all cases, so no
         // need to develop own annotations
-        return new JSpinner(new SpinnerNumberModel(0.0, Double.MIN_VALUE, Double.MAX_VALUE, 0.1));
+        JSpinner retValue = new JSpinner(new SpinnerNumberModel((double) fieldValue, Double.MIN_VALUE, Double.MAX_VALUE, 0.1));
+        retValue.addChangeListener(new ChangeListener() {
+
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                updateListener.onUpdate(new DoubleFieldUpdateEvent((Double) ((JSpinner)e.getSource()).getValue()));
+            }
+        });
+        return retValue;
     }
 
 }

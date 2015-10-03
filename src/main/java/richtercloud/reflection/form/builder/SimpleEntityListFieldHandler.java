@@ -14,9 +14,6 @@
  */
 package richtercloud.reflection.form.builder;
 
-import richtercloud.reflection.form.builder.panels.SimpleEntityListPanel;
-import richtercloud.reflection.form.builder.panels.ListPanelItemEvent;
-import richtercloud.reflection.form.builder.panels.ListPanelItemListener;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
@@ -24,12 +21,15 @@ import javax.swing.JComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import richtercloud.reflection.form.builder.panels.AbstractListPanel;
+import richtercloud.reflection.form.builder.panels.EditableListPanelItemListener;
+import richtercloud.reflection.form.builder.panels.ListPanelItemEvent;
+import richtercloud.reflection.form.builder.panels.SimpleEntityListPanel;
 
 /**
  *
  * @author richter
  */
-public class SimpleEntityListFieldHandler extends AbstractListFieldHandler<GenericListFieldUpdateEvent> implements FieldHandler<GenericListFieldUpdateEvent> {
+public class SimpleEntityListFieldHandler extends AbstractListFieldHandler<List<Object>,SimpleEntityListFieldUpdateEvent> implements FieldHandler<List<Object>,SimpleEntityListFieldUpdateEvent> {
     private final static SimpleEntityListFieldHandler INSTANCE = new SimpleEntityListFieldHandler();
     private final static Logger LOGGER = LoggerFactory.getLogger(SimpleEntityListFieldHandler.class);
 
@@ -41,11 +41,14 @@ public class SimpleEntityListFieldHandler extends AbstractListFieldHandler<Gener
     }
 
     @Override
-    public JComponent handle0(Type type, final UpdateListener<GenericListFieldUpdateEvent> updateListener, ReflectionFormBuilder reflectionFormBuilder) {
+    public JComponent handle0(Type type,
+            List<Object> fieldValue,
+            final FieldUpdateListener<SimpleEntityListFieldUpdateEvent> updateListener,
+            ReflectionFormBuilder reflectionFormBuilder) {
         LOGGER.debug("handling type {}", type);
         //don't assert that type is instanceof ParameterizedType because a
         //simple List can be treated as List<Object>
-        Class<?> entityClass;
+        Class<? extends Object> entityClass;
         if(type instanceof ParameterizedType) {
             ParameterizedType parameterizedType = (ParameterizedType) type;
             if(parameterizedType.getActualTypeArguments().length == 0) {
@@ -62,24 +65,22 @@ public class SimpleEntityListFieldHandler extends AbstractListFieldHandler<Gener
         }else {
             entityClass = Object.class;
         }
-        final AbstractListPanel retValue = new SimpleEntityListPanel(entityClass, reflectionFormBuilder);
-        retValue.addItemListener(new ListPanelItemListener() {
+        final SimpleEntityListPanel<Object> retValue = new SimpleEntityListPanel<>(reflectionFormBuilder, fieldValue, entityClass);
+        retValue.addItemListener(new EditableListPanelItemListener<Object>() {
 
             @Override
-            public void onItemAdded(ListPanelItemEvent event) {
-                updateListener.onUpdate(new GenericListFieldUpdateEvent(GenericListFieldUpdateEvent.EVENT_TYPE_ADDED, //removed
-                        event.getItem()));
+            public void onItemAdded(ListPanelItemEvent<Object> event) {
+                updateListener.onUpdate(new SimpleEntityListFieldUpdateEvent(event.getItem()));
             }
 
             @Override
-            public void onItemRemoved(ListPanelItemEvent event) {
-                updateListener.onUpdate(new GenericListFieldUpdateEvent(GenericListFieldUpdateEvent.EVENT_TYPE_REMOVED, //removed
-                        event.getItem()));
+            public void onItemRemoved(ListPanelItemEvent<Object> event) {
+                updateListener.onUpdate(new SimpleEntityListFieldUpdateEvent(event.getItem()));
             }
 
             @Override
-            public void onItemChanged(ListPanelItemEvent event) {
-                updateListener.onUpdate(new GenericListFieldUpdateEvent(GenericListFieldUpdateEvent.EVENT_TYPE_CHANGED, event.getItem()));
+            public void onItemChanged(ListPanelItemEvent<Object> event) {
+                updateListener.onUpdate(new SimpleEntityListFieldUpdateEvent(event.getItem()));
             }
         });
         return retValue;

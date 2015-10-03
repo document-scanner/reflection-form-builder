@@ -14,26 +14,41 @@
  */
 package richtercloud.reflection.form.builder.panels;
 
+import java.util.List;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
 
 /**
  *
  * @author richter
+ * @param <T> the type of the managed instance
  */
-public class SimpleEntityListPanel<T> extends AbstractListPanel<T>{
+public class SimpleEntityListPanel<T> extends AbstractSingleColumnListPanel<T, ListPanelItemListener<T>, SingleColumnListPanelTableModel<T>>{
     private static final long serialVersionUID = 1L;
-    private Class<T> entityClass;
 
-    protected SimpleEntityListPanel() {
+    public SimpleEntityListPanel(ReflectionFormBuilder reflectionFormBuilder,
+            List<T> initialValues,
+            Class<? extends T> entityClass) {
+        this(reflectionFormBuilder,
+                initialValues,
+                entityClass,
+                new SimpleEntityListPanelCellEditor(),
+                new SimpleEntityListPanelCellRenderer());
     }
 
-    public SimpleEntityListPanel(Class<T> entityClass, ReflectionFormBuilder reflectionFormBuilder) {
-        this(entityClass, reflectionFormBuilder, new SimpleEntityListPanelCellEditor(), new SimpleEntityListPanelCellRenderer());
-    }
-
-    public SimpleEntityListPanel(Class<T> entityClass, ReflectionFormBuilder reflectionFormBuilder, ListPanelTableCellEditor mainListCellEditor, ListPanelTableCellRenderer mainListCellRenderer) {
-        super(reflectionFormBuilder, mainListCellEditor, mainListCellRenderer);
-        this.entityClass = entityClass;
+    public SimpleEntityListPanel(ReflectionFormBuilder reflectionFormBuilder,
+            List<T> initialValues,
+            Class<? extends T> entityClass,
+            ListPanelTableCellEditor mainListCellEditor,
+            ListPanelTableCellRenderer mainListCellRenderer) {
+        super(reflectionFormBuilder,
+                mainListCellEditor,
+                mainListCellRenderer,
+                AbstractSingleColumnListPanel.<T>createMainListModel(entityClass));
+        if(initialValues != null) {
+            for(T initialValue : initialValues) {
+                this.getMainListModel().setValueAt(initialValue, this.getMainListModel().getRowCount(), 0);
+            }
+        }
     }
 
     /**

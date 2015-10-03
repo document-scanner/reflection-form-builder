@@ -24,7 +24,6 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.JTableHeader;
-import javax.swing.table.TableColumn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
@@ -32,7 +31,9 @@ import richtercloud.reflection.form.builder.ReflectionFormBuilder;
 /**
  *
  * @author richter
- * @param <T>
+ * @param <T> the type of the managed values
+ * @param <L> the type of the event listener to use
+ * @param <M> the type of the main table model to use
  */
 /*
  internal implementation notes:
@@ -56,7 +57,7 @@ import richtercloud.reflection.form.builder.ReflectionFormBuilder;
  place -> this should be handled in the model exclusively in order to allow
  exchangable implementations of this transformation
  */
-public abstract class AbstractListPanel<T> extends javax.swing.JPanel {
+public abstract class AbstractListPanel<T, L extends ListPanelItemListener<T>, M extends ListPanelTableModel<T>> extends javax.swing.JPanel {
 
     private static final long serialVersionUID = 1L;
     private final static Logger LOGGER = LoggerFactory.getLogger(AbstractListPanel.class);
@@ -67,67 +68,49 @@ public abstract class AbstractListPanel<T> extends javax.swing.JPanel {
             return o2.compareTo(o1);
         }
     };
-    private DefaultTableColumnModel mainListColumnModel = new DefaultTableColumnModel();
-    private ListPanelTableModel mainListModel = new ListPanelTableModel() {
-        private static final long serialVersionUID = 1L;
-        /*
-         internal implementation notes:
-         - without this nothing is displayed (specification of column renderer
-         and editor in DefaultTableModel.addColumn doesn't have any effect
-         */
-
-        @Override
-        public Class<?> getColumnClass(int columnIndex) {
-            if (columnIndex == 0) {
-                return Object.class;
-            } else {
-                throw new AssertionError();
-            }
-        }
-    };
     private ListSelectionModel mainListSelectionModel = new DefaultListSelectionModel();
     /**
      * The instance which manages the instances. There's no way to allow the
      * caller to change the specific type.
      */
-    private Set<ListPanelItemListener> itemListeners = new HashSet<>();
+    private Set<L> itemListeners = new HashSet<>();
     private ListPanelTableCellRenderer mainListCellRenderer;
     private ListPanelTableCellEditor mainListCellEditor;
-
-    /**
-     * Creates new form ListPanel
-     */
-    protected AbstractListPanel() {
-    }
+    private M mainListModel;
+    private DefaultTableColumnModel mainListColumnModel;
 
     /**
      *
      * @param reflectionFormBuilder
      * @param mainListCellEditor
      * @param mainListCellRenderer
+     * @param mainListModel
+     * @param mainListColumnModel
      */
     public AbstractListPanel(ReflectionFormBuilder reflectionFormBuilder,
             ListPanelTableCellEditor mainListCellEditor,
-            ListPanelTableCellRenderer mainListCellRenderer) {
+            ListPanelTableCellRenderer mainListCellRenderer,
+            M mainListModel,
+            DefaultTableColumnModel mainListColumnModel) {
         //not possible to call this() because of dependency on cell renderer and
         //editor
         this.reflectionFormBuilder = reflectionFormBuilder;
         //don't add an item initially because that is most certainly
         //unintentional
-        this.mainListModel.addColumn(""); //before initComponents
-        this.mainListColumnModel.addColumn(new TableColumn(0, 100, mainListCellRenderer, mainListCellEditor));
         this.mainListCellEditor = mainListCellEditor;
         this.mainListCellRenderer = mainListCellRenderer;
+        this.mainListModel = mainListModel;
+        this.mainListColumnModel = mainListColumnModel;
         initComponents();
         this.mainList.setDefaultRenderer(Object.class, mainListCellRenderer);
         this.mainList.setDefaultEditor(Object.class, mainListCellEditor);
     }
 
-    public void addItemListener(ListPanelItemListener itemListener) {
+    public void addItemListener(L itemListener) {
         this.itemListeners.add(itemListener);
     }
 
-    public void removeItemListener(ListPanelItemListener itemListener) {
+    public void removeItemListener(L itemListener) {
         this.itemListeners.remove(itemListener);
     }
 
@@ -175,12 +158,12 @@ public abstract class AbstractListPanel<T> extends javax.swing.JPanel {
             }
         });
 
-        mainList.setModel(mainListModel);
+        mainList.setModel(this.mainListModel);
         mainList.setCellEditor(mainListCellEditor);
         mainList.setSelectionModel(mainListSelectionModel);
         mainList.setTableHeader(new JTableHeader(this.mainListColumnModel));
         jScrollPane2.setViewportView(mainList);
-        mainList.setColumnModel(mainListColumnModel);
+        mainList.setColumnModel(this.mainListColumnModel);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -219,11 +202,11 @@ public abstract class AbstractListPanel<T> extends javax.swing.JPanel {
     private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
         //can't check field annotations, but class annotations and, of course, use field handler
         T newElement = createNewElement();
-        this.mainListModel.addRow(new Object[]{newElement}); //handles event firing
-        for (ListPanelItemListener listener : this.itemListeners) {
-            listener.onItemChanged(new ListPanelItemEvent(ListPanelItemEvent.EVENT_TYPE_ADDED,
-                    AbstractListPanel.this.mainListModel.getRowCount(),
-                    this.mainListModel.getData()));
+        this.getMainListModel().addElement(newElement);
+        for (L listener : this.getItemListeners()) {
+            listener.onItemAdded(new ListPanelItemEvent<>(ListPanelItemEvent.EVENT_TYPE_ADDED,
+                    AbstractListPanel.this.getMainListModel().getRowCount(),
+                    AbstractListPanel.this.getMainListModel().getData()));
         }
         this.updateRowHeights();
     }//GEN-LAST:event_addButtonActionPerformed
@@ -249,8 +232,8 @@ public abstract class AbstractListPanel<T> extends javax.swing.JPanel {
         }
         for (int selectedRow : selectedRowsSorted) {
             this.mainListModel.removeRow(selectedRow); //handles event firing
-            for (ListPanelItemListener itemListener : this.getItemListeners()) {
-                itemListener.onItemRemoved(new ListPanelItemEvent(ListPanelItemEvent.EVENT_TYPE_REMOVED,
+            for (ListPanelItemListener<T> itemListener : this.getItemListeners()) {
+                itemListener.onItemRemoved(new ListPanelItemEvent<>(ListPanelItemEvent.EVENT_TYPE_REMOVED,
                         selectedRow,
                         this.mainListModel.getData()));
             }
@@ -273,7 +256,7 @@ public abstract class AbstractListPanel<T> extends javax.swing.JPanel {
         this.mainListModel.fireTableDataChanged();
     }//GEN-LAST:event_invertSelectionButtonActionPerformed
 
-    private void updateRowHeights() {
+    protected void updateRowHeights() {
         for (int row = 0; row < this.mainList.getRowCount(); row++) {
             int rowHeight = this.mainList.getRowHeight();
 
@@ -301,11 +284,11 @@ public abstract class AbstractListPanel<T> extends javax.swing.JPanel {
         return reflectionFormBuilder;
     }
 
-    public ListPanelTableModel getMainListModel() {
+    public M getMainListModel() {
         return mainListModel;
     }
 
-    public Set<ListPanelItemListener> getItemListeners() {
+    public Set<L> getItemListeners() {
         return itemListeners;
     }
 

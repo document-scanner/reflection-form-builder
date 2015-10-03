@@ -14,7 +14,10 @@
  */
 package richtercloud.reflection.form.builder;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.lang.reflect.Type;
+import java.sql.Date;
 import javax.swing.JComponent;
 import richtercloud.reflection.form.builder.components.SqlDatePicker;
 
@@ -22,7 +25,7 @@ import richtercloud.reflection.form.builder.components.SqlDatePicker;
  *
  * @author richter
  */
-public class SqlDateFieldHandler implements FieldHandler {
+public class SqlDateFieldHandler implements FieldHandler<java.sql.Date, SqlDateFieldUpdateEvent> {
     private final static SqlDateFieldHandler INSTANCE = new SqlDateFieldHandler();
 
     public static SqlDateFieldHandler getInstance() {
@@ -33,8 +36,20 @@ public class SqlDateFieldHandler implements FieldHandler {
     }
 
     @Override
-    public JComponent handle(Type type, UpdateListener updateListener, ReflectionFormBuilder reflectionFormBuilder) {
-        return new SqlDatePicker();
+    public JComponent handle(Type type,
+            Date fieldValue,
+            final FieldUpdateListener<SqlDateFieldUpdateEvent> updateListener,
+            ReflectionFormBuilder reflectionFormBuilder) {
+        final SqlDatePicker retValue = new SqlDatePicker(fieldValue);
+        retValue.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //e.getSource points to a org.jdatepicker.JUtilDatePanel (which isn't 100 % correct given the fact that the action listener is added to a JDatePicker)
+                updateListener.onUpdate(new SqlDateFieldUpdateEvent(retValue.getModel().getValue()));
+            }
+        });
+        return retValue;
     }
 
 }

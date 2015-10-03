@@ -17,14 +17,16 @@ package richtercloud.reflection.form.builder;
 import richtercloud.reflection.form.builder.panels.ListPanelItemEvent;
 import richtercloud.reflection.form.builder.panels.ListPanelItemListener;
 import java.lang.reflect.Type;
+import java.util.List;
 import javax.swing.JComponent;
 import richtercloud.reflection.form.builder.panels.BooleanListPanel;
+import richtercloud.reflection.form.builder.panels.EditableListPanelItemListener;
 
 /**
  *
  * @author richter
  */
-public class BooleanListFieldHandler extends AbstractListFieldHandler<UpdateEvent<?>> implements FieldHandler<UpdateEvent<?>>{
+public class BooleanListFieldHandler extends AbstractListFieldHandler<List<Boolean>, BooleanListFieldUpdateEvent> implements FieldHandler<List<Boolean>, BooleanListFieldUpdateEvent>{
     private final static BooleanListFieldHandler INSTANCE = new BooleanListFieldHandler();
 
     public static BooleanListFieldHandler getInstance() {
@@ -35,23 +37,26 @@ public class BooleanListFieldHandler extends AbstractListFieldHandler<UpdateEven
     }
 
     @Override
-    public JComponent handle0(Type type, final UpdateListener<UpdateEvent<?>> updateListener, ReflectionFormBuilder reflectionFormBuilder) {
-        BooleanListPanel retValue = new BooleanListPanel(reflectionFormBuilder);
-        retValue.addItemListener(new ListPanelItemListener() {
+    public JComponent handle0(Type type,
+            List<Boolean> fieldValue,
+            final FieldUpdateListener<BooleanListFieldUpdateEvent> updateListener,
+            ReflectionFormBuilder reflectionFormBuilder) {
+        BooleanListPanel retValue = new BooleanListPanel(reflectionFormBuilder, fieldValue);
+        retValue.addItemListener(new EditableListPanelItemListener<Boolean>() {
 
             @Override
-            public void onItemChanged(ListPanelItemEvent event) {
-                updateListener.onUpdate(new GenericListFieldUpdateEvent(GenericListFieldUpdateEvent.EVENT_TYPE_CHANGED, event.getItem()));
+            public void onItemChanged(ListPanelItemEvent<Boolean> event) {
+                updateListener.onUpdate(new BooleanListFieldUpdateEvent(event.getItem()));
             }
 
             @Override
-            public void onItemAdded(ListPanelItemEvent event) {
-                updateListener.onUpdate(new GenericListFieldUpdateEvent(GenericListFieldUpdateEvent.EVENT_TYPE_ADDED, event.getItem()));
+            public void onItemAdded(ListPanelItemEvent<Boolean> event) {
+                updateListener.onUpdate(new BooleanListFieldUpdateEvent(event.getItem()));
             }
 
             @Override
-            public void onItemRemoved(ListPanelItemEvent event) {
-                updateListener.onUpdate(new GenericListFieldUpdateEvent(GenericListFieldUpdateEvent.EVENT_TYPE_REMOVED, event.getItem()));
+            public void onItemRemoved(ListPanelItemEvent<Boolean> event) {
+                updateListener.onUpdate(new BooleanListFieldUpdateEvent(event.getItem()));
             }
         });
         return retValue;

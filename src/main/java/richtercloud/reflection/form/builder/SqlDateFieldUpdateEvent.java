@@ -14,31 +14,21 @@
  */
 package richtercloud.reflection.form.builder;
 
-import java.util.List;
+import java.sql.Date;
 
 /**
- * The event doesn't care about the list added because a caller is most likely
- only interested in updating the field with the passed listreference.
+ *
  * @author richter
  */
-public class GenericListFieldUpdateEvent implements UpdateEvent<List<?>> {
-    public final static int EVENT_TYPE_ADDED = 1;
-    public final static int EVENT_TYPE_REMOVED = 2;
-    public final static int EVENT_TYPE_CHANGED = 4;
-    private int eventType;
-    private List<?> newValue;
+public class SqlDateFieldUpdateEvent implements FieldUpdateEvent<java.sql.Date> {
+    private Date newValue;
 
-    public GenericListFieldUpdateEvent(int eventType, List<?> newValue) {
-        this.eventType = eventType;
+    public SqlDateFieldUpdateEvent(Date newValue) {
         this.newValue = newValue;
     }
 
-    public int getEventType() {
-        return eventType;
-    }
-
     @Override
-    public List<?> getNewValue() {
+    public Date getNewValue() {
         return newValue;
     }
 }

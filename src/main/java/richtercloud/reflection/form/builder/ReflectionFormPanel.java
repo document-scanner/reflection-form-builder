@@ -43,9 +43,14 @@ public class ReflectionFormPanel extends javax.swing.JPanel implements Scrollabl
         }
         return retValue;
     }
+
+    public static String generateApplicationWindowTitle(String title, String applicationName, String applicationVersion) {
+        return String.format("%s - %s %s", title, applicationName, applicationVersion);
+    }
+
     private Map<Field, JComponent> fieldMapping = new HashMap<>();
     private Map<Class<? extends JComponent>, ValueRetriever<?, ?>> valueRetrieverMapping;
-    private Map<Type, FieldHandler<?>> classMapping;
+    private Map<Type, FieldHandler<?,?>> classMapping;
     private Object instance;
     private Class<?> entityClass;
     private final int maxUnitIncrement = 50;
@@ -61,7 +66,7 @@ public class ReflectionFormPanel extends javax.swing.JPanel implements Scrollabl
             Object instance,
             Class<?> entityClass,
             Map<Class<? extends JComponent>, ValueRetriever<?, ?>> valueRetrieverMapping,
-            Map<Type, FieldHandler<?>> classMapping) {
+            Map<Type, FieldHandler<?,?>> classMapping) {
         this();
         if(instance == null) {
             throw new IllegalArgumentException("instance mustn't be null");
@@ -134,7 +139,7 @@ public class ReflectionFormPanel extends javax.swing.JPanel implements Scrollabl
         return entityClass;
     }
 
-    public Map<Type, FieldHandler<?>> getClassMapping() {
+    public Map<Type, FieldHandler<?,?>> getClassMapping() {
         return Collections.unmodifiableMap(classMapping);
     }
 

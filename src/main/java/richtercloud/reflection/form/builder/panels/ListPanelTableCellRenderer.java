@@ -40,6 +40,8 @@ public abstract class ListPanelTableCellRenderer implements TableCellRenderer {
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         if(isSelected) {
             this.componentPanel.setBackground(Color.red);
+        }else {
+            this.componentPanel.setBackground(Color.white);
         }
         this.componentPanel.validate();
         this.componentPanel.setSize(this.componentPanel.getPreferredSize());

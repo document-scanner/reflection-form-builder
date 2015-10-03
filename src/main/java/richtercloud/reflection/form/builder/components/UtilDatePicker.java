@@ -14,6 +14,7 @@
  */
 package richtercloud.reflection.form.builder.components;
 
+import java.util.Date;
 import org.jdatepicker.JUtilDatePicker;
 
 /**
@@ -22,5 +23,12 @@ import org.jdatepicker.JUtilDatePicker;
  */
 public class UtilDatePicker extends JUtilDatePicker {
     private static final long serialVersionUID = 1L;
+
+    public UtilDatePicker() {
+    }
+
+    public UtilDatePicker(Date value) {
+        super(value);
+    }
 
 }

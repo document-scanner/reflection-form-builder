@@ -14,19 +14,22 @@
  */
 package richtercloud.reflection.form.builder;
 
+import java.util.List;
+
 /**
- *
+ * The event doesn't care about the list added because a caller is most likely
+ only interested in updating the field with the passed listreference.
  * @author richter
  */
-public class FloatFieldUpdateEvent implements FieldUpdateEvent<Float> {
-    private Float newValue;
+public class SimpleEntityListFieldUpdateEvent implements FieldUpdateEvent<List<Object>> {
+    private List<Object> newValue;
 
-    public FloatFieldUpdateEvent(Float newValue) {
+    public SimpleEntityListFieldUpdateEvent(List<Object> newValue) {
         this.newValue = newValue;
     }
 
     @Override
-    public Float getNewValue() {
+    public List<Object> getNewValue() {
         return newValue;
     }
 }

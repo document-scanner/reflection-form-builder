@@ -12,21 +12,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package richtercloud.reflection.form.builder;
+package richtercloud.reflection.form.builder.panels;
+
+import java.util.List;
 
 /**
  *
  * @author richter
  */
-public class FloatFieldUpdateEvent implements FieldUpdateEvent<Float> {
-    private Float newValue;
+public class EditableListPanelItemEvent<T> extends ListPanelItemEvent<T> {
 
-    public FloatFieldUpdateEvent(Float newValue) {
-        this.newValue = newValue;
+    public EditableListPanelItemEvent(int eventType, int index, List<T> item) {
+        super(eventType, index, item);
     }
 
-    @Override
-    public Float getNewValue() {
-        return newValue;
-    }
 }

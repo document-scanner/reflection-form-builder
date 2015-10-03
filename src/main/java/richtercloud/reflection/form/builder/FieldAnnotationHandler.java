@@ -14,13 +14,37 @@
  */
 package richtercloud.reflection.form.builder;
 
+import java.lang.reflect.Type;
+import java.util.Collections;
+import java.util.Set;
 import javax.swing.JComponent;
 
 /**
  *
  * @author richter
+ * @param <T> the type of the managed field
+ * @param <E> the type of event emitted on field updates
  */
-public interface FieldAnnotationHandler {
+public interface FieldAnnotationHandler<T, E extends FieldUpdateEvent<T>> {
 
-    JComponent handle(Class<?> clazz, Object entity, ReflectionFormBuilder reflectionFormBuilder);
+    /**
+     *
+     * @param fieldClass
+     * @param fieldValue
+     * @param entity
+     * @param updateListener
+     * @param reflectionFormBuilder
+     * @return
+     */
+    /*
+    internal implementation notes:
+    - Type needs to be passed in order to be able to retrieve type of List
+    (e.g. List<String> for simple nested Serializable type or nested Embeddable
+    type (field annotion handler should handle both)
+    */
+    JComponent handle(Type fieldClass,
+            T fieldValue,
+            Object entity,
+            FieldUpdateListener<E> updateListener,
+            ReflectionFormBuilder reflectionFormBuilder);
 }

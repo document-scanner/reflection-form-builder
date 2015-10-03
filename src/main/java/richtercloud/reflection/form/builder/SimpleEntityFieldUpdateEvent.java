@@ -18,10 +18,10 @@ package richtercloud.reflection.form.builder;
  *
  * @author richter
  */
-public class EntityFieldUpdateEvent implements UpdateEvent<Object> {
+public class SimpleEntityFieldUpdateEvent implements FieldUpdateEvent<Object> {
     private Object newValue;
 
-    public EntityFieldUpdateEvent(Object newValue) {
+    public SimpleEntityFieldUpdateEvent(Object newValue) {
         this.newValue = newValue;
     }
 

@@ -14,19 +14,21 @@
  */
 package richtercloud.reflection.form.builder;
 
+import java.util.List;
+
 /**
  *
  * @author richter
  */
-public class FloatFieldUpdateEvent implements FieldUpdateEvent<Float> {
-    private Float newValue;
+public class StringListFieldUpdateEvent implements FieldUpdateEvent<List<String>> {
+    private List<String> newValue;
 
-    public FloatFieldUpdateEvent(Float newValue) {
+    public StringListFieldUpdateEvent(List<String> newValue) {
         this.newValue = newValue;
     }
 
     @Override
-    public Float getNewValue() {
+    public List<String> getNewValue() {
         return newValue;
     }
 }

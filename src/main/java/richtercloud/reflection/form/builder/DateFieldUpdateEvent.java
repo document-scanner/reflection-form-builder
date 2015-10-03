@@ -14,19 +14,21 @@
  */
 package richtercloud.reflection.form.builder;
 
+import java.util.Date;
+
 /**
  *
  * @author richter
  */
-public class FloatFieldUpdateEvent implements FieldUpdateEvent<Float> {
-    private Float newValue;
+public class DateFieldUpdateEvent implements FieldUpdateEvent<Date> {
+    private final Date newValue;
 
-    public FloatFieldUpdateEvent(Float newValue) {
+    public DateFieldUpdateEvent(Date newValue) {
         this.newValue = newValue;
     }
 
     @Override
-    public Float getNewValue() {
+    public Date getNewValue() {
         return newValue;
     }
 }

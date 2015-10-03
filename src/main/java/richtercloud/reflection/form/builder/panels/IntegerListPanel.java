@@ -14,6 +14,7 @@
  */
 package richtercloud.reflection.form.builder.panels;
 
+import java.util.List;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
@@ -22,24 +23,26 @@ import richtercloud.reflection.form.builder.ReflectionFormBuilder;
  *
  * @author richter
  */
-public class IntegerListPanel extends AbstractListPanel<Integer> {
-
+public class IntegerListPanel extends AbstractSingleColumnListPanel<Integer, EditableListPanelItemListener<Integer>, SingleColumnListPanelTableModel<Integer>> {
     private static final long serialVersionUID = 1L;
 
-    protected IntegerListPanel() {
-    }
-
-    public IntegerListPanel(ReflectionFormBuilder reflectionFormBuilder) {
-        super(reflectionFormBuilder, new IntegerListPanelCellEditor(), new IntegerListPanelCellRenderer());
+    public IntegerListPanel(ReflectionFormBuilder reflectionFormBuilder, List<Integer> initialValues) {
+        super(reflectionFormBuilder,
+                new IntegerListPanelCellEditor(),
+                new IntegerListPanelCellRenderer(),
+                AbstractSingleColumnListPanel.<Integer>createMainListModel(Integer.class));
         getMainListCellEditor().addCellEditorListener(new CellEditorListener() {
 
             @Override
             public void editingStopped(ChangeEvent e) {
-                int index = IntegerListPanel.this.getMainList().getSelectedRow();
-                if(index > -1) {
-                    IntegerListPanel.this.getMainListModel().setRowValue(index, ((IntegerListPanelCellEditor) e.getSource()).getCellEditorValue());
-                    for(ListPanelItemListener itemListener : IntegerListPanel.this.getItemListeners()) {
-                        itemListener.onItemChanged(new ListPanelItemEvent(ListPanelItemEvent.EVENT_TYPE_CHANGED, index, IntegerListPanel.this.getMainListModel().getData()));
+                int row = IntegerListPanel.this.getMainList().getSelectedRow();
+                if(row > -1) {
+                    IntegerListPanel.this.getMainListModel().setValueAt((Integer) ((IntegerListPanelCellEditor) e.getSource()).getCellEditorValue(),
+                            row,
+                            0 //column
+                    );
+                    for(EditableListPanelItemListener<Integer> itemListener : IntegerListPanel.this.getItemListeners()) {
+                        itemListener.onItemChanged(new ListPanelItemEvent<>(ListPanelItemEvent.EVENT_TYPE_CHANGED, row, IntegerListPanel.this.getMainListModel().getData()));
                     }
                 }
             }
@@ -49,6 +52,11 @@ public class IntegerListPanel extends AbstractListPanel<Integer> {
                 //do nothing because there're no changes to the model
             }
         });
+        if(initialValues != null) {
+            for(Integer initialValue : initialValues) {
+                this.getMainListModel().setValueAt(initialValue, this.getMainListModel().getRowCount(), 0);
+            }
+        }
     }
 
     @Override

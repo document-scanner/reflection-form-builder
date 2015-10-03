@@ -14,16 +14,22 @@
  */
 package richtercloud.reflection.form.builder;
 
+import java.util.List;
+
 /**
  *
  * @author richter
- * @param <E> the type of the event
  */
-public interface UpdateListener<E extends UpdateEvent<?>> {
+public class BooleanFieldUpdateEvent implements FieldUpdateEvent<Boolean> {
+    private Boolean newValue;
 
-    /**
-     * Called if a component is updated.
-     * @param event
-     */
-    void onUpdate(E event);
+    public BooleanFieldUpdateEvent(Boolean newValue) {
+        this.newValue = newValue;
+    }
+
+    @Override
+    public Boolean getNewValue() {
+        return newValue;
+    }
+
 }

@@ -17,14 +17,16 @@ package richtercloud.reflection.form.builder;
 import richtercloud.reflection.form.builder.panels.ListPanelItemEvent;
 import richtercloud.reflection.form.builder.panels.ListPanelItemListener;
 import java.lang.reflect.Type;
+import java.util.List;
 import javax.swing.JComponent;
+import richtercloud.reflection.form.builder.panels.EditableListPanelItemListener;
 import richtercloud.reflection.form.builder.panels.IntegerListPanel;
 
 /**
  *
  * @author richter
  */
-public class IntegerListFieldHandler implements FieldHandler<UpdateEvent<?>>{
+public class IntegerListFieldHandler implements FieldHandler<List<Integer>, IntegerListFieldUpdateEvent>{
     private final static IntegerListFieldHandler INSTANCE = new IntegerListFieldHandler();
 
     public static IntegerListFieldHandler getInstance() {
@@ -35,23 +37,26 @@ public class IntegerListFieldHandler implements FieldHandler<UpdateEvent<?>>{
     }
 
     @Override
-    public JComponent handle(Type type, final UpdateListener<UpdateEvent<?>> updateListener, ReflectionFormBuilder reflectionFormBuilder) {
-        IntegerListPanel retValue = new IntegerListPanel(reflectionFormBuilder);
-        retValue.addItemListener(new ListPanelItemListener() {
+    public JComponent handle(Type type,
+            List<Integer> fieldValue,
+            final FieldUpdateListener<IntegerListFieldUpdateEvent> updateListener,
+            ReflectionFormBuilder reflectionFormBuilder) {
+        IntegerListPanel retValue = new IntegerListPanel(reflectionFormBuilder, fieldValue);
+        retValue.addItemListener(new EditableListPanelItemListener<Integer>() {
 
             @Override
-            public void onItemChanged(ListPanelItemEvent event) {
-                updateListener.onUpdate(new GenericListFieldUpdateEvent(GenericListFieldUpdateEvent.EVENT_TYPE_CHANGED, event.getItem()));
+            public void onItemChanged(ListPanelItemEvent<Integer> event) {
+                updateListener.onUpdate(new IntegerListFieldUpdateEvent(event.getItem()));
             }
 
             @Override
-            public void onItemAdded(ListPanelItemEvent event) {
-                updateListener.onUpdate(new GenericListFieldUpdateEvent(GenericListFieldUpdateEvent.EVENT_TYPE_ADDED, event.getItem()));
+            public void onItemAdded(ListPanelItemEvent<Integer> event) {
+                updateListener.onUpdate(new IntegerListFieldUpdateEvent(event.getItem()));
             }
 
             @Override
-            public void onItemRemoved(ListPanelItemEvent event) {
-                updateListener.onUpdate(new GenericListFieldUpdateEvent(GenericListFieldUpdateEvent.EVENT_TYPE_REMOVED, event.getItem()));
+            public void onItemRemoved(ListPanelItemEvent<Integer> event) {
+                updateListener.onUpdate(new IntegerListFieldUpdateEvent(event.getItem()));
             }
         });
         return retValue;

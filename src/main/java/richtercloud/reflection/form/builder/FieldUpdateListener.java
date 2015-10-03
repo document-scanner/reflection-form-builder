@@ -17,14 +17,13 @@ package richtercloud.reflection.form.builder;
 /**
  *
  * @author richter
- * @param <T> the type of the field value to be set after an update
+ * @param <E> the type of the event
  */
-public interface UpdateEvent<T> {
+public interface FieldUpdateListener<E extends FieldUpdateEvent<?>> {
 
     /**
-     * The new value to be to the field. The field is most likely only known
-     * by the creator of listeners working with this event type.
-     * @return
+     * Called if a component is updated.
+     * @param event
      */
-    T getNewValue();
+    void onUpdate(E event);
 }

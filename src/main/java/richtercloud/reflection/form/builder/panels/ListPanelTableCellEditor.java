@@ -64,6 +64,8 @@ public abstract class ListPanelTableCellEditor extends AbstractCellEditor implem
     public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
         if(isSelected) {
             this.component.setBackground(Color.red);
+        }else {
+            this.component.setBackground(Color.white);
         }
         component.setSize(this.component.getPreferredSize());
         return component;

@@ -18,7 +18,7 @@ package richtercloud.reflection.form.builder;
  *
  * @author richter
  */
-public class StringFieldUpdateEvent implements UpdateEvent<String> {
+public class StringFieldUpdateEvent implements FieldUpdateEvent<String> {
     private String newValue;
 
     public StringFieldUpdateEvent(String newValue) {

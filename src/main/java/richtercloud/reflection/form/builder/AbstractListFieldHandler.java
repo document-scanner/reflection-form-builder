@@ -23,19 +23,25 @@ import javax.swing.JComponent;
  *
  * @author richter
  */
-public abstract class AbstractListFieldHandler<E extends UpdateEvent<?>> implements FieldHandler<E> {
+public abstract class AbstractListFieldHandler<T, E extends FieldUpdateEvent<T>> implements FieldHandler<T, E> {
 
     @Override
-    public JComponent handle(Type type, UpdateListener<E> updateListener, ReflectionFormBuilder reflectionFormBuilder) {
+    public JComponent handle(Type type,
+            T fieldValue,
+            FieldUpdateListener<E> updateListener,
+            ReflectionFormBuilder reflectionFormBuilder) throws IllegalArgumentException, IllegalAccessException {
         if(type instanceof ParameterizedType) {
             ParameterizedType parameterizedType = (ParameterizedType) type;
             if(!parameterizedType.getRawType().equals(List.class)) {
                 throw new IllegalArgumentException(String.format("list field handlers are only allowed to be used with types with raw type %s (type is %s)", List.class, type));
             }
         }
-        JComponent retValue = handle0(type, updateListener, reflectionFormBuilder);
+        JComponent retValue = handle0(type, fieldValue, updateListener, reflectionFormBuilder);
         return retValue;
     }
 
-    protected abstract JComponent handle0(Type type, UpdateListener<E> updateListener, ReflectionFormBuilder reflectionFormBuilder);
+    protected abstract JComponent handle0(Type type,
+            T fieldValue,
+            FieldUpdateListener<E> updateListener,
+            ReflectionFormBuilder reflectionFormBuilder) throws IllegalArgumentException, IllegalAccessException;
 }

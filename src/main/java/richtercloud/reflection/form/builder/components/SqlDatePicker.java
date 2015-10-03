@@ -14,6 +14,7 @@
  */
 package richtercloud.reflection.form.builder.components;
 
+import java.sql.Date;
 import org.jdatepicker.JSqlDatePicker;
 
 /**
@@ -22,5 +23,12 @@ import org.jdatepicker.JSqlDatePicker;
  */
 public class SqlDatePicker extends JSqlDatePicker {
     private static final long serialVersionUID = 1L;
+
+    public SqlDatePicker() {
+    }
+
+    public SqlDatePicker(Date value) {
+        super(value);
+    }
 
 }

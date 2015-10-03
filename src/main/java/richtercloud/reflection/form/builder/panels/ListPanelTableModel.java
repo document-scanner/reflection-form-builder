@@ -14,58 +14,32 @@
  */
 package richtercloud.reflection.form.builder.panels;
 
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Vector;
-import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 
 /**
+ * Handles value queries and inserts for tables which don't care whether their
+ * values are displayed in one or multiple columns (it's up to subclasses to
+ * decide). This allows code reusage in {@link AbstractListPanel}.
  *
  * @author richter
  */
-/*
-internal implementation notes:
-- implement more efficient so that data vector isn't copied at retrieval, but
-target collection List used initially (add a delegate and wrap or change
-implementation)
-*/
-public class ListPanelTableModel<T> extends DefaultTableModel {
-    private static final long serialVersionUID = 1L;
+public interface ListPanelTableModel<T> extends TableModel {
 
-    public ListPanelTableModel() {
-    }
+    void fireTableDataChanged();
 
-    public List<?> getData() {
-        List retValue = new LinkedList<>();
-        for(Object datum : Collections.list(this.getDataVector().elements())) {
-            Vector rowVector = (Vector) datum;
-            retValue.add(rowVector.get(0));
-        }
-        return Collections.unmodifiableList(retValue); //should be unmodifiable in order to avoid callers thinking that
-        //changes to data is written back
-    }
+    void removeRow(int row);
+
+    void addElement(T element);
+
+    void removeElement(T element);
 
     /**
-     * A helper to deal with casts during access to dataVector and missing rows.
+     * A read-only view of the managed data. Changes are enforced through {@link #addElement(java.lang.Object) } and {@link #removeElement(java.lang.Object) } in order to be able to track changes.
+     * @return a read-only view of the managed data
      */
-    public void setRowValue(int row, T value) {
-        if(this.getRowCount() <= row) {
-            this.addRow(new Object[]{value});
-        }else {
-            ((Vector)this.getDataVector().get(row)).set(0, value);
-        }
-    }
+    List<T> getData();
 
-    /**
-     * A helper to deal with casts during access to dataVector which avoids
-     * transformation of the complete model like in {@link #getData() }.
-     * @param row
-     * @return
-     */
-    public Object getRowValue(int row) {
-        Object retValue = ((Vector)this.getDataVector().get(row)).get(0);
-        return retValue;
-    }
+    void addColumn(String columnName);
 
 }

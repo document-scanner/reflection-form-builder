@@ -17,16 +17,14 @@ package richtercloud.reflection.form.builder;
 /**
  *
  * @author richter
+ * @param <T> the type of the field value to be set after an update
  */
-public class FloatFieldUpdateEvent implements FieldUpdateEvent<Float> {
-    private Float newValue;
+public interface FieldUpdateEvent<T> {
 
-    public FloatFieldUpdateEvent(Float newValue) {
-        this.newValue = newValue;
-    }
-
-    @Override
-    public Float getNewValue() {
-        return newValue;
-    }
+    /**
+     * The new value to be to the field. The field is most likely only known
+     * by the creator of listeners working with this event type.
+     * @return
+     */
+    T getNewValue();
 }

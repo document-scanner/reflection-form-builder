@@ -14,6 +14,8 @@
  */
 package richtercloud.reflection.form.builder;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.lang.reflect.Type;
@@ -24,7 +26,7 @@ import javax.swing.JTextField;
  *
  * @author richter
  */
-public class StringFieldHandler implements FieldHandler<StringFieldUpdateEvent> {
+public class StringFieldHandler implements FieldHandler<String, StringFieldUpdateEvent> {
     private final static StringFieldHandler INSTANCE = new StringFieldHandler();
 
     public static StringFieldHandler getInstance() {
@@ -35,11 +37,11 @@ public class StringFieldHandler implements FieldHandler<StringFieldUpdateEvent> 
     }
 
     @Override
-    public JComponent handle(Type type, final UpdateListener<StringFieldUpdateEvent> updateListener, ReflectionFormBuilder reflectionFormBuilder) {
-        final JTextField retValue = new JTextField();
-        retValue.addKeyListener(new KeyAdapter() {
+    public JComponent handle(Type type, String fieldValue, final FieldUpdateListener<StringFieldUpdateEvent> updateListener, ReflectionFormBuilder reflectionFormBuilder) {
+        final JTextField retValue = new JTextField(fieldValue);
+        retValue.addActionListener(new ActionListener() {
             @Override
-            public void keyReleased(KeyEvent e) {
+            public void actionPerformed(ActionEvent e) {
                 updateListener.onUpdate(new StringFieldUpdateEvent(retValue.getText()));
             }
         });

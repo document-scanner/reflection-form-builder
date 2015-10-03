@@ -12,21 +12,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package richtercloud.reflection.form.builder;
+package richtercloud.reflection.form.builder.panels;
 
 /**
  *
  * @author richter
  */
-public class FloatFieldUpdateEvent implements FieldUpdateEvent<Float> {
-    private Float newValue;
+public class ListPanelSelectionEvent<T> {
+    private T selectedItem;
 
-    public FloatFieldUpdateEvent(Float newValue) {
-        this.newValue = newValue;
+    public ListPanelSelectionEvent(T selectedItem) {
+        this.selectedItem = selectedItem;
     }
 
-    @Override
-    public Float getNewValue() {
-        return newValue;
+    public T getSelectedItem() {
+        return selectedItem;
     }
 }
