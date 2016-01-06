@@ -14,6 +14,9 @@
  */
 package richtercloud.reflection.form.builder;
 
+import javax.measure.quantity.Mass;
+import org.jscience.physics.amount.Amount;
+
 /**
  *
  * @author richter
@@ -22,8 +25,9 @@ package richtercloud.reflection.form.builder;
 internal implementation notes:
 - needs to be a proper class in order to have a constructor in reflection API
 */
-class TestEntity {
+public class TestEntity {
     private String a = "a";
+    private Amount<Mass> m;
 
     TestEntity() {
     }

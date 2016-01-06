@@ -16,10 +16,7 @@ package richtercloud.reflection.form.builder.panels;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Vector;
-import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -42,6 +39,14 @@ public class SingleColumnListPanelTableModel<T> extends DefaultTableModel implem
         this.columnClass = columnClass;
     }
 
+    /**
+     *
+     * @return
+     */
+    /*
+    internal implementation notes:
+    - returning an unmodifiable view corresponds to interface specifications
+    */
     @Override
     public List<T> getData() {
         return Collections.unmodifiableList(this.values);
@@ -53,7 +58,7 @@ public class SingleColumnListPanelTableModel<T> extends DefaultTableModel implem
     }
 
     @Override
-    public void removeRow(int row) {
+    public void removeElement(int row) {
         this.values.remove(row);
         this.fireTableDataChanged();
     }
@@ -61,6 +66,12 @@ public class SingleColumnListPanelTableModel<T> extends DefaultTableModel implem
     @Override
     public void addElement(T element) {
         this.values.add(element);
+        this.fireTableDataChanged();
+    }
+
+    @Override
+    public void insertElementAt(int row, T element) {
+        this.values.add(row, element);
         this.fireTableDataChanged();
     }
 

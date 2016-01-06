@@ -18,31 +18,34 @@ import java.util.List;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
+import richtercloud.reflection.form.builder.message.MessageHandler;
 
 /**
  *
  * @author richter
  */
-public class IntegerListPanel extends AbstractSingleColumnListPanel<Integer, EditableListPanelItemListener<Integer>, SingleColumnListPanelTableModel<Integer>> {
+public class IntegerListPanel extends AbstractSingleColumnListPanel<Integer, EditableListPanelItemListener<Integer>, SingleColumnListPanelTableModel<Integer>, ReflectionFormBuilder> {
     private static final long serialVersionUID = 1L;
 
-    public IntegerListPanel(ReflectionFormBuilder reflectionFormBuilder, List<Integer> initialValues) {
+    public IntegerListPanel(ReflectionFormBuilder reflectionFormBuilder,
+            List<Integer> initialValues,
+            MessageHandler messageHandler) {
         super(reflectionFormBuilder,
                 new IntegerListPanelCellEditor(),
                 new IntegerListPanelCellRenderer(),
-                AbstractSingleColumnListPanel.<Integer>createMainListModel(Integer.class));
+                AbstractSingleColumnListPanel.<Integer>createMainListModel(Integer.class),
+                initialValues,
+                messageHandler);
         getMainListCellEditor().addCellEditorListener(new CellEditorListener() {
 
             @Override
             public void editingStopped(ChangeEvent e) {
                 int row = IntegerListPanel.this.getMainList().getSelectedRow();
                 if(row > -1) {
-                    IntegerListPanel.this.getMainListModel().setValueAt((Integer) ((IntegerListPanelCellEditor) e.getSource()).getCellEditorValue(),
-                            row,
-                            0 //column
-                    );
                     for(EditableListPanelItemListener<Integer> itemListener : IntegerListPanel.this.getItemListeners()) {
-                        itemListener.onItemChanged(new ListPanelItemEvent<>(ListPanelItemEvent.EVENT_TYPE_CHANGED, row, IntegerListPanel.this.getMainListModel().getData()));
+                        itemListener.onItemChanged(new ListPanelItemEvent<>(ListPanelItemEvent.EVENT_TYPE_CHANGED,
+                                row,
+                                IntegerListPanel.this.getMainListModel().getData()));
                     }
                 }
             }

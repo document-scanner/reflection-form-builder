@@ -22,7 +22,7 @@ import javax.swing.JTable;
  *
  * @author richter
  */
-public class BooleanListPanelCellEditor extends ListPanelTableCellEditor {
+public class BooleanListPanelCellEditor extends ListPanelTableCellEditor<JCheckBox> {
     private static final long serialVersionUID = 1L;
 
     public BooleanListPanelCellEditor() {
@@ -31,13 +31,13 @@ public class BooleanListPanelCellEditor extends ListPanelTableCellEditor {
 
     @Override
     public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
-        ((JCheckBox)this.getComponent()).setSelected((boolean) value);
+        this.getComponent().setSelected((boolean) value);
         Component retValue = super.getTableCellEditorComponent(table, value, isSelected, row, column);
         return retValue;
     }
 
     @Override
     protected Object stopCellEditing0() {
-        return ((JCheckBox)this.getComponent()).isSelected();
+        return this.getComponent().isSelected();
     }
 }

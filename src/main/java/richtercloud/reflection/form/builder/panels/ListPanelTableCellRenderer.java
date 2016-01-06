@@ -15,8 +15,8 @@
 package richtercloud.reflection.form.builder.panels;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
+import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JTable;
@@ -26,29 +26,36 @@ import javax.swing.table.TableCellRenderer;
  *
  * @author richter
  */
-public abstract class ListPanelTableCellRenderer implements TableCellRenderer {
+public abstract class ListPanelTableCellRenderer<C extends JComponent> implements TableCellRenderer {
     private JPanel componentPanel = new JPanel(new BorderLayout());
-    private JComponent component;
+    private C component;
 
-    public ListPanelTableCellRenderer(JComponent component) {
-        componentPanel.add(component);
+    public ListPanelTableCellRenderer(C component) {
+        this.componentPanel.add(component);
         this.component = component;
     }
 
 
     @Override
-    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+    public Component getTableCellRendererComponent(JTable table,
+            Object value,
+            boolean isSelected,
+            boolean hasFocus,
+            int row,
+            int column) {
         if(isSelected) {
-            this.componentPanel.setBackground(Color.red);
+            this.componentPanel.setBorder(BorderFactory.createEtchedBorder());
+            //this.componentPanel.setBackground(Color.red);
         }else {
-            this.componentPanel.setBackground(Color.white);
+            this.componentPanel.setBorder(BorderFactory.createEmptyBorder());
+            //this.componentPanel.setBackground(Color.white);
         }
         this.componentPanel.validate();
         this.componentPanel.setSize(this.componentPanel.getPreferredSize());
         return this.componentPanel;
     }
 
-    protected JComponent getComponent() {
+    protected C getComponent() {
         return this.component;
     }
 }

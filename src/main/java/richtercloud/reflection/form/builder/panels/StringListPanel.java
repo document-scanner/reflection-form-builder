@@ -18,32 +18,35 @@ import java.util.List;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
+import richtercloud.reflection.form.builder.message.MessageHandler;
 
 /**
  *
  * @author richter
  */
-public class StringListPanel extends AbstractSingleColumnListPanel<String, EditableListPanelItemListener<String>, SingleColumnListPanelTableModel<String>> {
+public class StringListPanel extends AbstractSingleColumnListPanel<String, EditableListPanelItemListener<String>, SingleColumnListPanelTableModel<String>, ReflectionFormBuilder> {
 
     private static final long serialVersionUID = 1L;
 
-    public StringListPanel(ReflectionFormBuilder reflectionFormBuilder, List<String> initialValues) {
+    public StringListPanel(ReflectionFormBuilder reflectionFormBuilder,
+            List<String> initialValues,
+            MessageHandler messageHandler) {
         super(reflectionFormBuilder,
                 new StringListPanelCellEditor(),
                 new StringListPanelCellRenderer(),
-                AbstractSingleColumnListPanel.<String>createMainListModel(String.class));
+                AbstractSingleColumnListPanel.<String>createMainListModel(String.class),
+                initialValues,
+                messageHandler);
         getMainListCellEditor().addCellEditorListener(new CellEditorListener() {
 
             @Override
             public void editingStopped(ChangeEvent e) {
                 int row = StringListPanel.this.getMainList().getSelectedRow();
                 if(row > -1) {
-                    StringListPanel.this.getMainListModel().setValueAt((String) ((StringListPanelCellEditor) e.getSource()).getCellEditorValue(),
-                            row,
-                            0 //column
-                    );
                     for(EditableListPanelItemListener<String> itemListener : StringListPanel.this.getItemListeners()) {
-                        itemListener.onItemChanged(new ListPanelItemEvent<>(ListPanelItemEvent.EVENT_TYPE_CHANGED, row, StringListPanel.this.getMainListModel().getData()));
+                        itemListener.onItemChanged(new ListPanelItemEvent<>(ListPanelItemEvent.EVENT_TYPE_CHANGED,
+                                row,
+                                StringListPanel.this.getMainListModel().getData()));
                     }
                 }
             }
@@ -53,11 +56,7 @@ public class StringListPanel extends AbstractSingleColumnListPanel<String, Edita
                 //do nothing because there're no changes to the model
             }
         });
-        if(initialValues != null) {
-            for(String initialValue : initialValues) {
-                this.getMainListModel().setValueAt(initialValue, this.getMainListModel().getRowCount(), 0);
-            }
-        }
+        //initialValues are already add in superclass
     }
 
     @Override

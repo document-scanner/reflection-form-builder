@@ -23,7 +23,7 @@ import javax.swing.JTable;
  * representing created instances with default values.
  * @author richter
  */
-public class SimpleEntityListPanelCellRenderer extends ListPanelTableCellRenderer {
+public class SimpleEntityListPanelCellRenderer extends ListPanelTableCellRenderer<JLabel> {
 
     public SimpleEntityListPanelCellRenderer() {
         super(new JLabel());
@@ -31,7 +31,7 @@ public class SimpleEntityListPanelCellRenderer extends ListPanelTableCellRendere
 
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-        ((JLabel)this.getComponent()).setText(value != null ? value.toString() : null);
+        this.getComponent().setText(value != null ? value.toString() : null);
         Component retValue = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
         return retValue;
     }

@@ -15,16 +15,14 @@
 package richtercloud.reflection.form.builder.panels;
 
 import java.awt.Component;
-import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.SpinnerNumberModel;
 
 /**
  *
  * @author richter
  */
-public class StringListPanelCellEditor extends ListPanelTableCellEditor {
+public class StringListPanelCellEditor extends ListPanelTableCellEditor<JTextField> {
     private static final long serialVersionUID = 1L;
 
     public StringListPanelCellEditor() {
@@ -33,14 +31,14 @@ public class StringListPanelCellEditor extends ListPanelTableCellEditor {
 
     @Override
     public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
-        ((JTextField)this.getComponent()).setText((String) value);
+        this.getComponent().setText((String) value);
         Component retValue = super.getTableCellEditorComponent(table, value, isSelected, row, column);
         return retValue;
     }
 
     @Override
     protected Object stopCellEditing0() {
-        return ((JTextField)this.getComponent()).getText();
+        return this.getComponent().getText();
     }
 
 }

@@ -15,9 +15,9 @@
 package richtercloud.reflection.form.builder.panels;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import javax.swing.AbstractCellEditor;
+import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JTable;
@@ -26,24 +26,27 @@ import javax.swing.table.TableCellEditor;
 /**
  * Manages {@link JComponent}s in a list. Editor values aren't managed
  * because they are already managed by the model components.
+ * @param <C>
  */
 /*
 internal implementation notes:
 - DefaultCellEditor doesn't provide a default constructor and causes
 ClassCastExceptions
+- update of model when editing is stopped occurs automatically in
+AbstractCellEditor
  */
-public abstract class ListPanelTableCellEditor extends AbstractCellEditor implements TableCellEditor {
+public abstract class ListPanelTableCellEditor<C extends JComponent> extends AbstractCellEditor implements TableCellEditor {
     private static final long serialVersionUID = 1L;
     private JPanel componentPanel = new JPanel(new BorderLayout());
-    private JComponent component;
+    private C component;
     private Object cellEditorValue = null;
 
-    public ListPanelTableCellEditor(JComponent component) {
+    public ListPanelTableCellEditor(C component) {
         this.componentPanel.add(component);
         this.component = component;
     }
 
-    public JComponent getComponent() {
+    public C getComponent() {
         return component;
     }
 
@@ -52,10 +55,20 @@ public abstract class ListPanelTableCellEditor extends AbstractCellEditor implem
         return cellEditorValue;
     }
 
+    /**
+     * Sets the editor value to {@code null}. Can be called after stopping
+     * editing (which also retrieves the editor value).
+     */
+    public void resetCellEditorValue() {
+        this.cellEditorValue = null;
+    }
+
     @Override
     public boolean stopCellEditing() {
         this.cellEditorValue = stopCellEditing0();
-        return super.stopCellEditing();
+        boolean retValue = super.stopCellEditing();
+        this.resetCellEditorValue();
+        return retValue;
     }
 
     protected abstract Object stopCellEditing0();
@@ -63,9 +76,11 @@ public abstract class ListPanelTableCellEditor extends AbstractCellEditor implem
     @Override
     public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
         if(isSelected) {
-            this.component.setBackground(Color.red);
+            this.componentPanel.setBorder(BorderFactory.createEtchedBorder());
+            //this.componentPanel.setBackground(Color.red);
         }else {
-            this.component.setBackground(Color.white);
+            this.componentPanel.setBorder(BorderFactory.createEmptyBorder());
+            //this.componentPanel.setBackground(Color.white);
         }
         component.setSize(this.component.getPreferredSize());
         return component;

@@ -14,25 +14,31 @@
  */
 package richtercloud.reflection.form.builder;
 
-import java.awt.Dimension;
-import java.awt.Rectangle;
 import java.lang.reflect.Field;
-import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import javax.swing.GroupLayout;
 import javax.swing.JComponent;
-import javax.swing.Scrollable;
-import javax.swing.SwingConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import richtercloud.reflection.form.builder.retriever.ValueRetriever;
 
 /**
  *
  * @author richter
  */
-public class ReflectionFormPanel extends javax.swing.JPanel implements Scrollable {
+/*
+internal implementation notes:
+- in order to be able to add components to used GroupLayout it's necessary to
+expose the horizontal and vertical layout group which are not retrievable from
+GroupLayout
+- implementing Scrollable messes up horizontal resizing of components in the
+right column when a ReflectionFormPanel is added to a JTabbedPane inside a
+JScrollPane
+*/
+public class ReflectionFormPanel extends javax.swing.JPanel {
     private static final long serialVersionUID = 1L;
     private final static Logger LOGGER = LoggerFactory.getLogger(ReflectionFormPanel.class);
 
@@ -43,83 +49,69 @@ public class ReflectionFormPanel extends javax.swing.JPanel implements Scrollabl
         }
         return retValue;
     }
-
-    public static String generateApplicationWindowTitle(String title, String applicationName, String applicationVersion) {
-        return String.format("%s - %s %s", title, applicationName, applicationVersion);
-    }
-
+    private GroupLayout.Group horizontalSequentialGroup;
+    private GroupLayout.Group verticalSequentialGroup;
     private Map<Field, JComponent> fieldMapping = new HashMap<>();
-    private Map<Class<? extends JComponent>, ValueRetriever<?, ?>> valueRetrieverMapping;
-    private Map<Type, FieldHandler<?,?>> classMapping;
     private Object instance;
     private Class<?> entityClass;
-    private final int maxUnitIncrement = 50;
-
-    /**
-     * Creates new form ReflectionFormPanel
-     */
-    public ReflectionFormPanel() {
-        this.initComponents();
-    }
+    private final Set<ReflectionFormPanelUpdateListener> updateListeners = new HashSet<>();
 
     public ReflectionFormPanel(Map<Field, JComponent> fieldMapping,
             Object instance,
-            Class<?> entityClass,
-            Map<Class<? extends JComponent>, ValueRetriever<?, ?>> valueRetrieverMapping,
-            Map<Type, FieldHandler<?,?>> classMapping) {
-        this();
+            Class<?> entityClass) {
+        super();
+        this.initComponents();
+        GroupLayout layout = new GroupLayout(this);
+        this.setLayout(layout);
+        this.horizontalSequentialGroup = layout.createSequentialGroup();
+        this.verticalSequentialGroup = layout.createSequentialGroup();
+        layout.setHorizontalGroup(horizontalSequentialGroup);
+        layout.setVerticalGroup(verticalSequentialGroup);
         if(instance == null) {
             throw new IllegalArgumentException("instance mustn't be null");
         }
         if(fieldMapping == null) {
             throw new IllegalArgumentException("fieldMapping mustn't be null");
         }
-        if(valueRetrieverMapping == null) {
-            throw new IllegalArgumentException("valueRetrieverMapping mustn't be null");
-        }
-        if(classMapping == null) {
-            throw new IllegalArgumentException("classMapping mustn't be null");
-        }
         if(entityClass == null) {
             throw new IllegalArgumentException("entityClass mustn't be null");
         }
         this.fieldMapping = fieldMapping;
-        this.valueRetrieverMapping = valueRetrieverMapping;
-        this.classMapping = classMapping;
         this.instance = instance;
         this.entityClass = entityClass;
+    }
+
+    public void addUpdateListener(ReflectionFormPanelUpdateListener updateListener) {
+        this.updateListeners.add(updateListener);
+    }
+
+    public void removeUpdateListener(ReflectionFormPanelUpdateListener updateListener) {
+        this.updateListeners.remove(updateListener);
+    }
+
+    protected Set<ReflectionFormPanelUpdateListener> getUpdateListeners() {
+        return Collections.unmodifiableSet(this.updateListeners);
+    }
+
+    @Override
+    public GroupLayout getLayout() {
+        return (GroupLayout) super.getLayout();
+    }
+
+    public GroupLayout.Group getVerticalSequentialGroup() {
+        return verticalSequentialGroup;
+    }
+
+    public GroupLayout.Group getHorizontalSequentialGroup() {
+        return horizontalSequentialGroup;
     }
 
     public JComponent getComponentByField(Field field) {
         return this.fieldMapping.get(field);
     }
 
-    public void updateInstance() throws IllegalArgumentException, IllegalAccessException {
-        for(Field field : this.fieldMapping.keySet()) {
-            JComponent comp = this.fieldMapping.get(field);
-            //figure out what type comp is supposed to deliver
-            ValueRetriever valueRetriever = this.valueRetrieverMapping.get(comp.getClass());
-            if(valueRetriever == null) {
-                if(this.classMapping.get(field.getType()) == null) {
-                    LOGGER.debug("skipping update of instance for field '{}' of class '{}' because no component is mapped in class mapping", field.getName(), field.getDeclaringClass().getName());
-                    continue;
-
-                }else {
-                    throw new IllegalArgumentException(String.format("valueRetriever mapped to component '%s' class is null", comp.getClass().getName()));
-                }
-            }
-            Object value = valueRetriever.retrieve(comp);
-            field.set(this.instance, value);
-        }
-    }
-
     public Object retrieveInstance() throws IllegalArgumentException, IllegalAccessException {
-        this.updateInstance();
         return this.instance;
-    }
-
-    public Map<Class<? extends JComponent>, ValueRetriever<?, ?>> getValueRetrieverMapping() {
-        return Collections.unmodifiableMap(this.valueRetrieverMapping);
     }
 
     public Map<Field, JComponent> getFieldMapping() {
@@ -137,10 +129,6 @@ public class ReflectionFormPanel extends javax.swing.JPanel implements Scrollabl
 
     public Class<?> getEntityClass() {
         return entityClass;
-    }
-
-    public Map<Type, FieldHandler<?,?>> getClassMapping() {
-        return Collections.unmodifiableMap(classMapping);
     }
 
     /**
@@ -167,53 +155,5 @@ public class ReflectionFormPanel extends javax.swing.JPanel implements Scrollabl
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables
-
-    @Override
-    public Dimension getPreferredScrollableViewportSize() {
-        return getPreferredSize();
-    }
-
-    @Override
-    public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
-        //Get the current position.
-        int currentPosition;
-        if (orientation == SwingConstants.HORIZONTAL) {
-            currentPosition = visibleRect.x;
-        } else {
-            currentPosition = visibleRect.y;
-        }
-
-        //Return the number of pixels between currentPosition
-        //and the nearest tick mark in the indicated direction.
-        if (direction < 0) {
-            int newPosition = currentPosition -
-                             (currentPosition / maxUnitIncrement)
-                              * maxUnitIncrement;
-            return (newPosition == 0) ? maxUnitIncrement : newPosition;
-        } else {
-            return ((currentPosition / maxUnitIncrement) + 1)
-                     * maxUnitIncrement
-                     - currentPosition;
-        }
-    }
-
-    @Override
-    public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
-        if (orientation == SwingConstants.HORIZONTAL) {
-            return visibleRect.width - maxUnitIncrement;
-        } else {
-            return visibleRect.height - maxUnitIncrement;
-        }
-    }
-
-    @Override
-    public boolean getScrollableTracksViewportWidth() {
-        return false;
-    }
-
-    @Override
-    public boolean getScrollableTracksViewportHeight() {
-        return false;
-    }
 
 }

@@ -23,7 +23,7 @@ import javax.swing.SpinnerNumberModel;
  *
  * @author richter
  */
-public class IntegerListPanelCellRenderer extends ListPanelTableCellRenderer {
+public class IntegerListPanelCellRenderer extends ListPanelTableCellRenderer<JSpinner> {
 
     public IntegerListPanelCellRenderer() {
         super(new JSpinner(new SpinnerNumberModel(0, Integer.MIN_VALUE, Integer.MAX_VALUE, 1)));
@@ -31,7 +31,7 @@ public class IntegerListPanelCellRenderer extends ListPanelTableCellRenderer {
 
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-        ((JSpinner)this.getComponent()).setValue(value);
+        this.getComponent().setValue(value);
         Component retValue = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
         return retValue;
     }

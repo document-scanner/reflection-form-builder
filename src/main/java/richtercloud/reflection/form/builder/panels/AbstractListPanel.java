@@ -15,20 +15,27 @@
 package richtercloud.reflection.form.builder.panels;
 
 import java.awt.Component;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
-import java.util.PriorityQueue;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import javax.swing.DefaultListSelectionModel;
+import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
-import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.JTableHeader;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
+import richtercloud.reflection.form.builder.fieldhandler.FieldHandlingException;
+import richtercloud.reflection.form.builder.message.Message;
+import richtercloud.reflection.form.builder.message.MessageHandler;
 
 /**
+ * The superclass of all list panel (both with one or multiple columns). It supports multiple selection, also in multiple intervals of a size >= 1. Provides buttons to add a new item and remove the selected intervals(s). Provides a buttons to move the selected items up and down the list (if multiple items are selected they're moved as if they were the only selected one by one). The up button does nothing for the topmost item if it is selected as does the down button for the bottommost item. The edit button starts editing the item; implementation is up to subclasses (in {@link #editRow() }). The "Select all" and "Invert selection" buttons select all items and invert the selection of items respectively.
  *
  * @author richter
  * @param <T> the type of the managed values
@@ -57,11 +64,11 @@ import richtercloud.reflection.form.builder.ReflectionFormBuilder;
  place -> this should be handled in the model exclusively in order to allow
  exchangable implementations of this transformation
  */
-public abstract class AbstractListPanel<T, L extends ListPanelItemListener<T>, M extends ListPanelTableModel<T>> extends javax.swing.JPanel {
+public abstract class AbstractListPanel<T, L extends ListPanelItemListener<T>, M extends ListPanelTableModel<T>, R extends ReflectionFormBuilder> extends javax.swing.JPanel {
 
     private static final long serialVersionUID = 1L;
     private final static Logger LOGGER = LoggerFactory.getLogger(AbstractListPanel.class);
-    private ReflectionFormBuilder reflectionFormBuilder;
+    private R reflectionFormBuilder;
     public final static Comparator<Integer> DESCENDING_ORDER = new Comparator<Integer>() {
         @Override
         public int compare(Integer o1, Integer o2) {
@@ -77,7 +84,7 @@ public abstract class AbstractListPanel<T, L extends ListPanelItemListener<T>, M
     private ListPanelTableCellRenderer mainListCellRenderer;
     private ListPanelTableCellEditor mainListCellEditor;
     private M mainListModel;
-    private DefaultTableColumnModel mainListColumnModel;
+    private MessageHandler messageHandler;
 
     /**
      *
@@ -86,12 +93,16 @@ public abstract class AbstractListPanel<T, L extends ListPanelItemListener<T>, M
      * @param mainListCellRenderer
      * @param mainListModel
      * @param mainListColumnModel
+     * @param messageHandler
+     * @param tableHeader a table header object which allows control over the
+     * height of the table column header
      */
-    public AbstractListPanel(ReflectionFormBuilder reflectionFormBuilder,
+    public AbstractListPanel(R reflectionFormBuilder,
             ListPanelTableCellEditor mainListCellEditor,
             ListPanelTableCellRenderer mainListCellRenderer,
             M mainListModel,
-            DefaultTableColumnModel mainListColumnModel) {
+            MessageHandler messageHandler,
+            JTableHeader tableHeader) {
         //not possible to call this() because of dependency on cell renderer and
         //editor
         this.reflectionFormBuilder = reflectionFormBuilder;
@@ -100,10 +111,12 @@ public abstract class AbstractListPanel<T, L extends ListPanelItemListener<T>, M
         this.mainListCellEditor = mainListCellEditor;
         this.mainListCellRenderer = mainListCellRenderer;
         this.mainListModel = mainListModel;
-        this.mainListColumnModel = mainListColumnModel;
         initComponents();
+        this.mainList.setTableHeader(tableHeader);
+        this.mainList.setColumnModel(tableHeader.getColumnModel());
         this.mainList.setDefaultRenderer(Object.class, mainListCellRenderer);
         this.mainList.setDefaultEditor(Object.class, mainListCellEditor);
+        this.messageHandler = messageHandler;
     }
 
     public void addItemListener(L itemListener) {
@@ -127,8 +140,11 @@ public abstract class AbstractListPanel<T, L extends ListPanelItemListener<T>, M
         removeButton = new javax.swing.JButton();
         selectAllButton = new javax.swing.JButton();
         invertSelectionButton = new javax.swing.JButton();
-        jScrollPane2 = new javax.swing.JScrollPane();
+        mainListScrollPane = new javax.swing.JScrollPane();
         mainList = new javax.swing.JTable();
+        editButton = new javax.swing.JButton();
+        upButton = new javax.swing.JButton();
+        downButton = new javax.swing.JButton();
 
         addButton.setText("+");
         addButton.addActionListener(new java.awt.event.ActionListener() {
@@ -161,9 +177,28 @@ public abstract class AbstractListPanel<T, L extends ListPanelItemListener<T>, M
         mainList.setModel(this.mainListModel);
         mainList.setCellEditor(mainListCellEditor);
         mainList.setSelectionModel(mainListSelectionModel);
-        mainList.setTableHeader(new JTableHeader(this.mainListColumnModel));
-        jScrollPane2.setViewportView(mainList);
-        mainList.setColumnModel(this.mainListColumnModel);
+        mainListScrollPane.setViewportView(mainList);
+
+        editButton.setText("Edit");
+        editButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                editButtonActionPerformed(evt);
+            }
+        });
+
+        upButton.setText("Up");
+        upButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                upButtonActionPerformed(evt);
+            }
+        });
+
+        downButton.setText("Down");
+        downButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                downButtonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -171,13 +206,16 @@ public abstract class AbstractListPanel<T, L extends ListPanelItemListener<T>, M
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 248, Short.MAX_VALUE)
+                .addComponent(mainListScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 286, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(invertSelectionButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(invertSelectionButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 165, Short.MAX_VALUE)
                     .addComponent(selectAllButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(removeButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(addButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(addButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(editButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(upButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(downButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -185,22 +223,33 @@ public abstract class AbstractListPanel<T, L extends ListPanelItemListener<T>, M
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(mainListScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 380, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(addButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(removeButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(upButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(downButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(selectAllButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(invertSelectionButton)
-                        .addGap(0, 127, Short.MAX_VALUE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(editButton)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
-        //can't check field annotations, but class annotations and, of course, use field handler
+        this.mainListCellEditor.stopCellEditing();
+        this.mainListCellEditor.resetCellEditorValue(); //avoid value of
+            //previous edits to be set as initial value of new items
+
+        //can't check field annotations, but class annotations and, of course,
+        //use field handler
         T newElement = createNewElement();
         this.getMainListModel().addElement(newElement);
         for (L listener : this.getItemListeners()) {
@@ -208,7 +257,13 @@ public abstract class AbstractListPanel<T, L extends ListPanelItemListener<T>, M
                     AbstractListPanel.this.getMainListModel().getRowCount(),
                     AbstractListPanel.this.getMainListModel().getData()));
         }
+        this.mainListModel.fireTableDataChanged();
         this.updateRowHeights();
+        //open editing dialog immediately because the probability that the user
+        //wants to edit immediately is high
+        this.getMainList().getSelectionModel().setSelectionInterval(this.getMainListModel().getRowCount()-1,
+                this.getMainListModel().getRowCount()-1);
+        editRow0();
     }//GEN-LAST:event_addButtonActionPerformed
 
     private void removeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeButtonActionPerformed
@@ -216,8 +271,9 @@ public abstract class AbstractListPanel<T, L extends ListPanelItemListener<T>, M
         //- TableModel doesn't expose methods which allow smart iteration
         //- no way found to sort int[] (!= Integer[]) in descending order, so
         //copying int[] into List<Integer> to be able to apply sort functions
-        //with Comparator (using PriorityQueue to make copying and creation one
-        //step)
+        //with Comparator (using PriorityQueue has no advantage because it needs
+        //to be sorted before iterating over it (see doc of PriorityQueue for
+        //details)
         if (this.mainList.getSelectedRowCount() == 0) {
             return;
         }
@@ -226,35 +282,87 @@ public abstract class AbstractListPanel<T, L extends ListPanelItemListener<T>, M
         //edited row is removed)
         this.mainListCellEditor.stopCellEditing();
 
-        PriorityQueue<Integer> selectedRowsSorted = new PriorityQueue<>(this.mainList.getSelectedRows().length, DESCENDING_ORDER);
+        List<Integer> selectedRowsSorted = new LinkedList<>();
         for (int selectedRow : this.mainList.getSelectedRows()) {
             selectedRowsSorted.add(selectedRow);
         }
+        Collections.sort(selectedRowsSorted, DESCENDING_ORDER);
         for (int selectedRow : selectedRowsSorted) {
-            this.mainListModel.removeRow(selectedRow); //handles event firing
+            this.mainListModel.removeElement(selectedRow); //handles event firing
             for (ListPanelItemListener<T> itemListener : this.getItemListeners()) {
                 itemListener.onItemRemoved(new ListPanelItemEvent<>(ListPanelItemEvent.EVENT_TYPE_REMOVED,
                         selectedRow,
                         this.mainListModel.getData()));
             }
         }
+        this.mainListModel.fireTableDataChanged();
+        this.updateRowHeights();
     }//GEN-LAST:event_removeButtonActionPerformed
 
     private void selectAllButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectAllButtonActionPerformed
         this.mainListSelectionModel.addSelectionInterval(0, this.mainList.getRowCount() - 1);
         this.mainListModel.fireTableDataChanged();
+        this.updateRowHeights();
     }//GEN-LAST:event_selectAllButtonActionPerformed
 
     private void invertSelectionButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_invertSelectionButtonActionPerformed
         for (int i = 0; i < this.mainListModel.getRowCount(); i++) {
-            if (mainListSelectionModel.isSelectedIndex(i)) {
+            if (this.mainListSelectionModel.isSelectedIndex(i)) {
                 this.mainListSelectionModel.removeIndexInterval(i, i);
             } else {
                 this.mainListSelectionModel.addSelectionInterval(i, i);
             }
         }
         this.mainListModel.fireTableDataChanged();
+        this.updateRowHeights();
     }//GEN-LAST:event_invertSelectionButtonActionPerformed
+
+    private void editButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editButtonActionPerformed
+        editRow0();
+    }//GEN-LAST:event_editButtonActionPerformed
+
+    private void upButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_upButtonActionPerformed
+        this.mainListCellEditor.stopCellEditing();
+        for(int selectedRow : this.mainList.getSelectedRows()) {
+            if(selectedRow == 0) {
+                //do nothing for the topmost item
+                continue;
+            }
+            T toRemove = mainListModel.getData().get(selectedRow);
+            LOGGER.debug(String.format("moving item %s from %d to %d", toRemove, selectedRow, selectedRow-1));
+            mainListModel.removeElement(selectedRow);
+            mainListModel.insertElementAt(selectedRow-1, toRemove);
+        }
+        this.mainListModel.fireTableDataChanged();
+        this.updateRowHeights();
+    }//GEN-LAST:event_upButtonActionPerformed
+
+    private void downButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_downButtonActionPerformed
+        this.mainListCellEditor.stopCellEditing();
+        for(int selectedRow : this.mainList.getSelectedRows()) {
+            if(selectedRow == mainList.getRowCount()-1) {
+                //do nothing for the bottommost item
+                continue;
+            }
+            T toRemove = mainListModel.getData().get(selectedRow);
+            LOGGER.debug(String.format("moving item %s from %d to %d", toRemove, selectedRow, selectedRow+1));
+            mainListModel.removeElement(selectedRow);
+            mainListModel.insertElementAt(selectedRow+1, toRemove);
+        }
+        this.mainListModel.fireTableDataChanged();
+        this.updateRowHeights();
+    }//GEN-LAST:event_downButtonActionPerformed
+
+    private void editRow0() {
+        try {
+            editRow();
+        } catch (FieldHandlingException ex) {
+            messageHandler.handle(new Message(String.format("An exception during editing the row occured: %s", ExceptionUtils.getRootCauseMessage(ex)),
+                    JOptionPane.ERROR_MESSAGE));
+        }
+    }
+
+    protected abstract void editRow() throws FieldHandlingException;
 
     protected void updateRowHeights() {
         for (int row = 0; row < this.mainList.getRowCount(); row++) {
@@ -280,7 +388,7 @@ public abstract class AbstractListPanel<T, L extends ListPanelItemListener<T>, M
      */
     protected abstract T createNewElement();
 
-    public ReflectionFormBuilder getReflectionFormBuilder() {
+    public R getReflectionFormBuilder() {
         return reflectionFormBuilder;
     }
 
@@ -303,10 +411,13 @@ public abstract class AbstractListPanel<T, L extends ListPanelItemListener<T>, M
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addButton;
+    private javax.swing.JButton downButton;
+    private javax.swing.JButton editButton;
     private javax.swing.JButton invertSelectionButton;
-    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTable mainList;
+    private javax.swing.JScrollPane mainListScrollPane;
     private javax.swing.JButton removeButton;
     private javax.swing.JButton selectAllButton;
+    private javax.swing.JButton upButton;
     // End of variables declaration//GEN-END:variables
 }

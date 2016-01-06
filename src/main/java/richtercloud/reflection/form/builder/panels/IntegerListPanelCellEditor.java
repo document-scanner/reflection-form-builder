@@ -23,7 +23,7 @@ import javax.swing.SpinnerNumberModel;
  *
  * @author richter
  */
-public class IntegerListPanelCellEditor extends ListPanelTableCellEditor {
+public class IntegerListPanelCellEditor extends ListPanelTableCellEditor<JSpinner> {
     private static final long serialVersionUID = 1L;
 
     public IntegerListPanelCellEditor() {
@@ -32,14 +32,14 @@ public class IntegerListPanelCellEditor extends ListPanelTableCellEditor {
 
     @Override
     public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
-        ((JSpinner)this.getComponent()).setValue(value);
+        this.getComponent().setValue(value);
         Component retValue = super.getTableCellEditorComponent(table, value, isSelected, row, column);
         return retValue;
     }
 
     @Override
     protected Object stopCellEditing0() {
-        return ((JSpinner)this.getComponent()).getValue();
+        return this.getComponent().getValue();
     }
 
 }

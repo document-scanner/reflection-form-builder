@@ -28,14 +28,20 @@ public interface ListPanelTableModel<T> extends TableModel {
 
     void fireTableDataChanged();
 
-    void removeRow(int row);
+    void removeElement(int row);
 
     void addElement(T element);
+
+    void insertElementAt(int row, T element);
 
     void removeElement(T element);
 
     /**
-     * A read-only view of the managed data. Changes are enforced through {@link #addElement(java.lang.Object) } and {@link #removeElement(java.lang.Object) } in order to be able to track changes.
+     * A read-only view of the managed data. Changes are enforced through
+     * {@link #addElement(java.lang.Object) },
+     * {@link #removeElement(java.lang.Object) }, {@link #removeElement(int) }
+     * and {@link #insertElementAt(int, java.lang.Object) } in order to be able
+     * to track changes.
      * @return a read-only view of the managed data
      */
     List<T> getData();

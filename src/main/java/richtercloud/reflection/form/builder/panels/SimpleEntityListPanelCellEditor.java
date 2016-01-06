@@ -24,7 +24,7 @@ import javax.swing.JTable;
  * Editing doesn't have any effect.
  * @author richter
  */
-public class SimpleEntityListPanelCellEditor extends ListPanelTableCellEditor {
+public class SimpleEntityListPanelCellEditor extends ListPanelTableCellEditor<JLabel> {
     private static final long serialVersionUID = 1L;
 
     public SimpleEntityListPanelCellEditor() {
@@ -33,7 +33,7 @@ public class SimpleEntityListPanelCellEditor extends ListPanelTableCellEditor {
 
     @Override
     public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
-        ((JLabel)getComponent()).setText(value != null ? value.toString() : null);
+        getComponent().setText(value != null ? value.toString() : null);
         Component retValue = super.getTableCellEditorComponent(table, value, isSelected, row, column);
         return retValue;
 
@@ -96,7 +96,7 @@ public class SimpleEntityListPanelCellEditor extends ListPanelTableCellEditor {
      */
     @Override
     protected Object stopCellEditing0() {
-        return ((JLabel)this.getComponent()).getText();
+        return this.getComponent().getText();
     }
 
 }

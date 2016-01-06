@@ -14,9 +14,11 @@
  */
 package richtercloud.reflection.form.builder.panels;
 
+import java.util.List;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.TableColumn;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
+import richtercloud.reflection.form.builder.message.MessageHandler;
 
 /**
  * An {@link AbstractListPanel} which displays only editable components in one
@@ -26,12 +28,15 @@ import richtercloud.reflection.form.builder.ReflectionFormBuilder;
  * @param <T> the type of the managed values
  * @param <L> the type of the event listener to use
  */
-public abstract class AbstractSingleColumnListPanel<T, L extends ListPanelItemListener<T>, M extends SingleColumnListPanelTableModel<T>> extends AbstractListPanel<T, L, M> {
+public abstract class AbstractSingleColumnListPanel<T, L extends ListPanelItemListener<T>, M extends SingleColumnListPanelTableModel<T>, R extends ReflectionFormBuilder> extends AbstractListPanel<T, L, M, R> {
     private static final long serialVersionUID = 1L;
 
     private static DefaultTableColumnModel createMainListColumnModel(ListPanelTableCellEditor mainListCellEditor, ListPanelTableCellRenderer mainListCellRenderer) {
         DefaultTableColumnModel mainListColumnModel = new DefaultTableColumnModel();
-        mainListColumnModel.addColumn(new TableColumn(0, 100, mainListCellRenderer, mainListCellEditor));
+        mainListColumnModel.addColumn(new TableColumn(0,
+                100,
+                mainListCellRenderer,
+                mainListCellEditor));
         return mainListColumnModel;
     }
 
@@ -41,15 +46,32 @@ public abstract class AbstractSingleColumnListPanel<T, L extends ListPanelItemLi
         return mainListModel;
     }
 
-    public  AbstractSingleColumnListPanel(ReflectionFormBuilder reflectionFormBuilder,
+    public  AbstractSingleColumnListPanel(R reflectionFormBuilder,
             ListPanelTableCellEditor mainListCellEditor,
             ListPanelTableCellRenderer mainListCellRenderer,
-            M mainListModel) {
+            M mainListModel,
+            List<T> initialValues,
+            MessageHandler messageHandler) {
         super(reflectionFormBuilder,
                 mainListCellEditor,
                 mainListCellRenderer,
                 mainListModel,
-                createMainListColumnModel(mainListCellEditor, mainListCellRenderer));
+                messageHandler,
+                new RightHeightTableHeader(createMainListColumnModel(mainListCellEditor, mainListCellRenderer), 0));
+        if(initialValues != null) {
+            for(T initialValue : initialValues) {
+                this.getMainListModel().setValueAt(initialValue,
+                        this.getMainListModel().getRowCount(),
+                        0);
+            }
+        }
+        updateRowHeights(); //necessary after adding initial values
+    }
+
+    @Override
+    protected void editRow() {
+        this.getMainList().editCellAt(this.getMainList().getSelectedRow(),
+                this.getMainList().getSelectedColumn());
     }
 
 }

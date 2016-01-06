@@ -22,7 +22,7 @@ import javax.swing.JTable;
  *
  * @author richter
  */
-public class BooleanListPanelCellRenderer extends ListPanelTableCellRenderer {
+public class BooleanListPanelCellRenderer extends ListPanelTableCellRenderer<JCheckBox> {
 
     public BooleanListPanelCellRenderer() {
         super(new JCheckBox("", false));
@@ -30,7 +30,7 @@ public class BooleanListPanelCellRenderer extends ListPanelTableCellRenderer {
 
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-        ((JCheckBox)this.getComponent()).setSelected((boolean) value);
+        this.getComponent().setSelected((boolean) value);
         Component retValue = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
         return retValue;
     }

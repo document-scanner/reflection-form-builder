@@ -20,24 +20,24 @@ import java.util.List;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
+import richtercloud.reflection.form.builder.message.MessageHandler;
 
 /**
  *
  * @author richter
  */
-public class BooleanListPanel extends AbstractSingleColumnListPanel<Boolean, EditableListPanelItemListener<Boolean>, SingleColumnListPanelTableModel<Boolean>> {
+public class BooleanListPanel extends AbstractSingleColumnListPanel<Boolean, EditableListPanelItemListener<Boolean>, SingleColumnListPanelTableModel<Boolean>, ReflectionFormBuilder> {
     private static final long serialVersionUID = 1L;
 
-    public BooleanListPanel(ReflectionFormBuilder reflectionFormBuilder, List<Boolean> initialValues) {
+    public BooleanListPanel(ReflectionFormBuilder reflectionFormBuilder,
+            List<Boolean> initialValues,
+            MessageHandler messageHandler) {
         super(reflectionFormBuilder,
                 new BooleanListPanelCellEditor(),
                 new BooleanListPanelCellRenderer(),
-                AbstractSingleColumnListPanel.<Boolean>createMainListModel(Boolean.class));
-        if(initialValues != null) {
-            for(Boolean initialValue : initialValues) {
-                this.getMainListModel().setValueAt(initialValue, this.getMainListModel().getRowCount(), 0);
-            }
-        }
+                AbstractSingleColumnListPanel.<Boolean>createMainListModel(Boolean.class),
+                initialValues,
+                messageHandler);
     }
 
     @Override
@@ -52,12 +52,12 @@ public class BooleanListPanel extends AbstractSingleColumnListPanel<Boolean, Edi
             @Override
             public void mouseReleased(MouseEvent e) {
                 int row = BooleanListPanel.this.getMainList().getSelectedRow();
-                BooleanListPanel.this.getMainListModel().setValueAt(newElement.isSelected(),
-                        row,
-                        0 //column
-                );
-                for(EditableListPanelItemListener<Boolean> listener : BooleanListPanel.this.getItemListeners()) {
-                    listener.onItemChanged(new ListPanelItemEvent<>(ListPanelItemEvent.EVENT_TYPE_CHANGED, row, BooleanListPanel.this.getMainListModel().getData()));
+                if(row > -1) {
+                    for(EditableListPanelItemListener<Boolean> listener : BooleanListPanel.this.getItemListeners()) {
+                        listener.onItemChanged(new ListPanelItemEvent<>(ListPanelItemEvent.EVENT_TYPE_CHANGED,
+                                row,
+                                BooleanListPanel.this.getMainListModel().getData()));
+                    }
                 }
             }
         });
