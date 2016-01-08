@@ -271,7 +271,8 @@ public class ReflectionFormBuilder<F extends FieldRetriever> {
         Object instance = prepareInstance(entityClass, entityToUpdate);
         ReflectionFormPanel retValue = new ReflectionFormPanel(fieldMapping,
                 instance,
-                entityClass);
+                entityClass,
+                fieldHandler);
         transformClass(entityClass,
                 instance,
                 fieldMapping,

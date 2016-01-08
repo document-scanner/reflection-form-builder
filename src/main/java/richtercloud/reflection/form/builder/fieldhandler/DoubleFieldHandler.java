@@ -18,13 +18,14 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import javax.swing.JComponent;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
+import richtercloud.reflection.form.builder.panels.DoublePanel;
 import richtercloud.reflection.form.builder.typehandler.DoubleTypeHandler;
 
 /**
  *
  * @author richter
  */
-public class DoubleFieldHandler implements FieldHandler<Double, FieldUpdateEvent<Double>, ReflectionFormBuilder> {
+public class DoubleFieldHandler implements FieldHandler<Double, FieldUpdateEvent<Double>, ReflectionFormBuilder, DoublePanel> {
     private final static DoubleFieldHandler INSTANCE = new DoubleFieldHandler();
 
     public static DoubleFieldHandler getInstance() {
@@ -53,6 +54,11 @@ public class DoubleFieldHandler implements FieldHandler<Double, FieldUpdateEvent
                 field.getDeclaringClass(), //declaringClass
                 updateListener,
                 reflectionFormBuilder);
+    }
+
+    @Override
+    public void reset(DoublePanel component) {
+        component.reset();
     }
 
 }

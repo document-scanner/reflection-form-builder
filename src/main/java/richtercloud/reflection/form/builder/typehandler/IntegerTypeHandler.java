@@ -28,7 +28,7 @@ import richtercloud.reflection.form.builder.panels.NumberPanelUpdateListener;
  *
  * @author richter
  */
-public class IntegerTypeHandler implements TypeHandler<Integer, FieldUpdateEvent<Integer>,ReflectionFormBuilder> {
+public class IntegerTypeHandler implements TypeHandler<Integer, FieldUpdateEvent<Integer>,ReflectionFormBuilder, IntegerPanel> {
 
     private final static IntegerTypeHandler INSTANCE = new IntegerTypeHandler();
 
@@ -59,5 +59,10 @@ public class IntegerTypeHandler implements TypeHandler<Integer, FieldUpdateEvent
             }
         });
         return retValue;
+    }
+
+    @Override
+    public void reset(IntegerPanel component) {
+        component.reset();
     }
 }

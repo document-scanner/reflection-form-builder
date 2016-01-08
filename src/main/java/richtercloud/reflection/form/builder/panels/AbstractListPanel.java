@@ -85,6 +85,7 @@ public abstract class AbstractListPanel<T, L extends ListPanelItemListener<T>, M
     private ListPanelTableCellEditor mainListCellEditor;
     private M mainListModel;
     private MessageHandler messageHandler;
+    private final List<T> initialValues;
 
     /**
      *
@@ -101,6 +102,7 @@ public abstract class AbstractListPanel<T, L extends ListPanelItemListener<T>, M
             ListPanelTableCellEditor mainListCellEditor,
             ListPanelTableCellRenderer mainListCellRenderer,
             M mainListModel,
+            List<T> initialValues,
             MessageHandler messageHandler,
             JTableHeader tableHeader) {
         //not possible to call this() because of dependency on cell renderer and
@@ -117,6 +119,8 @@ public abstract class AbstractListPanel<T, L extends ListPanelItemListener<T>, M
         this.mainList.setDefaultRenderer(Object.class, mainListCellRenderer);
         this.mainList.setDefaultEditor(Object.class, mainListCellEditor);
         this.messageHandler = messageHandler;
+        this.initialValues = initialValues;
+        reset();
     }
 
     public void addItemListener(L itemListener) {
@@ -406,6 +410,19 @@ public abstract class AbstractListPanel<T, L extends ListPanelItemListener<T>, M
 
     public ListPanelTableCellEditor getMainListCellEditor() {
         return mainListCellEditor;
+    }
+
+    public void reset() {
+        while(this.getMainListModel().getRowCount() > 0) {
+            this.getMainListModel().removeElement(0);
+        }
+        if(initialValues != null) {
+            for(T initialValue : initialValues) {
+                this.getMainListModel().setValueAt(initialValue,
+                        this.getMainListModel().getRowCount(),
+                        0);
+            }
+        }
     }
 
 

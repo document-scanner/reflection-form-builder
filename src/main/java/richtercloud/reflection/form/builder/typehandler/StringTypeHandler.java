@@ -28,7 +28,7 @@ import richtercloud.reflection.form.builder.fieldhandler.FieldUpdateListener;
  *
  * @author richter
  */
-public class StringTypeHandler implements TypeHandler<String, FieldUpdateEvent<String>,ReflectionFormBuilder> {
+public class StringTypeHandler implements TypeHandler<String, FieldUpdateEvent<String>,ReflectionFormBuilder, JTextField> {
     private final static StringTypeHandler INSTANCE = new StringTypeHandler();
 
     public static StringTypeHandler getInstance() {
@@ -66,6 +66,11 @@ public class StringTypeHandler implements TypeHandler<String, FieldUpdateEvent<S
             }
         }); //action listener doesn't register text change events with keyboard
         return  retValue;
+    }
+
+    @Override
+    public void reset(JTextField component) {
+        component.setText("");
     }
 
 }

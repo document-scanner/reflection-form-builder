@@ -22,7 +22,8 @@ package richtercloud.reflection.form.builder.fieldhandler;
 public interface FieldUpdateListener<E extends FieldUpdateEvent<?>> {
 
     /**
-     * Called if a component is updated.
+     * Called if a component is updated. They type of the update is determined
+     * by the {@code type} property of the used {@link FieldUpdateEvent}.
      * @param event
      */
     void onUpdate(E event);

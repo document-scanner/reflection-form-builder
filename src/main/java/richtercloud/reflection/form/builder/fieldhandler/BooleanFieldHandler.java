@@ -16,16 +16,22 @@ package richtercloud.reflection.form.builder.fieldhandler;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
+import java.util.HashMap;
+import java.util.Map;
 import javax.swing.JComponent;
+import org.apache.commons.lang3.tuple.Pair;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
+import richtercloud.reflection.form.builder.components.AmountMoneyPanel;
+import richtercloud.reflection.form.builder.components.BooleanWrapperComboBox;
 import richtercloud.reflection.form.builder.typehandler.BooleanTypeHandler;
 
 /**
  *
  * @author richter
  */
-public class BooleanFieldHandler implements FieldHandler<Boolean, FieldUpdateEvent<Boolean>, ReflectionFormBuilder> {
+public class BooleanFieldHandler implements FieldHandler<Boolean, FieldUpdateEvent<Boolean>, ReflectionFormBuilder, BooleanWrapperComboBox> {
     private final static BooleanFieldHandler INSTANCE = new BooleanFieldHandler();
+    private final Map<Pair<Field, Integer>, AmountMoneyPanel> handledFieldMapping = new HashMap<>();
 
     public static BooleanFieldHandler getInstance() {
         return INSTANCE;
@@ -53,6 +59,11 @@ public class BooleanFieldHandler implements FieldHandler<Boolean, FieldUpdateEve
                 field.getDeclaringClass(), //declaringClass
                 updateListener,
                 reflectionFormBuilder);
+    }
+
+    @Override
+    public void reset(BooleanWrapperComboBox component) {
+        component.setSelectedItem(Boolean.FALSE);
     }
 
 }

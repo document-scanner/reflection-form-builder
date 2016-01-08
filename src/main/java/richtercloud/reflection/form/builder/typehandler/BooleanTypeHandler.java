@@ -28,7 +28,7 @@ import richtercloud.reflection.form.builder.fieldhandler.FieldUpdateListener;
  *
  * @author richter
  */
-public class BooleanTypeHandler implements TypeHandler<Boolean, FieldUpdateEvent<Boolean>,ReflectionFormBuilder> {
+public class BooleanTypeHandler implements TypeHandler<Boolean, FieldUpdateEvent<Boolean>,ReflectionFormBuilder, BooleanWrapperComboBox> {
     private final static BooleanTypeHandler INSTANCE = new BooleanTypeHandler();
 
     public static BooleanTypeHandler getInstance() {
@@ -56,6 +56,11 @@ public class BooleanTypeHandler implements TypeHandler<Boolean, FieldUpdateEvent
             }
         });
         return retValue;
+    }
+
+    @Override
+    public void reset(BooleanWrapperComboBox component) {
+        component.reset();
     }
 
 }

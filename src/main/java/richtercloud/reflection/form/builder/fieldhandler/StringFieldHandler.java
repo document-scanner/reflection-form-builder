@@ -17,6 +17,7 @@ package richtercloud.reflection.form.builder.fieldhandler;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import javax.swing.JComponent;
+import javax.swing.JTextField;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
 import richtercloud.reflection.form.builder.typehandler.StringTypeHandler;
 
@@ -24,7 +25,7 @@ import richtercloud.reflection.form.builder.typehandler.StringTypeHandler;
  *
  * @author richter
  */
-public class StringFieldHandler implements FieldHandler<String, FieldUpdateEvent<String>, ReflectionFormBuilder> {
+public class StringFieldHandler implements FieldHandler<String, FieldUpdateEvent<String>, ReflectionFormBuilder, JTextField> {
     private final static StringFieldHandler INSTANCE = new StringFieldHandler();
 
     public static StringFieldHandler getInstance() {
@@ -53,6 +54,11 @@ public class StringFieldHandler implements FieldHandler<String, FieldUpdateEvent
                 field.getDeclaringClass(), //declaringClass
                 updateListener,
                 reflectionFormBuilder);
+    }
+
+    @Override
+    public void reset(JTextField component) {
+        component.setText("");
     }
 
 }

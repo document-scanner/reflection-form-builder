@@ -23,12 +23,18 @@ import org.jdatepicker.JSqlDatePicker;
  */
 public class SqlDatePicker extends JSqlDatePicker {
     private static final long serialVersionUID = 1L;
+    private final Date initialValue;
 
     public SqlDatePicker() {
+        this.initialValue = new Date(System.currentTimeMillis());
     }
 
-    public SqlDatePicker(Date value) {
-        super(value);
+    public SqlDatePicker(Date initialValue) {
+        super(initialValue);
+        this.initialValue = initialValue;
     }
 
+    public void reset() {
+        getModel().setValue(initialValue);
+    }
 }

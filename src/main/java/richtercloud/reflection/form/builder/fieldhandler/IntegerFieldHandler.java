@@ -18,13 +18,14 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import javax.swing.JComponent;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
+import richtercloud.reflection.form.builder.panels.IntegerPanel;
 import richtercloud.reflection.form.builder.typehandler.IntegerTypeHandler;
 
 /**
  *
  * @author richter
  */
-public class IntegerFieldHandler implements FieldHandler<Integer, FieldUpdateEvent<Integer>, ReflectionFormBuilder> {
+public class IntegerFieldHandler implements FieldHandler<Integer, FieldUpdateEvent<Integer>, ReflectionFormBuilder, IntegerPanel> {
     private final static IntegerFieldHandler INSTANCE = new IntegerFieldHandler();
 
     public static IntegerFieldHandler getInstance() {
@@ -53,6 +54,11 @@ public class IntegerFieldHandler implements FieldHandler<Integer, FieldUpdateEve
                 field.getDeclaringClass(), //declaringClass
                 updateListener,
                 reflectionFormBuilder);
+    }
+
+    @Override
+    public void reset(IntegerPanel component) {
+        component.reset();
     }
 
 }

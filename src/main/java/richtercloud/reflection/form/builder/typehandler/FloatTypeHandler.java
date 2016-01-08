@@ -28,7 +28,7 @@ import richtercloud.reflection.form.builder.panels.NumberPanelUpdateListener;
  *
  * @author richter
  */
-public class FloatTypeHandler implements TypeHandler<Float, FieldUpdateEvent<Float>,ReflectionFormBuilder> {
+public class FloatTypeHandler implements TypeHandler<Float, FieldUpdateEvent<Float>,ReflectionFormBuilder, FloatPanel> {
     private final static FloatTypeHandler INSTANCE = new FloatTypeHandler();
 
     public static FloatTypeHandler getInstance() {
@@ -58,6 +58,11 @@ public class FloatTypeHandler implements TypeHandler<Float, FieldUpdateEvent<Flo
             }
         });
         return retValue;
+    }
+
+    @Override
+    public void reset(FloatPanel component) {
+        component.reset();
     }
 
 }

@@ -15,7 +15,12 @@
 package richtercloud.reflection.form.builder.fieldhandler;
 
 import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
 import javax.swing.JComponent;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
+import org.jscience.economics.money.Currency;
 import org.jscience.economics.money.Money;
 import org.jscience.physics.amount.Amount;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
@@ -36,7 +41,7 @@ internal implementation notes:
 - naming is strange, but conforms best to JScience structure with Amount<Unit>
 types
 */
-public class AmountMoneyFieldHandler implements FieldHandler<Amount<Money>, FieldUpdateEvent<Amount<Money>>, ReflectionFormBuilder> {
+public class AmountMoneyFieldHandler implements FieldHandler<Amount<Money>, FieldUpdateEvent<Amount<Money>>, ReflectionFormBuilder, AmountMoneyPanel> {
     private final AmountMoneyUsageStatisticsStorage amountMoneyUsageStatisticsStorage;
     private final AmountMoneyCurrencyStorage additionalCurrencies;
     private final MessageHandler messageHandler;
@@ -69,5 +74,11 @@ public class AmountMoneyFieldHandler implements FieldHandler<Amount<Money>, Fiel
             }
         });
         return retValue;
+    }
+
+    @Override
+    public void reset(AmountMoneyPanel component) {
+        Amount<Money> fieldResetValue = Amount.valueOf(0.0, Currency.getReferenceCurrency());
+        component.applyAmountMoney(fieldResetValue);
     }
 }

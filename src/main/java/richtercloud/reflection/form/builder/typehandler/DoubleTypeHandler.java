@@ -28,7 +28,7 @@ import richtercloud.reflection.form.builder.panels.NumberPanelUpdateListener;
  *
  * @author richter
  */
-public class DoubleTypeHandler implements TypeHandler<Double, FieldUpdateEvent<Double>,ReflectionFormBuilder> {
+public class DoubleTypeHandler implements TypeHandler<Double, FieldUpdateEvent<Double>,ReflectionFormBuilder, DoublePanel> {
 
     private final static DoubleTypeHandler INSTANCE = new DoubleTypeHandler();
 
@@ -59,5 +59,10 @@ public class DoubleTypeHandler implements TypeHandler<Double, FieldUpdateEvent<D
             }
         });
         return retValue;
+    }
+
+    @Override
+    public void reset(DoublePanel component) {
+        component.reset();
     }
 }

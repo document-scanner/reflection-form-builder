@@ -23,12 +23,18 @@ import org.jdatepicker.JUtilDatePicker;
  */
 public class UtilDatePicker extends JUtilDatePicker {
     private static final long serialVersionUID = 1L;
+    private final Date initialValue;
 
     public UtilDatePicker() {
+        this.initialValue = new Date();
     }
 
-    public UtilDatePicker(Date value) {
-        super(value);
+    public UtilDatePicker(Date initialValue) {
+        super(initialValue);
+        this.initialValue = initialValue;
     }
 
+    public void reset() {
+        this.getModel().setValue(initialValue);
+    }
 }

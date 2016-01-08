@@ -45,8 +45,8 @@ public class MappingFieldHandlerFactoryTest {
         AmountMoneyUsageStatisticsStorage amountMoneyUsageStatisticsStorage = null;
         AmountMoneyCurrencyStorage additionalCurrencies = null;
         MappingFieldHandlerFactory instance = new MappingFieldHandlerFactory(messageHandler);
-        Map<Type, FieldHandler<?, ?, ?>> expResult = null;
-        Map<Type, FieldHandler<?, ?, ?>> result = instance.generateClassMapping();
+        Map<Type, FieldHandler<?, ?, ?, ?>> expResult = null;
+        Map<Type, FieldHandler<?, ?, ?, ?>> result = instance.generateClassMapping();
         assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
@@ -76,8 +76,8 @@ public class MappingFieldHandlerFactoryTest {
         System.out.println("generateTypeHandlerMapping");
         MessageHandler messageHandler = null;
         MappingFieldHandlerFactory instance = null;
-        Map<Type, TypeHandler<?, ?, ?>> expResult = null;
-        Map<Class<?>, FieldHandler<?, ?, ?>> result = instance.generatePrimitiveMapping();
+        Map<Type, TypeHandler<?, ?, ?, ?>> expResult = null;
+        Map<Class<?>, FieldHandler<?, ?, ?, ?>> result = instance.generatePrimitiveMapping();
         assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");

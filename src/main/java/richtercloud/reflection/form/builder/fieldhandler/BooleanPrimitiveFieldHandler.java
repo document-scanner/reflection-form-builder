@@ -25,7 +25,7 @@ import richtercloud.reflection.form.builder.ReflectionFormBuilder;
  *
  * @author richter
  */
-public class BooleanPrimitiveFieldHandler implements FieldHandler<Boolean, FieldUpdateEvent<Boolean>, ReflectionFormBuilder> {
+public class BooleanPrimitiveFieldHandler implements FieldHandler<Boolean, FieldUpdateEvent<Boolean>, ReflectionFormBuilder, JCheckBox> {
     private final static BooleanPrimitiveFieldHandler INSTANCE = new BooleanPrimitiveFieldHandler();
 
     public static BooleanPrimitiveFieldHandler getInstance() {
@@ -51,6 +51,11 @@ public class BooleanPrimitiveFieldHandler implements FieldHandler<Boolean, Field
             }
         });
         return retValue;
+    }
+
+    @Override
+    public void reset(JCheckBox component) {
+        component.setSelected(false);
     }
 
 }

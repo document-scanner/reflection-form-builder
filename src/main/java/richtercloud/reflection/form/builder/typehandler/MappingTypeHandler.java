@@ -14,6 +14,7 @@
  */
 package richtercloud.reflection.form.builder.typehandler;
 
+import java.awt.Component;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,16 +28,28 @@ import richtercloud.reflection.form.builder.fieldhandler.FieldUpdateListener;
  *
  * @author richter
  */
-public class MappingTypeHandler<T, E extends FieldUpdateEvent<T>, R extends ReflectionFormBuilder> implements TypeHandler<T,E,R>{
-    private Map<Type, TypeHandler<T,E,R>> classMapping = new HashMap<>();
+public class MappingTypeHandler<T, E extends FieldUpdateEvent<T>, R extends ReflectionFormBuilder> implements TypeHandler<T,E,R, Component>{
+    private Map<Type, TypeHandler<T,E,R, Component>> classMapping = new HashMap<>();
+    /**
+     * Since the type handler delegates to mapped type handlers it's sufficient
+     * to track the created components internally.
+     */
+    private final Map<JComponent, TypeHandler> componentMapping = new HashMap<>();
 
     @Override
     public JComponent handle(Type type, T fieldValue, String fieldName, Class<?> declaringClass, FieldUpdateListener<E> updateListener, R reflectionFormBuilder) throws IllegalArgumentException, IllegalAccessException, FieldHandlingException {
-        TypeHandler<T,E,R> typeHandler = classMapping.get(type);
+        TypeHandler<T,E,R, Component> typeHandler = classMapping.get(type);
         if(typeHandler == null) {
             throw new IllegalArgumentException(String.format("Type '%s' isn't mapped.", type));
         }
-        return typeHandler.handle(type, fieldValue, fieldName, declaringClass, updateListener, reflectionFormBuilder);
+        JComponent retValue = typeHandler.handle(type, fieldValue, fieldName, declaringClass, updateListener, reflectionFormBuilder);
+        this.componentMapping.put(retValue, typeHandler);
+        return retValue;
+    }
+
+    @Override
+    public void reset(Component component) {
+        this.componentMapping.get(component).reset(component);
     }
 
 }

@@ -26,7 +26,7 @@ import richtercloud.reflection.form.builder.ReflectionFormBuilder;
  *
  * @author richter
  */
-public class IntegerPrimitiveFieldHandler implements FieldHandler<Integer, FieldUpdateEvent<Integer>, ReflectionFormBuilder> {
+public class IntegerPrimitiveFieldHandler implements FieldHandler<Integer, FieldUpdateEvent<Integer>, ReflectionFormBuilder, JSpinner> {
     private final static IntegerPrimitiveFieldHandler INSTANCE = new IntegerPrimitiveFieldHandler();
 
     public static IntegerPrimitiveFieldHandler getInstance() {
@@ -53,6 +53,11 @@ public class IntegerPrimitiveFieldHandler implements FieldHandler<Integer, Field
             }
         });
         return retValue;
+    }
+
+    @Override
+    public void reset(JSpinner component) {
+        component.setValue(0);
     }
 
 }

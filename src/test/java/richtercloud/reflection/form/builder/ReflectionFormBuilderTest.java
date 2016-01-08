@@ -15,6 +15,7 @@
 package richtercloud.reflection.form.builder;
 
 import com.google.common.reflect.TypeToken;
+import java.awt.Component;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
@@ -61,6 +62,11 @@ public class ReflectionFormBuilderTest {
             public JComponent handle(Field field, Object instance, FieldUpdateListener updateListener, ReflectionFormBuilder reflectionFormBuilder) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, InstantiationException, FieldHandlingException {
                 throw new UnsupportedOperationException("Won't ever be called.");
             }
+
+            @Override
+            public void reset(Component component) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
         };
         ReflectionFormBuilder instance = new ReflectionFormBuilder(
                 "Field description",
@@ -72,7 +78,7 @@ public class ReflectionFormBuilderTest {
         JComponent result = instance.getClassComponent(field, entityClass, entity, fieldHandler);
         assertEquals(JTextField.class, result.getClass());
         //test that AnyType specifiecation is matched
-        Map<Type, FieldHandler<?,?, ?>> classMapping = new HashMap<>();
+        Map<Type, FieldHandler<?,?, ?, ?>> classMapping = new HashMap<>();
         Type listAnyType = new TypeToken<List<AnyType>>() {}.getType();
         Type listBooleanType = new TypeToken<List<Boolean>>() {}.getType();
         classMapping.put(listAnyType, StringFieldHandler.getInstance());
@@ -101,6 +107,11 @@ public class ReflectionFormBuilderTest {
             @Override
             public JComponent handle(Field field, Object instance, FieldUpdateListener updateListener, ReflectionFormBuilder reflectionFormBuilder) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, InstantiationException, FieldHandlingException {
                 throw new UnsupportedOperationException("Won't ever be called.");
+            }
+
+            @Override
+            public void reset(Component component) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
             }
         };
         ReflectionFormBuilder instance = new ReflectionFormBuilder(

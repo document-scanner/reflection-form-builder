@@ -26,7 +26,7 @@ import richtercloud.reflection.form.builder.ReflectionFormBuilder;
  *
  * @author richter
  */
-public class LongPrimitiveFieldHandler implements FieldHandler<Long, FieldUpdateEvent<Long>, ReflectionFormBuilder> {
+public class LongPrimitiveFieldHandler implements FieldHandler<Long, FieldUpdateEvent<Long>, ReflectionFormBuilder, JSpinner> {
     private final static LongPrimitiveFieldHandler INSTANCE = new LongPrimitiveFieldHandler();
 
     public static LongPrimitiveFieldHandler getInstance() {
@@ -53,6 +53,11 @@ public class LongPrimitiveFieldHandler implements FieldHandler<Long, FieldUpdate
             }
         });
         return retValue;
+    }
+
+    @Override
+    public void reset(JSpinner component) {
+        component.setValue(0);
     }
 
 }

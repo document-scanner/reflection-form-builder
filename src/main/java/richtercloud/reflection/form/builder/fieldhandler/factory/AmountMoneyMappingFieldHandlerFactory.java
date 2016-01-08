@@ -54,8 +54,8 @@ public class AmountMoneyMappingFieldHandlerFactory extends MappingFieldHandlerFa
      * @return
      */
     @Override
-    public Map<Type, FieldHandler<?, ?, ?>> generateClassMapping() {
-        Map<Type, FieldHandler<?, ?, ?>> classMapping0 = new HashMap<>(super.generateClassMapping());
+    public Map<Type, FieldHandler<?, ?, ?, ?>> generateClassMapping() {
+        Map<Type, FieldHandler<?, ?, ?, ?>> classMapping0 = new HashMap<>(super.generateClassMapping());
         classMapping0.put(createAmountMoneyTypeToken(),
                 new AmountMoneyFieldHandler(amountMoneyUsageStatisticsStorage,
                         amountMoneyCurrencyStorage,

@@ -59,9 +59,9 @@ arguments and that doesn't make sense neither)
 */
 public class MappingFieldHandlerFactory {
 
-    private static final Map<Class<?>, FieldHandler<?, ?, ?>> PRIMITIVE_MAPPING_DEFAULT;
+    private static final Map<Class<?>, FieldHandler<?, ?, ?, ?>> PRIMITIVE_MAPPING_DEFAULT;
     static {
-        Map<Class<?>, FieldHandler<?, ?, ?>> primitiveMappingDefault0 = new HashMap<>();
+        Map<Class<?>, FieldHandler<?, ?, ?, ?>> primitiveMappingDefault0 = new HashMap<>();
         primitiveMappingDefault0.put(float.class, FloatPrimitiveFieldHandler.getInstance());
         primitiveMappingDefault0.put(int.class, IntegerPrimitiveFieldHandler.getInstance());
         primitiveMappingDefault0.put(double.class, DoublePrimitiveFieldHandler.getInstance());
@@ -177,8 +177,8 @@ public class MappingFieldHandlerFactory {
      components as well easily (can't be done by specifying a subclass of the
      component).
      */
-    public Map<Type, FieldHandler<?, ?, ?>> generateClassMapping() {
-        Map<Type, FieldHandler<?, ?, ?>> classMapping0 = new HashMap<>();
+    public Map<Type, FieldHandler<?, ?, ?, ?>> generateClassMapping() {
+        Map<Type, FieldHandler<?, ?, ?, ?>> classMapping0 = new HashMap<>();
         classMapping0.put(createStringTypeToken(), StringFieldHandler.getInstance());
         classMapping0.put(createFloatTypeToken(), FloatFieldHandler.getInstance());
         classMapping0.put(createIntegerTypetoken(), IntegerFieldHandler.getInstance());
@@ -196,8 +196,8 @@ public class MappingFieldHandlerFactory {
         return classMapping0;
     }
 
-    public Map<Class<?>, FieldHandler<?, ?, ?>> generatePrimitiveMapping() {
-        Map<Class<?>, FieldHandler<?, ?, ?>> primitiveMapping0 = new HashMap<>();
+    public Map<Class<?>, FieldHandler<?, ?, ?, ?>> generatePrimitiveMapping() {
+        Map<Class<?>, FieldHandler<?, ?, ?, ?>> primitiveMapping0 = new HashMap<>();
         primitiveMapping0.putAll(PRIMITIVE_MAPPING_DEFAULT);
         return Collections.unmodifiableMap(primitiveMapping0);
     }

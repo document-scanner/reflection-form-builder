@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
 import richtercloud.reflection.form.builder.message.MessageHandler;
+import richtercloud.reflection.form.builder.panels.AbstractListPanel;
 import richtercloud.reflection.form.builder.typehandler.SimpleEntityListTypeHandler;
 import richtercloud.reflection.form.builder.typehandler.TypeHandler;
 
@@ -26,7 +27,7 @@ import richtercloud.reflection.form.builder.typehandler.TypeHandler;
  *
  * @author richter
  */
-public class SimpleEntityListFieldHandler extends AbstractListFieldHandler<List<Object>, FieldUpdateEvent<List<Object>>, ReflectionFormBuilder> implements FieldHandler<List<Object>,FieldUpdateEvent<List<Object>>, ReflectionFormBuilder> {
+public class SimpleEntityListFieldHandler extends AbstractListFieldHandler<List<Object>, FieldUpdateEvent<List<Object>>, ReflectionFormBuilder> implements FieldHandler<List<Object>,FieldUpdateEvent<List<Object>>, ReflectionFormBuilder, AbstractListPanel> {
     private final static Logger LOGGER = LoggerFactory.getLogger(SimpleEntityListFieldHandler.class);
 
     public SimpleEntityListFieldHandler(MessageHandler messageHandler) {
@@ -35,7 +36,7 @@ public class SimpleEntityListFieldHandler extends AbstractListFieldHandler<List<
     }
 
     public SimpleEntityListFieldHandler(MessageHandler messageHandler,
-            TypeHandler<List<Object>, FieldUpdateEvent<List<Object>>,ReflectionFormBuilder> typeHandler) {
+            TypeHandler<List<Object>, FieldUpdateEvent<List<Object>>,ReflectionFormBuilder, AbstractListPanel> typeHandler) {
         super(messageHandler, typeHandler);
     }
 }

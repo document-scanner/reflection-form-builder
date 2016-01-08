@@ -18,13 +18,14 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import javax.swing.JComponent;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
+import richtercloud.reflection.form.builder.panels.LongPanel;
 import richtercloud.reflection.form.builder.typehandler.LongTypeHandler;
 
 /**
  *
  * @author richter
  */
-public class LongFieldHandler implements FieldHandler<Long, FieldUpdateEvent<Long>, ReflectionFormBuilder> {
+public class LongFieldHandler implements FieldHandler<Long, FieldUpdateEvent<Long>, ReflectionFormBuilder, LongPanel> {
     private final static LongFieldHandler INSTANCE = new LongFieldHandler();
 
     public static LongFieldHandler getInstance() {
@@ -52,6 +53,11 @@ public class LongFieldHandler implements FieldHandler<Long, FieldUpdateEvent<Lon
                 field.getDeclaringClass(), //declaringClass
                 updateListener,
                 reflectionFormBuilder);
+    }
+
+    @Override
+    public void reset(LongPanel component) {
+        component.reset();
     }
 
 }

@@ -50,7 +50,15 @@ internal implementation notes:
 public class AmountMoneyPanel extends javax.swing.JPanel {
     private static final long serialVersionUID = 1L;
     private MutableComboBoxModel<Currency> currencyComboBoxModel = new DefaultComboBoxModel<>();
-    public final static Set<Currency> DEFAULT_CURRENCIES = new HashSet<>(Arrays.asList(Currency.AUD, Currency.CAD, Currency.CNY, Currency.EUR, Currency.GBP, Currency.JPY, Currency.KRW, Currency.TWD, Currency.USD));
+    public final static Set<Currency> DEFAULT_CURRENCIES = new HashSet<>(Arrays.asList(Currency.AUD,
+            Currency.CAD,
+            Currency.CNY,
+            Currency.EUR,
+            Currency.GBP,
+            Currency.JPY,
+            Currency.KRW,
+            Currency.TWD,
+            Currency.USD));
     private final Set<AmountMoneyPanelUpdateListener> updateListeners = new HashSet<>();
     private final AmountMoneyCurrencyStorage amountMoneyCurrencyStorage;
     private final AmountMoneyUsageStatisticsStorage amountMoneyUsageStatisticsStorage;
@@ -128,6 +136,13 @@ public class AmountMoneyPanel extends javax.swing.JPanel {
     public Amount<Money> retrieveAmountMoney() {
         double amount = retrieveAmount();
         return Amount.valueOf(amount, (Currency)currencyComboBoxModel.getSelectedItem());
+    }
+
+    public void applyAmountMoney(Amount<Money> amountMoney) {
+        double amount = amountMoney.doubleValue(amountMoney.getUnit());
+        this.amountIntegerSpinner.setValue((int)amount);
+        this.amountDecimalSpinner.setValue(amount % 1);
+        this.currencyComboBox.setSelectedItem(amountMoney.getUnit());
     }
 
     public void addUpdateListener(AmountMoneyPanelUpdateListener updateListener) {

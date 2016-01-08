@@ -52,9 +52,9 @@ import richtercloud.reflection.form.builder.typehandler.TypeHandler;
  * @author richter
  */
 public class MappingTypeHandlerFactory {
-    private static final Map<Type, TypeHandler<?, ?,?>> TYPE_HANDLER_MAPPING_DEFAULT;
+    private static final Map<Type, TypeHandler<?, ?,?,?>> TYPE_HANDLER_MAPPING_DEFAULT;
     static {
-        Map<Type, TypeHandler<?, ?,?>> typeHandlerMappingDefault0 = new HashMap<>();
+        Map<Type, TypeHandler<?, ?,?,?>> typeHandlerMappingDefault0 = new HashMap<>();
         typeHandlerMappingDefault0.put(createStringTypeToken(), StringTypeHandler.getInstance());
         typeHandlerMappingDefault0.put(createFloatTypeToken(), FloatTypeHandler.getInstance());
         typeHandlerMappingDefault0.put(createIntegerTypetoken(), IntegerTypeHandler.getInstance());
@@ -76,8 +76,8 @@ public class MappingTypeHandlerFactory {
         return messageHandler;
     }
 
-    public Map<Type, TypeHandler<?, ?,?>> generateTypeHandlerMapping() {
-        Map<Type, TypeHandler<?, ?,?>> typeHandlerMapping0 = new HashMap<>();
+    public Map<Type, TypeHandler<?, ?,?,?>> generateTypeHandlerMapping() {
+        Map<Type, TypeHandler<?, ?,?,?>> typeHandlerMapping0 = new HashMap<>();
         typeHandlerMapping0.putAll(TYPE_HANDLER_MAPPING_DEFAULT);
         //in addition to CLASS_MAPPING_DEFAULT
         typeHandlerMapping0.put(createBooleanListTypeToken(), new BooleanListTypeHandler(messageHandler));

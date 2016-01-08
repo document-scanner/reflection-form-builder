@@ -5,6 +5,7 @@
  */
 package richtercloud.reflection.form.builder;
 
+import java.awt.Component;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
@@ -42,6 +43,11 @@ public class CachedFieldRetrieverTest {
             @Override
             public JComponent handle(Field field, Object instance, FieldUpdateListener updateListener, ReflectionFormBuilder reflectionFormBuilder) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, InstantiationException, FieldHandlingException {
                 throw new UnsupportedOperationException("Won't ever be called.");
+            }
+
+            @Override
+            public void reset(Component component) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
             }
         };
         CachedFieldRetriever instance = new CachedFieldRetriever();

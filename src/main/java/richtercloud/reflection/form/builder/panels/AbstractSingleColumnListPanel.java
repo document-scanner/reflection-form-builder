@@ -56,15 +56,9 @@ public abstract class AbstractSingleColumnListPanel<T, L extends ListPanelItemLi
                 mainListCellEditor,
                 mainListCellRenderer,
                 mainListModel,
+                initialValues,
                 messageHandler,
                 new RightHeightTableHeader(createMainListColumnModel(mainListCellEditor, mainListCellRenderer), 0));
-        if(initialValues != null) {
-            for(T initialValue : initialValues) {
-                this.getMainListModel().setValueAt(initialValue,
-                        this.getMainListModel().getRowCount(),
-                        0);
-            }
-        }
         updateRowHeights(); //necessary after adding initial values
     }
 

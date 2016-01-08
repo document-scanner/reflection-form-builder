@@ -14,10 +14,12 @@
  */
 package richtercloud.reflection.form.builder.fieldhandler;
 
+import java.awt.Component;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import javax.swing.JComponent;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
+import richtercloud.reflection.form.builder.ComponentResettable;
 
 /**
  *
@@ -25,7 +27,7 @@ import richtercloud.reflection.form.builder.ReflectionFormBuilder;
  * @param <T> the type of the managed field
  * @param <E> the type of event emitted on field updates
  */
-public interface FieldAnnotationHandler<T, E extends FieldUpdateEvent<T>, R extends ReflectionFormBuilder> {
+public interface FieldAnnotationHandler<T, E extends FieldUpdateEvent<T>, R extends ReflectionFormBuilder, C extends Component> extends ComponentResettable<C> {
 
     /**
      *

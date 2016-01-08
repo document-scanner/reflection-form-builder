@@ -36,7 +36,7 @@ public class MappingClassAnnotationFactory {
     - return a modifiable view of the collections because protecting against
     writes doesn't increase any security or enforce any interface
     */
-    public List<Pair<Class<? extends Annotation>, ClassAnnotationHandler<Object,FieldUpdateEvent<Object>>>> generateClassAnnotationMapping() {
+    public List<Pair<Class<? extends Annotation>, ClassAnnotationHandler<Object,FieldUpdateEvent<Object>, ?>>> generateClassAnnotationMapping() {
         return new LinkedList<>();
     }
 }

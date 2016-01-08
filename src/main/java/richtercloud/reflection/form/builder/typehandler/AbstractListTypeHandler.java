@@ -14,6 +14,7 @@
  */
 package richtercloud.reflection.form.builder.typehandler;
 
+import java.awt.Component;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
@@ -23,12 +24,13 @@ import richtercloud.reflection.form.builder.fieldhandler.FieldHandlingException;
 import richtercloud.reflection.form.builder.fieldhandler.FieldUpdateEvent;
 import richtercloud.reflection.form.builder.fieldhandler.FieldUpdateListener;
 import richtercloud.reflection.form.builder.message.MessageHandler;
+import richtercloud.reflection.form.builder.panels.AbstractListPanel;
 
 /**
  *
  * @author richter
  */
-public abstract class AbstractListTypeHandler<T, E extends FieldUpdateEvent<T>, R extends ReflectionFormBuilder> implements TypeHandler<T, E,R> {
+public abstract class AbstractListTypeHandler<T, E extends FieldUpdateEvent<T>, R extends ReflectionFormBuilder> implements TypeHandler<T, E,R, AbstractListPanel> {
     private MessageHandler messageHandler;
 
     public AbstractListTypeHandler(MessageHandler messageHandler) {
@@ -60,4 +62,9 @@ public abstract class AbstractListTypeHandler<T, E extends FieldUpdateEvent<T>, 
             T fieldValue,
             FieldUpdateListener<E> updateListener,
             ReflectionFormBuilder reflectionFormBuilder) throws IllegalArgumentException, IllegalAccessException;
+
+    @Override
+    public void reset(AbstractListPanel component) {
+        component.reset();
+    }
 }

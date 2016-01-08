@@ -30,7 +30,7 @@ import richtercloud.reflection.form.builder.fieldhandler.FieldUpdateListener;
  *
  * @author richter
  */
-public class DateTypeHandler implements TypeHandler<Date, FieldUpdateEvent<Date>,ReflectionFormBuilder> {
+public class DateTypeHandler implements TypeHandler<Date, FieldUpdateEvent<Date>,ReflectionFormBuilder, UtilDatePicker> {
 
     private final static DateTypeHandler INSTANCE = new DateTypeHandler();
 
@@ -60,5 +60,10 @@ public class DateTypeHandler implements TypeHandler<Date, FieldUpdateEvent<Date>
             }
         });
         return retValue;
+    }
+
+    @Override
+    public void reset(UtilDatePicker component) {
+        component.reset();
     }
 }

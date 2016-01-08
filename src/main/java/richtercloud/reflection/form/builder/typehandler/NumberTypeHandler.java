@@ -29,7 +29,7 @@ import richtercloud.reflection.form.builder.fieldhandler.FieldUpdateListener;
  *
  * @author richter
  */
-public class NumberTypeHandler implements TypeHandler<Number, FieldUpdateEvent<Number>,ReflectionFormBuilder> {
+public class NumberTypeHandler implements TypeHandler<Number, FieldUpdateEvent<Number>,ReflectionFormBuilder, JSpinner> {
 
     private final static NumberTypeHandler INSTANCE = new NumberTypeHandler();
 
@@ -60,5 +60,10 @@ public class NumberTypeHandler implements TypeHandler<Number, FieldUpdateEvent<N
             }
         });
         return retValue;
+    }
+
+    @Override
+    public void reset(JSpinner component) {
+        component.setValue(0);
     }
 }

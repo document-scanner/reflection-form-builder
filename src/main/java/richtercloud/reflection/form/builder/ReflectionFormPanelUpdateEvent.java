@@ -25,6 +25,7 @@ public class ReflectionFormPanelUpdateEvent {
     public final static int INSTANCE_SAVED = 2;
     public final static int INSTANCE_UPDATED = 4;
     public final static int INSTANCE_FIELD_CHANGED = 8;
+    public final static int INSTANCE_RESET = 16;
     /**
      * the changed field
      */

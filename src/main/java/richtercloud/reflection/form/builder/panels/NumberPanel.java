@@ -58,6 +58,7 @@ public abstract class NumberPanel<N extends Number> extends JPanel {
     private Group layoutVerticalGroup;
     private JSpinner valueSpinner;
     private JCheckBox nullCheckBox;
+    private final Number initialValue;
 
     public NumberPanel(N initialValue) {
         initComponents();
@@ -69,13 +70,8 @@ public abstract class NumberPanel<N extends Number> extends JPanel {
                 }
             }
         });
-        if(initialValue == null) {
-            this.nullCheckBox.setSelected(true);
-            this.valueSpinner.setEnabled(false);
-        }else {
-            this.valueSpinner.setValue(initialValue);
-            this.nullCheckBox.setSelected(false); //might not be necessary, but is clearer
-        }
+        this.initialValue = initialValue;
+        reset();
     }
 
     public JSpinner getValueSpinner() {
@@ -164,5 +160,13 @@ public abstract class NumberPanel<N extends Number> extends JPanel {
         }
     }
 
-
+    public void reset() {
+        if(initialValue == null) {
+            this.nullCheckBox.setSelected(true);
+            this.valueSpinner.setEnabled(false);
+        }else {
+            this.valueSpinner.setValue(initialValue);
+            this.nullCheckBox.setSelected(false); //might not be necessary, but is clearer
+        }
+    }
 }

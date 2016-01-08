@@ -14,23 +14,25 @@
  */
 package richtercloud.reflection.form.builder.fieldhandler;
 
+import java.awt.Component;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import javax.swing.JComponent;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
 import richtercloud.reflection.form.builder.message.MessageHandler;
+import richtercloud.reflection.form.builder.panels.AbstractListPanel;
 import richtercloud.reflection.form.builder.typehandler.TypeHandler;
 
 /**
  *
  * @author richter
  */
-public abstract class AbstractListFieldHandler<T, E extends FieldUpdateEvent<T>, R extends ReflectionFormBuilder> implements FieldHandler<T, E, R> {
+public abstract class AbstractListFieldHandler<T, E extends FieldUpdateEvent<T>, R extends ReflectionFormBuilder> implements FieldHandler<T, E, R, AbstractListPanel> {
     private MessageHandler messageHandler;
-    private TypeHandler<T,E,R> typeHandler;
+    private TypeHandler<T,E,R,AbstractListPanel> typeHandler;
 
     public AbstractListFieldHandler(MessageHandler messageHandler,
-            TypeHandler<T,E,R> typeHandler) {
+            TypeHandler<T,E,R,AbstractListPanel> typeHandler) {
         this.messageHandler = messageHandler;
         this.typeHandler = typeHandler;
     }
@@ -52,5 +54,10 @@ public abstract class AbstractListFieldHandler<T, E extends FieldUpdateEvent<T>,
                 updateListener,
                 reflectionFormBuilder);
         return retValue;
+    }
+
+    @Override
+    public void reset(AbstractListPanel component) {
+        this.typeHandler.reset(component);
     }
 }

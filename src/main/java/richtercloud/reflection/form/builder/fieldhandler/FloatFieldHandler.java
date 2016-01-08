@@ -18,13 +18,14 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import javax.swing.JComponent;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
+import richtercloud.reflection.form.builder.panels.FloatPanel;
 import richtercloud.reflection.form.builder.typehandler.FloatTypeHandler;
 
 /**
  *
  * @author richter
  */
-public class FloatFieldHandler implements FieldHandler<Float, FieldUpdateEvent<Float>, ReflectionFormBuilder> {
+public class FloatFieldHandler implements FieldHandler<Float, FieldUpdateEvent<Float>, ReflectionFormBuilder, FloatPanel> {
 
     private final static FloatFieldHandler INSTANCE = new FloatFieldHandler();
 
@@ -54,5 +55,10 @@ public class FloatFieldHandler implements FieldHandler<Float, FieldUpdateEvent<F
                 field.getDeclaringClass(), //declaringClass
                 updateListener,
                 reflectionFormBuilder);
+    }
+
+    @Override
+    public void reset(FloatPanel component) {
+        this.floatTypeHandler.reset(component);
     }
 }

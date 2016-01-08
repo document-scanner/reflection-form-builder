@@ -23,14 +23,20 @@ import javax.swing.JComboBox;
  */
 public class BooleanWrapperComboBox extends JComboBox<Boolean> {
     private static final long serialVersionUID = 1L;
+    private final Boolean initialValue;
 
     public BooleanWrapperComboBox(Boolean initialValue) {
         super(new DefaultComboBoxModel<>(new Boolean[] {Boolean.TRUE, Boolean.FALSE, null}));
-        this.setSelectedItem(initialValue);
+        this.initialValue = initialValue;
+        reset();
     }
 
     public Boolean getValue() {
         return (Boolean) this.getSelectedItem();
+    }
+
+    public void reset() {
+        this.setSelectedItem(initialValue);
     }
 
 }

@@ -14,6 +14,7 @@
  */
 package richtercloud.reflection.form.builder;
 
+import java.awt.Component;
 import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.HashMap;
@@ -24,10 +25,12 @@ import javax.swing.GroupLayout;
 import javax.swing.JComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import richtercloud.reflection.form.builder.fieldhandler.FieldHandler;
 
 /**
  *
  * @author richter
+ * @param <U> the type of {@link ReflectionFormPanelUpdateListener} to use
  */
 /*
 internal implementation notes:
@@ -37,8 +40,11 @@ GroupLayout
 - implementing Scrollable messes up horizontal resizing of components in the
 right column when a ReflectionFormPanel is added to a JTabbedPane inside a
 JScrollPane
+- collectionMapping is necessary in order provide a reset method in
+ReflectionFormPanel which is necessary because a FieldHandler can't reset the
+ReflectionFormPanel if it only delegates to the ReflectionFormPanel i
 */
-public class ReflectionFormPanel extends javax.swing.JPanel {
+public class ReflectionFormPanel<U extends ReflectionFormPanelUpdateListener> extends javax.swing.JPanel {
     private static final long serialVersionUID = 1L;
     private final static Logger LOGGER = LoggerFactory.getLogger(ReflectionFormPanel.class);
 
@@ -54,11 +60,23 @@ public class ReflectionFormPanel extends javax.swing.JPanel {
     private Map<Field, JComponent> fieldMapping = new HashMap<>();
     private Object instance;
     private Class<?> entityClass;
-    private final Set<ReflectionFormPanelUpdateListener> updateListeners = new HashSet<>();
+    private final Set<U> updateListeners = new HashSet<>();
+    /**
+     * The field handler to use for reset actions.
+     */
+    private final FieldHandler fieldHandler;
 
+    /**
+     *
+     * @param fieldMapping
+     * @param instance
+     * @param entityClass
+     * @param fieldHandler the {@link FieldHandler} to perform reset actions
+     */
     public ReflectionFormPanel(Map<Field, JComponent> fieldMapping,
             Object instance,
-            Class<?> entityClass) {
+            Class<?> entityClass,
+            FieldHandler fieldHandler) {
         super();
         this.initComponents();
         GroupLayout layout = new GroupLayout(this);
@@ -79,17 +97,18 @@ public class ReflectionFormPanel extends javax.swing.JPanel {
         this.fieldMapping = fieldMapping;
         this.instance = instance;
         this.entityClass = entityClass;
+        this.fieldHandler = fieldHandler;
     }
 
-    public void addUpdateListener(ReflectionFormPanelUpdateListener updateListener) {
+    public void addUpdateListener(U updateListener) {
         this.updateListeners.add(updateListener);
     }
 
-    public void removeUpdateListener(ReflectionFormPanelUpdateListener updateListener) {
+    public void removeUpdateListener(U updateListener) {
         this.updateListeners.remove(updateListener);
     }
 
-    protected Set<ReflectionFormPanelUpdateListener> getUpdateListeners() {
+    protected Set<U> getUpdateListeners() {
         return Collections.unmodifiableSet(this.updateListeners);
     }
 
@@ -118,6 +137,10 @@ public class ReflectionFormPanel extends javax.swing.JPanel {
         return Collections.unmodifiableMap(fieldMapping);
     }
 
+    public FieldHandler getFieldHandler() {
+        return fieldHandler;
+    }
+
     /**
      * returns the pointer to the instance field (to be used in subclasses). An
      * updated version of the instance can only be retrieved with {@link #retrieveInstance() }.
@@ -129,6 +152,12 @@ public class ReflectionFormPanel extends javax.swing.JPanel {
 
     public Class<?> getEntityClass() {
         return entityClass;
+    }
+
+    public void reset() {
+        for(Component component : getFieldMapping().values()) {
+            getFieldHandler().reset(component);
+        }
     }
 
     /**

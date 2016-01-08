@@ -19,13 +19,14 @@ import java.lang.reflect.Type;
 import java.util.Date;
 import javax.swing.JComponent;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
+import richtercloud.reflection.form.builder.components.UtilDatePicker;
 import richtercloud.reflection.form.builder.typehandler.DateTypeHandler;
 
 /**
  *
  * @author richter
  */
-public class DateFieldHandler implements FieldHandler<Date, FieldUpdateEvent<Date>, ReflectionFormBuilder> {
+public class DateFieldHandler implements FieldHandler<Date, FieldUpdateEvent<Date>, ReflectionFormBuilder, UtilDatePicker> {
     private final static DateFieldHandler INSTANCE = new DateFieldHandler();
 
     public static DateFieldHandler getInstance() {
@@ -54,6 +55,11 @@ public class DateFieldHandler implements FieldHandler<Date, FieldUpdateEvent<Dat
                 field.getDeclaringClass(), //declaringClass
                 updateListener,
                 reflectionFormBuilder);
+    }
+
+    @Override
+    public void reset(UtilDatePicker component) {
+        component.reset();
     }
 
 }

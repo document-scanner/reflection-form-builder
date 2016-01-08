@@ -15,6 +15,7 @@
 package richtercloud.reflection.form.builder.fieldhandler;
 
 import com.google.common.reflect.TypeToken;
+import java.awt.Component;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -90,7 +91,7 @@ public class MappingFieldHandlerTest {
     public void testRetrieveFieldHandler() {
         System.out.println("retrieveFieldHandler");
         Type fieldType = null;
-        Map<Type, FieldHandler<?, ?, ?>> classMapping = null;
+        Map<Type, FieldHandler<?, ?, ?, ?>> classMapping = null;
         MappingFieldHandler instance = null;
         FieldHandler expResult = null;
         FieldHandler result = instance.retrieveFieldHandler(fieldType, classMapping);
@@ -103,9 +104,9 @@ public class MappingFieldHandlerTest {
     @SuppressWarnings("serial")
     public void testRetrieveClassMappingBestMatch() throws NoSuchFieldException {
         List<Pair<Class<? extends Annotation>, FieldAnnotationHandler>> fieldAnnotationMapping = new LinkedList<>();
-        List<Pair<Class<? extends Annotation>, ClassAnnotationHandler<Object,FieldUpdateEvent<Object>>>> classAnnotationMapping = new LinkedList<>();
+        List<Pair<Class<? extends Annotation>, ClassAnnotationHandler<Object,FieldUpdateEvent<Object>, ?>>> classAnnotationMapping = new LinkedList<>();
         ParameterizedType type = (ParameterizedType) TestEntityCollection.class.getDeclaredField("gs").getGenericType();
-        Map<Type, FieldHandler<?,?, ?>> classMapping = new HashMap<>();
+        Map<Type, FieldHandler<?,?, ?, ?>> classMapping = new HashMap<>();
         classMapping.put(type,
                 NumberFieldHandler.getInstance() //any handler
         );
@@ -118,8 +119,13 @@ public class MappingFieldHandlerTest {
                     ReflectionFormBuilder reflectionFormBuilder) {
                 return new JPasswordField();
             }
+
+            @Override
+            public void reset(Component component) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
         });// a type with common prefix
-        Map<Class<?>, FieldHandler<?,?, ?>> primitiveMapping = new HashMap<>();
+        Map<Class<?>, FieldHandler<?,?, ?, ?>> primitiveMapping = new HashMap<>();
         MappingFieldHandler instance = new MappingFieldHandler(classMapping,
                 primitiveMapping,
                 fieldAnnotationMapping,
@@ -157,7 +163,7 @@ public class MappingFieldHandlerTest {
     @SuppressWarnings("serial")
     public void testRetrieveAnyCountRecursively() {
         List<Pair<Class<? extends Annotation>, FieldAnnotationHandler>> fieldAnnotationMapping = new LinkedList<>();
-        List<Pair<Class<? extends Annotation>, ClassAnnotationHandler<Object,FieldUpdateEvent<Object>>>> classAnnotationMapping = new LinkedList<>();
+        List<Pair<Class<? extends Annotation>, ClassAnnotationHandler<Object,FieldUpdateEvent<Object>, ?>>> classAnnotationMapping = new LinkedList<>();
         MessageHandler messageHandler = new LoggerMessageHandler(LOGGER);
         MappingFieldHandler instance = new MappingFieldHandler(classMappingFactory.generateClassMapping(),
                 classMappingFactory.generatePrimitiveMapping(),

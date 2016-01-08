@@ -28,7 +28,7 @@ import richtercloud.reflection.form.builder.panels.NumberPanelUpdateListener;
  *
  * @author richter
  */
-public class LongTypeHandler implements TypeHandler<Long, FieldUpdateEvent<Long>,ReflectionFormBuilder> {
+public class LongTypeHandler implements TypeHandler<Long, FieldUpdateEvent<Long>,ReflectionFormBuilder, LongPanel> {
 
     private final static LongTypeHandler INSTANCE = new LongTypeHandler();
 
@@ -57,5 +57,10 @@ public class LongTypeHandler implements TypeHandler<Long, FieldUpdateEvent<Long>
             }
         });
         return retValue;
+    }
+
+    @Override
+    public void reset(LongPanel component) {
+        component.reset();
     }
 }

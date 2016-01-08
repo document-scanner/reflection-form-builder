@@ -14,10 +14,12 @@
  */
 package richtercloud.reflection.form.builder.fieldhandler;
 
+import java.awt.Component;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import javax.swing.JComponent;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
+import richtercloud.reflection.form.builder.ComponentResettable;
 
 /**
  * This interface specifies information which allow you to write custom field handlers. Due to the fact that {@link #handle(java.lang.reflect.Field, java.lang.Object, java.lang.String, java.lang.Class, richtercloud.reflection.form.builder.FieldUpdateListener, richtercloud.reflection.form.builder.ReflectionFormBuilder) } provides information about the handled field you can retrieve information as good and as easily as the Java Reflection API allows you.
@@ -56,8 +58,13 @@ FieldHandler registers for each component individually.
 changes to items can't be -> it is inevitable to provide custom field handler
 for immutable types (eventually it's possible to provide generic immutable type
 field handler)
+- reset implementation notes:
+  - The reset funtionality has to be placed on the
+JComponent level in order to be able to write values on JComponents (otherwise there's no way to retrieve the component in the TypeHandler; other approaches include
+
+  - ; FIXME event handler
 */
-public interface FieldHandler<T, E extends FieldUpdateEvent<T>, R extends ReflectionFormBuilder> {
+public interface FieldHandler<T, E extends FieldUpdateEvent<T>, R extends ReflectionFormBuilder, C extends Component> extends ComponentResettable<C> {
 
     /**
      * Information about the field value can be retrieved with {@link Field#get(java.lang.Object) } and {@code instance}, about the field name with {@link Field#getName() } and about the declaring class with {@link Field#getDeclaringClass() }.

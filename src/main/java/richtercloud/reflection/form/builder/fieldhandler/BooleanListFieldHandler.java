@@ -14,9 +14,11 @@
  */
 package richtercloud.reflection.form.builder.fieldhandler;
 
+import java.awt.Component;
 import java.util.List;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
 import richtercloud.reflection.form.builder.message.MessageHandler;
+import richtercloud.reflection.form.builder.panels.AbstractListPanel;
 import richtercloud.reflection.form.builder.typehandler.BooleanListTypeHandler;
 import richtercloud.reflection.form.builder.typehandler.TypeHandler;
 
@@ -24,7 +26,7 @@ import richtercloud.reflection.form.builder.typehandler.TypeHandler;
  *
  * @author richter
  */
-public class BooleanListFieldHandler extends AbstractListFieldHandler<List<Boolean>, FieldUpdateEvent<List<Boolean>>, ReflectionFormBuilder> implements FieldHandler<List<Boolean>, FieldUpdateEvent<List<Boolean>>, ReflectionFormBuilder>{
+public class BooleanListFieldHandler extends AbstractListFieldHandler<List<Boolean>, FieldUpdateEvent<List<Boolean>>, ReflectionFormBuilder> implements FieldHandler<List<Boolean>, FieldUpdateEvent<List<Boolean>>, ReflectionFormBuilder, AbstractListPanel>{
 
     public BooleanListFieldHandler(MessageHandler messageHandler) {
         super(messageHandler,
@@ -32,7 +34,7 @@ public class BooleanListFieldHandler extends AbstractListFieldHandler<List<Boole
     }
 
     protected BooleanListFieldHandler(MessageHandler messageHandler,
-            TypeHandler<List<Boolean>, FieldUpdateEvent<List<Boolean>>,ReflectionFormBuilder> typeHandler) {
+            TypeHandler<List<Boolean>, FieldUpdateEvent<List<Boolean>>,ReflectionFormBuilder, AbstractListPanel> typeHandler) {
         super(messageHandler, typeHandler);
     }
 }

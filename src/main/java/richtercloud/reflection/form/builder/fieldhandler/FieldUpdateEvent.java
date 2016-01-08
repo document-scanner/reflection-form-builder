@@ -24,7 +24,7 @@ internal implementation notes:
 - doesn't need to be an interface with hundreds of implementations
 */
 public class FieldUpdateEvent<T> {
-    private T newValue;
+    private final T newValue;
 
     public FieldUpdateEvent(T newValue) {
         this.newValue = newValue;

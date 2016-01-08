@@ -19,13 +19,14 @@ import java.lang.reflect.Type;
 import java.sql.Date;
 import javax.swing.JComponent;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
+import richtercloud.reflection.form.builder.components.SqlDatePicker;
 import richtercloud.reflection.form.builder.typehandler.SqlDateTypeHandler;
 
 /**
  *
  * @author richter
  */
-public class SqlDateFieldHandler implements FieldHandler<java.sql.Date,FieldUpdateEvent<Date>, ReflectionFormBuilder> {
+public class SqlDateFieldHandler implements FieldHandler<java.sql.Date,FieldUpdateEvent<Date>, ReflectionFormBuilder, SqlDatePicker> {
     private final static SqlDateFieldHandler INSTANCE = new SqlDateFieldHandler();
 
     public static SqlDateFieldHandler getInstance() {
@@ -54,6 +55,11 @@ public class SqlDateFieldHandler implements FieldHandler<java.sql.Date,FieldUpda
                 field.getDeclaringClass(), //declaringClass
                 updateListener,
                 reflectionFormBuilder);
+    }
+
+    @Override
+    public void reset(SqlDatePicker component) {
+        component.reset();
     }
 
 }

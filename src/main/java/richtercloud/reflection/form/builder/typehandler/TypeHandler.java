@@ -14,8 +14,10 @@
  */
 package richtercloud.reflection.form.builder.typehandler;
 
+import java.awt.Component;
 import java.lang.reflect.Type;
 import javax.swing.JComponent;
+import richtercloud.reflection.form.builder.ComponentResettable;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
 import richtercloud.reflection.form.builder.fieldhandler.FieldHandlingException;
 import richtercloud.reflection.form.builder.fieldhandler.FieldUpdateEvent;
@@ -27,7 +29,13 @@ import richtercloud.reflection.form.builder.fieldhandler.FieldUpdateListener;
  * @param <T>
  * @param <E>
  */
-public interface TypeHandler<T, E extends FieldUpdateEvent<T>, R extends ReflectionFormBuilder> {
+/*
+internal implementation notes:
+- don't implement ClassPartHandler because it enforce the reset method, but a
+TypeHandler isn't a ClassPartHandler and some ClassPartHandlers (like
+FieldHandler delegate reset to TypeHandler)
+*/
+public interface TypeHandler<T, E extends FieldUpdateEvent<T>, R extends ReflectionFormBuilder, C extends Component> extends ComponentResettable<C> {
 
     /**
      *
@@ -39,8 +47,8 @@ public interface TypeHandler<T, E extends FieldUpdateEvent<T>, R extends Reflect
      * @param reflectionFormBuilder a {@link ReflectionFormBuilder} used for
      * recursion
      * @return
-     * @throws richtercloud.reflection.form.builder.FieldHandlingException
      * @throws java.lang.IllegalAccessException
+     * @throws richtercloud.reflection.form.builder.fieldhandler.FieldHandlingException
      */
     JComponent handle(Type type,
             T fieldValue,
@@ -50,4 +58,5 @@ public interface TypeHandler<T, E extends FieldUpdateEvent<T>, R extends Reflect
             R reflectionFormBuilder) throws IllegalArgumentException,
             IllegalAccessException,
             FieldHandlingException;
+
 }

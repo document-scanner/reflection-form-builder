@@ -14,9 +14,12 @@
  */
 package richtercloud.reflection.form.builder;
 
+import java.awt.Component;
 import javax.swing.JComponent;
+import richtercloud.reflection.form.builder.ReflectionFormBuilder;
 import richtercloud.reflection.form.builder.fieldhandler.FieldUpdateEvent;
 import richtercloud.reflection.form.builder.fieldhandler.FieldUpdateListener;
+import richtercloud.reflection.form.builder.ComponentResettable;
 
 /**
  * Used to produce a {@link JComponent} if a field is encountered whose type is
@@ -24,7 +27,7 @@ import richtercloud.reflection.form.builder.fieldhandler.FieldUpdateListener;
  * @author richter
  * @param <E> the type of the {@link FieldUpdateListener}
  */
-public interface ClassAnnotationHandler<T, E extends FieldUpdateEvent<T>> {
+public interface ClassAnnotationHandler<T, E extends FieldUpdateEvent<T>, C extends Component> extends ComponentResettable<C> {
 
     /**
      *
