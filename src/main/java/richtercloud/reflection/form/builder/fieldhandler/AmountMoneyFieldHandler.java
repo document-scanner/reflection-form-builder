@@ -15,11 +15,7 @@
 package richtercloud.reflection.form.builder.fieldhandler;
 
 import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Map;
 import javax.swing.JComponent;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 import org.jscience.economics.money.Currency;
 import org.jscience.economics.money.Money;
 import org.jscience.physics.amount.Amount;

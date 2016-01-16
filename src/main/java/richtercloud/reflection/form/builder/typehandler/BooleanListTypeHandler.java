@@ -14,7 +14,6 @@
  */
 package richtercloud.reflection.form.builder.typehandler;
 
-import java.awt.Component;
 import java.lang.reflect.Type;
 import java.util.List;
 import javax.swing.JComponent;

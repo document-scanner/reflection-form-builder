@@ -15,6 +15,7 @@
 package richtercloud.reflection.form.builder.typehandler;
 
 import java.awt.Component;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,12 +38,22 @@ public class MappingTypeHandler<T, E extends FieldUpdateEvent<T>, R extends Refl
     private final Map<JComponent, TypeHandler> componentMapping = new HashMap<>();
 
     @Override
-    public JComponent handle(Type type, T fieldValue, String fieldName, Class<?> declaringClass, FieldUpdateListener<E> updateListener, R reflectionFormBuilder) throws IllegalArgumentException, IllegalAccessException, FieldHandlingException {
+    public JComponent handle(Type type,
+            T fieldValue,
+            String fieldName,
+            Class<?> declaringClass,
+            FieldUpdateListener<E> updateListener,
+            R reflectionFormBuilder) throws IllegalArgumentException, IllegalAccessException, FieldHandlingException, InstantiationException, InvocationTargetException {
         TypeHandler<T,E,R, Component> typeHandler = classMapping.get(type);
         if(typeHandler == null) {
             throw new IllegalArgumentException(String.format("Type '%s' isn't mapped.", type));
         }
-        JComponent retValue = typeHandler.handle(type, fieldValue, fieldName, declaringClass, updateListener, reflectionFormBuilder);
+        JComponent retValue = typeHandler.handle(type,
+                fieldValue,
+                fieldName,
+                declaringClass,
+                updateListener,
+                reflectionFormBuilder);
         this.componentMapping.put(retValue, typeHandler);
         return retValue;
     }

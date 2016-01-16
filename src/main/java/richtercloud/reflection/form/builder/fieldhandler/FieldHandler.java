@@ -18,8 +18,8 @@ import java.awt.Component;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import javax.swing.JComponent;
-import richtercloud.reflection.form.builder.ReflectionFormBuilder;
 import richtercloud.reflection.form.builder.ComponentResettable;
+import richtercloud.reflection.form.builder.ReflectionFormBuilder;
 
 /**
  * This interface specifies information which allow you to write custom field handlers. Due to the fact that {@link #handle(java.lang.reflect.Field, java.lang.Object, java.lang.String, java.lang.Class, richtercloud.reflection.form.builder.FieldUpdateListener, richtercloud.reflection.form.builder.ReflectionFormBuilder) } provides information about the handled field you can retrieve information as good and as easily as the Java Reflection API allows you.

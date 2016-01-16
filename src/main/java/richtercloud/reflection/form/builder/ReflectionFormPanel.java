@@ -117,11 +117,11 @@ public class ReflectionFormPanel<U extends ReflectionFormPanelUpdateListener> ex
         return (GroupLayout) super.getLayout();
     }
 
-    public GroupLayout.Group getVerticalSequentialGroup() {
+    public GroupLayout.Group getVerticalMainGroup() {
         return verticalSequentialGroup;
     }
 
-    public GroupLayout.Group getHorizontalSequentialGroup() {
+    public GroupLayout.Group getHorizontalMainGroup() {
         return horizontalSequentialGroup;
     }
 

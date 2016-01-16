@@ -16,25 +16,21 @@ package richtercloud.reflection.form.builder.fieldhandler;
 
 import com.google.common.reflect.TypeToken;
 import java.awt.Component;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.swing.JComponent;
 import javax.swing.JPasswordField;
 import junit.framework.Assert;
-import org.apache.commons.lang3.tuple.Pair;
 import static org.junit.Assert.*;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import richtercloud.reflection.form.builder.AnyType;
-import richtercloud.reflection.form.builder.ClassAnnotationHandler;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
 import richtercloud.reflection.form.builder.TestEntity;
 import richtercloud.reflection.form.builder.TestEntityCollection;
@@ -103,8 +99,6 @@ public class MappingFieldHandlerTest {
     @Test
     @SuppressWarnings("serial")
     public void testRetrieveClassMappingBestMatch() throws NoSuchFieldException {
-        List<Pair<Class<? extends Annotation>, FieldAnnotationHandler>> fieldAnnotationMapping = new LinkedList<>();
-        List<Pair<Class<? extends Annotation>, ClassAnnotationHandler<Object,FieldUpdateEvent<Object>, ?>>> classAnnotationMapping = new LinkedList<>();
         ParameterizedType type = (ParameterizedType) TestEntityCollection.class.getDeclaredField("gs").getGenericType();
         Map<Type, FieldHandler<?,?, ?, ?>> classMapping = new HashMap<>();
         classMapping.put(type,
@@ -127,18 +121,14 @@ public class MappingFieldHandlerTest {
         });// a type with common prefix
         Map<Class<?>, FieldHandler<?,?, ?, ?>> primitiveMapping = new HashMap<>();
         MappingFieldHandler instance = new MappingFieldHandler(classMapping,
-                primitiveMapping,
-                fieldAnnotationMapping,
-                classAnnotationMapping);
+                primitiveMapping);
         Type result = instance.retrieveClassMappingBestMatch(type);
         assertEquals(type, result);
         // check that empty class mapping returns null
         classMapping = new HashMap<>();
         primitiveMapping = new HashMap<>();
         instance = new MappingFieldHandler(classMapping,
-                primitiveMapping,
-                fieldAnnotationMapping,
-                classAnnotationMapping);
+                primitiveMapping);
         result = instance.retrieveClassMappingBestMatch(type);
         assertEquals(null, result);
         //check that AnyType is matched needs to be in testGetClassComponent
@@ -152,9 +142,7 @@ public class MappingFieldHandlerTest {
         primitiveMapping = new HashMap<>();
         type = (ParameterizedType) TestEntity.class.getDeclaredField("m").getGenericType();
         instance = new MappingFieldHandler(classMapping,
-                primitiveMapping,
-                fieldAnnotationMapping,
-                classAnnotationMapping);
+                primitiveMapping);
         result = instance.retrieveClassMappingBestMatch(type);
         assertEquals(null, result);
     }
@@ -162,13 +150,9 @@ public class MappingFieldHandlerTest {
     @Test
     @SuppressWarnings("serial")
     public void testRetrieveAnyCountRecursively() {
-        List<Pair<Class<? extends Annotation>, FieldAnnotationHandler>> fieldAnnotationMapping = new LinkedList<>();
-        List<Pair<Class<? extends Annotation>, ClassAnnotationHandler<Object,FieldUpdateEvent<Object>, ?>>> classAnnotationMapping = new LinkedList<>();
         MessageHandler messageHandler = new LoggerMessageHandler(LOGGER);
         MappingFieldHandler instance = new MappingFieldHandler(classMappingFactory.generateClassMapping(),
-                classMappingFactory.generatePrimitiveMapping(),
-                fieldAnnotationMapping,
-                classAnnotationMapping);
+                classMappingFactory.generatePrimitiveMapping());
         //test 0
         int result = instance.retrieveAnyCountRecursively((ParameterizedType) new TypeToken<List<Set<Integer>>>() {
 }.getType());

@@ -15,6 +15,7 @@
 package richtercloud.reflection.form.builder.typehandler;
 
 import java.awt.Component;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.LinkedList;
@@ -29,30 +30,58 @@ import richtercloud.reflection.form.builder.fieldhandler.FieldUpdateListener;
 /**
  * A {@link TypeHandler} which allows to check for an exact type match (which is
  * handled immediately (and the result returned)) and retrieve the type of the
- * {@link List}.
+ * {@link List}. Furthermore check different class annotations for the base type
+ * and the generic list type.
  *
  * @author richter
  */
 public abstract class GenericListTypeHandler<R extends ReflectionFormBuilder, C extends Component> implements TypeHandler<List<Object>, FieldUpdateEvent<List<Object>>,R, C> {
     /**
-     * The {@link TypeHandler} mapping for the generic type of the field (excluding the file type itself. Will be used if there's no match in {@code fieldTypeHandlerMapping}.
+     * The {@link TypeHandler} mapping for the generic type. Will be used if
+     * there's no match in {@code typeHandlerMapping}.
      */
     private final Map<Type, TypeHandler<?, ?,?, ?>> genericsTypeHandlerMapping;
     /**
-     * A mapping for {@link TypeHandler which is used is the field type matches
+     * The {@link TypeHandler} mapping which is used if the type matches
      * exactly.
      */
-    private final Map<Type, TypeHandler<?,?,?, ?>> fieldTypeHandlerMapping;
+    private final Map<Type, TypeHandler<?,?,?, ?>> typeHandlerMapping;
 
     public GenericListTypeHandler(Map<Type, TypeHandler<?, ?, ?, ?>> genericsTypeHandlerMapping,
-            Map<Type, TypeHandler<?, ?, ?, ?>> fieldTypeHandlerMapping) {
+            Map<Type, TypeHandler<?, ?, ?, ?>> typeHandlerMapping) {
         this.genericsTypeHandlerMapping = genericsTypeHandlerMapping;
-        this.fieldTypeHandlerMapping = fieldTypeHandlerMapping;
+        this.typeHandlerMapping = typeHandlerMapping;
     }
 
+    /**
+     * Checks {@code typeClassAnnotationHandlerMapping} and then
+     * {@code typeHandlerMapping} for exact matches. If there're no results,
+     * checks {@code typeClassAnnotationHandlerMapping} and
+     * {@code genericsTypeClassAnnotationHandlerMapping}.
+     * @param type
+     * @param fieldValue
+     * @param fieldName
+     * @param declaringClass
+     * @param updateListener
+     * @param reflectionFormBuilder
+     * @return
+     * @throws IllegalArgumentException
+     * @throws IllegalAccessException
+     * @throws FieldHandlingException
+     * @throws InstantiationException
+     * @throws InvocationTargetException
+     */
     @Override
-    public JComponent handle(Type type, List<Object> fieldValue, String fieldName, Class<?> declaringClass, final FieldUpdateListener<FieldUpdateEvent<List<Object>>> updateListener, R reflectionFormBuilder) throws IllegalArgumentException, IllegalAccessException, FieldHandlingException {
-
+    public JComponent handle(Type type,
+            List<Object> fieldValue,
+            String fieldName,
+            Class<?> declaringClass,
+            final FieldUpdateListener<FieldUpdateEvent<List<Object>>> updateListener,
+            R reflectionFormBuilder) throws IllegalArgumentException,
+            IllegalAccessException,
+            FieldHandlingException,
+            InstantiationException,
+            InvocationTargetException {
         if(fieldValue == null) {
             fieldValue = new LinkedList<>(); //this is legitimate because all
                     //mechanisms will fail if the field value (retrieved with
@@ -60,8 +89,16 @@ public abstract class GenericListTypeHandler<R extends ReflectionFormBuilder, C 
                     //this value which can be passed to updateListener then)
         }
 
+        //unclear whether typeClass can be null in the following scenario
+        Class<?> typeClass = null;
+        if(type instanceof Class) {
+            typeClass = (Class<?>) type;
+        }else if(type instanceof ParameterizedType) {
+            typeClass = (Class<?>) ((ParameterizedType)type).getRawType();
+        }
+
         //check for an exact match (including all nested generics) first
-        TypeHandler fieldTypeHandler = this.fieldTypeHandlerMapping.get(type);
+        TypeHandler fieldTypeHandler = this.typeHandlerMapping.get(type);
         if(fieldTypeHandler != null) {
             JComponent retValue = fieldTypeHandler.handle(type,
                     fieldValue,
@@ -73,6 +110,14 @@ public abstract class GenericListTypeHandler<R extends ReflectionFormBuilder, C 
         }
 
         Type genericType = retrieveTypeGenericType(type);
+        //class annotations can be checked (field annotations not, of course)
+        Class<?> genericTypeClass = null;
+        if(genericType instanceof Class) {
+            genericTypeClass = (Class<?>) genericType;
+        }else if(genericType instanceof ParameterizedType) {
+            genericTypeClass = (Class<?>) ((ParameterizedType)genericType).getRawType();
+        }
+
         TypeHandler genericTypeHandler = this.genericsTypeHandlerMapping.get(genericType);
         if(genericTypeHandler != null) {
             return genericTypeHandler.handle(genericType,

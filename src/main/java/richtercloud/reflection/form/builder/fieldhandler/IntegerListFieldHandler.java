@@ -18,7 +18,6 @@ import java.util.List;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
 import richtercloud.reflection.form.builder.message.MessageHandler;
 import richtercloud.reflection.form.builder.panels.AbstractListPanel;
-import richtercloud.reflection.form.builder.panels.IntegerListPanel;
 import richtercloud.reflection.form.builder.typehandler.IntegerListTypeHandler;
 import richtercloud.reflection.form.builder.typehandler.TypeHandler;
 

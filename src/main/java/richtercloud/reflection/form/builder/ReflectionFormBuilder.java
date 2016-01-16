@@ -240,10 +240,10 @@ public class ReflectionFormBuilder<F extends FieldRetriever> {
             Group verticalFieldGroup = layout.createParallelGroup(GroupLayout.Alignment.BASELINE);
             verticalFieldGroup.addComponent(label);
             verticalFieldGroup.addComponent(comp);
-            reflectionFormPanel.getVerticalSequentialGroup().addGroup(verticalFieldGroup);
+            reflectionFormPanel.getVerticalMainGroup().addGroup(verticalFieldGroup);
             fieldMapping.put(field, comp);
         }
-        reflectionFormPanel.getHorizontalSequentialGroup().addGroup(horizontalLabelParallelGroup).addGroup(horizontalCompParallelGroup);
+        reflectionFormPanel.getHorizontalMainGroup().addGroup(horizontalLabelParallelGroup).addGroup(horizontalCompParallelGroup);
         reflectionFormPanel.revalidate();
         reflectionFormPanel.repaint();
     }

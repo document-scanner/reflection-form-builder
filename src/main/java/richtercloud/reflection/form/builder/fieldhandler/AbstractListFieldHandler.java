@@ -14,8 +14,8 @@
  */
 package richtercloud.reflection.form.builder.fieldhandler;
 
-import java.awt.Component;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
 import javax.swing.JComponent;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
@@ -45,7 +45,7 @@ public abstract class AbstractListFieldHandler<T, E extends FieldUpdateEvent<T>,
     public JComponent handle(Field field,
             Object instance,
             FieldUpdateListener<E> updateListener,
-            R reflectionFormBuilder) throws IllegalArgumentException, IllegalAccessException, FieldHandlingException {
+            R reflectionFormBuilder) throws IllegalArgumentException, IllegalAccessException, FieldHandlingException, InstantiationException, InvocationTargetException {
         Type fieldGenericType = field.getGenericType();
         JComponent retValue = this.typeHandler.handle(fieldGenericType,
                 (T) field.get(instance), //fieldValue

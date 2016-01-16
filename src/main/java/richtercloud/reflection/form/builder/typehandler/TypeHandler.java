@@ -15,6 +15,7 @@
 package richtercloud.reflection.form.builder.typehandler;
 
 import java.awt.Component;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
 import javax.swing.JComponent;
 import richtercloud.reflection.form.builder.ComponentResettable;
@@ -57,6 +58,6 @@ public interface TypeHandler<T, E extends FieldUpdateEvent<T>, R extends Reflect
             FieldUpdateListener<E> updateListener,
             R reflectionFormBuilder) throws IllegalArgumentException,
             IllegalAccessException,
-            FieldHandlingException;
+            FieldHandlingException, InstantiationException, InvocationTargetException;
 
 }

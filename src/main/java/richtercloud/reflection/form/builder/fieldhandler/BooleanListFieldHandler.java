@@ -14,7 +14,6 @@
  */
 package richtercloud.reflection.form.builder.fieldhandler;
 
-import java.awt.Component;
 import java.util.List;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
 import richtercloud.reflection.form.builder.message.MessageHandler;
