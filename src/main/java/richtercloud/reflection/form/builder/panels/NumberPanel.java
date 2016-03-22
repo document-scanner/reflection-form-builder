@@ -71,7 +71,7 @@ public abstract class NumberPanel<N extends Number> extends JPanel {
             }
         });
         this.initialValue = initialValue;
-        reset();
+        reset0();
     }
 
     public JSpinner getValueSpinner() {
@@ -161,6 +161,10 @@ public abstract class NumberPanel<N extends Number> extends JPanel {
     }
 
     public void reset() {
+        reset0();
+    }
+
+    private void reset0() {
         if(initialValue == null) {
             this.nullCheckBox.setSelected(true);
             this.valueSpinner.setEnabled(false);

@@ -120,7 +120,7 @@ public abstract class AbstractListPanel<T, L extends ListPanelItemListener<T>, M
         this.mainList.setDefaultEditor(Object.class, mainListCellEditor);
         this.messageHandler = messageHandler;
         this.initialValues = initialValues;
-        reset();
+        reset0();
     }
 
     public void addItemListener(L itemListener) {
@@ -413,6 +413,10 @@ public abstract class AbstractListPanel<T, L extends ListPanelItemListener<T>, M
     }
 
     public void reset() {
+        reset0();
+    }
+
+    private void reset0() {
         while(this.getMainListModel().getRowCount() > 0) {
             this.getMainListModel().removeElement(0);
         }

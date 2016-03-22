@@ -28,7 +28,7 @@ public class BooleanWrapperComboBox extends JComboBox<Boolean> {
     public BooleanWrapperComboBox(Boolean initialValue) {
         super(new DefaultComboBoxModel<>(new Boolean[] {Boolean.TRUE, Boolean.FALSE, null}));
         this.initialValue = initialValue;
-        reset();
+        reset0();
     }
 
     public Boolean getValue() {
@@ -36,6 +36,10 @@ public class BooleanWrapperComboBox extends JComboBox<Boolean> {
     }
 
     public void reset() {
+        reset0();
+    }
+
+    private void reset0() {
         this.setSelectedItem(initialValue);
     }
 
