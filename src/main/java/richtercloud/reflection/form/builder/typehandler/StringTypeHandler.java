@@ -19,6 +19,9 @@ import java.awt.event.KeyListener;
 import java.lang.reflect.Type;
 import javax.swing.JComponent;
 import javax.swing.JTextField;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
+import richtercloud.reflection.form.builder.ComponentResettable;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
 import richtercloud.reflection.form.builder.fieldhandler.FieldHandlingException;
 import richtercloud.reflection.form.builder.fieldhandler.FieldUpdateEvent;
@@ -39,7 +42,7 @@ public class StringTypeHandler implements TypeHandler<String, FieldUpdateEvent<S
     }
 
     @Override
-    public JComponent handle(Type type,
+    public Pair<JComponent, ComponentResettable<?>> handle(Type type,
             String fieldValue,
             String fieldName,
             Class<?> declaringClass,
@@ -65,7 +68,7 @@ public class StringTypeHandler implements TypeHandler<String, FieldUpdateEvent<S
                 updateListener.onUpdate(new FieldUpdateEvent<>(retValue.getText()));
             }
         }); //action listener doesn't register text change events with keyboard
-        return  retValue;
+        return  new ImmutablePair<JComponent, ComponentResettable<?>>(retValue, this);
     }
 
     @Override

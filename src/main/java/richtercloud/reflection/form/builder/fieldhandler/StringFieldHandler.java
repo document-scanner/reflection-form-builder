@@ -53,7 +53,7 @@ public class StringFieldHandler implements FieldHandler<String, FieldUpdateEvent
                 field.getName(), //fieldName,
                 field.getDeclaringClass(), //declaringClass
                 updateListener,
-                reflectionFormBuilder);
+                reflectionFormBuilder).getKey();
     }
 
     @Override

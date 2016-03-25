@@ -19,6 +19,8 @@ import java.awt.event.ActionListener;
 import java.lang.reflect.Field;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
+import org.apache.commons.lang3.tuple.Pair;
+import richtercloud.reflection.form.builder.ComponentResettable;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
 
 /**

@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JComponent;
 import org.apache.commons.lang3.tuple.Pair;
+import richtercloud.reflection.form.builder.ComponentResettable;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
 import richtercloud.reflection.form.builder.components.AmountMoneyPanel;
 import richtercloud.reflection.form.builder.components.BooleanWrapperComboBox;
@@ -58,7 +59,7 @@ public class BooleanFieldHandler implements FieldHandler<Boolean, FieldUpdateEve
                 field.getName(), //fieldName,
                 field.getDeclaringClass(), //declaringClass
                 updateListener,
-                reflectionFormBuilder);
+                reflectionFormBuilder).getKey();
     }
 
     @Override

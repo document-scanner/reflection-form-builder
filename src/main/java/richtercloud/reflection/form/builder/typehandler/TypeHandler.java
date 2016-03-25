@@ -18,6 +18,7 @@ import java.awt.Component;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
 import javax.swing.JComponent;
+import org.apache.commons.lang3.tuple.Pair;
 import richtercloud.reflection.form.builder.ComponentResettable;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
 import richtercloud.reflection.form.builder.fieldhandler.FieldHandlingException;
@@ -47,11 +48,25 @@ public interface TypeHandler<T, E extends FieldUpdateEvent<T>, R extends Reflect
      * @param updateListener an {@link FieldUpdateListener} to notify on updates
      * @param reflectionFormBuilder a {@link ReflectionFormBuilder} used for
      * recursion
-     * @return
+     * @return a {@link Pair} of the handling result and the generating
+     * {@link ComponentResettable}. The latter reference can be used to easily
+     * keep track of the actual generating handler in a long line of delegations
+     * of handlers which avoids {@code ClassCastException}s at runtime as long
+     * as {@link ComponentResettable}s implemented correctly
      * @throws java.lang.IllegalAccessException
      * @throws richtercloud.reflection.form.builder.fieldhandler.FieldHandlingException
      */
-    JComponent handle(Type type,
+    /*
+    internal implementation notes:
+    - Since there's no need to store the component mapping (JComponent ->
+    ComponentResettable) for types, but for fields (which are actually reset
+    (recursively)) only, there's no need for a final handle and a handle0 method
+    like in FieldHandler. Even if some callers like AbstractListFieldHandler
+    don't need a reference to a ComponentResettable because they use their own
+    JComponent subclasses which implement a reset method the information can
+    still be provided by TypeHandler and be discarded in those FieldHandlers.
+    */
+    Pair<JComponent, ComponentResettable<?>> handle(Type type,
             T fieldValue,
             String fieldName,
             Class<?> declaringClass,

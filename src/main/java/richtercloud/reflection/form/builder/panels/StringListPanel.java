@@ -56,7 +56,7 @@ public class StringListPanel extends AbstractSingleColumnListPanel<String, Edita
                 //do nothing because there're no changes to the model
             }
         });
-        //initialValues are already add in superclass
+        //initialValues are already added in superclass
     }
 
     @Override

@@ -40,10 +40,7 @@ import richtercloud.reflection.form.builder.typehandler.TypeHandler;
  *
  * @author richter
  */
-public class MappingFieldHandler<T, E extends FieldUpdateEvent<T>, R extends ReflectionFormBuilder, C extends Component> implements FieldHandler<T, E, R, C> {
-    private Map<Type, FieldHandler<?, ?, ?, ?>> classMapping = new HashMap<>();
-    private Map<Class<?>, FieldHandler<?, ?, ?, ?>> primitiveMapping;
-
+public class MappingFieldHandler<T, E extends FieldUpdateEvent<T>, R extends ReflectionFormBuilder, C extends Component> extends ResettableFieldHandler<T, E, R, C> {
     protected static <K,V> void validateMapping(List<Pair<K, V>> mapping, String argumentName) {
         if(argumentName == null) {
             throw new IllegalArgumentException("argumentName mustn't be null");
@@ -55,7 +52,8 @@ public class MappingFieldHandler<T, E extends FieldUpdateEvent<T>, R extends Ref
             throw new IllegalArgumentException(String.format("%s mustn't contain null values", argumentName));
         }
     }
-    private final Map<JComponent, ComponentResettable> componentMapping = new HashMap<>();
+    private Map<Type, FieldHandler<?, ?, ?, ?>> classMapping = new HashMap<>();
+    private Map<Class<?>, FieldHandler<?, ?, ?, ?>> primitiveMapping;
 
     /**
      * Creates a {@code ClassMappingFieldHandler}. It's recommended to generate
@@ -63,8 +61,6 @@ public class MappingFieldHandler<T, E extends FieldUpdateEvent<T>, R extends Ref
      * {@link #generateClassMappingAmountMoneyFieldHandler(richtercloud.reflection.form.builder.components.AmountMoneyUsageStatisticsStorage, richtercloud.reflection.form.builder.components.AmountMoneyAdditionalCurrencyStorage, boolean) }.
      * @param classMapping
      * @param primitiveMapping
-     * @param fieldAnnotationMapping
-     * @param classAnnotationMapping
      */
     public MappingFieldHandler(Map<Type, FieldHandler<?, ?, ?, ?>> classMapping,
             Map<Class<?>, FieldHandler<?, ?, ?, ?>> primitiveMapping) {
@@ -83,23 +79,21 @@ public class MappingFieldHandler<T, E extends FieldUpdateEvent<T>, R extends Ref
         return Collections.unmodifiableMap(this.classMapping);
     }
 
-    @Override
-    @SuppressWarnings("FinalMethod") //enforce everything being handled in handle0
-    public final JComponent handle(final Field field,
-            final Object instance,
-            FieldUpdateListener<E> updateListener,
-            R reflectionFormBuilder) throws IllegalArgumentException,
-            IllegalAccessException,
-            FieldHandlingException,
-            InvocationTargetException,
-            NoSuchMethodException,
-            InstantiationException {
-        Pair<JComponent, ComponentResettable> retValueEntry = handle0(field, instance, updateListener, reflectionFormBuilder);
-        this.componentMapping.put(retValueEntry.getKey(), retValueEntry.getValue());
-        return retValueEntry.getKey();
-    }
-
-    public Pair<JComponent, ComponentResettable> handle0(final Field field,
+    /**
+     * Must never return {@code null}, otherwise {@link #handle(java.lang.reflect.Field, java.lang.Object, richtercloud.reflection.form.builder.fieldhandler.FieldUpdateListener, richtercloud.reflection.form.builder.ReflectionFormBuilder) } throws {@link IllegalArgumentException}.
+     * @param field
+     * @param instance
+     * @param updateListener
+     * @param reflectionFormBuilder
+     * @return
+     * @throws IllegalArgumentException
+     * @throws IllegalAccessException
+     * @throws FieldHandlingException
+     * @throws InvocationTargetException
+     * @throws NoSuchMethodException
+     * @throws InstantiationException
+     */
+    protected Pair<JComponent, ComponentResettable<?>> handle0(final Field field,
             final Object instance,
             FieldUpdateListener<E> updateListener,
             R reflectionFormBuilder) throws IllegalArgumentException,
@@ -114,30 +108,35 @@ public class MappingFieldHandler<T, E extends FieldUpdateEvent<T>, R extends Ref
         Class<?> declaringClass = field.getDeclaringClass();
 
         FieldHandler fieldHandler = null;
+            //can't have a generic type because it requires R to be passed down
+            //the call hierarchy which requires to redesign the whole mapping
+            //factory hierarchy which is extremely difficult due to entangled
+            //generics like FieldHandler<T, FieldUpdateEvent<T>, ...>
         if (field.getType().isPrimitive()) {
             fieldHandler = primitiveMapping.get(field.getType());
         } else {
             // check exact type match
             fieldHandler = retrieveFieldHandler(field.getGenericType(), classMapping);
         }
+        ComponentResettable<?> componentResettable;
         if (fieldHandler == null) {
-            retValue = new JLabel(field.getType().getSimpleName());
-        } else {
-            retValue = fieldHandler.handle(field,
-                    instance,
-                    new FieldUpdateListener() {
-                        @Override
-                        public void onUpdate(FieldUpdateEvent event) {
-                            try {
-                                field.set(instance, event.getNewValue());
-                            } catch (IllegalArgumentException | IllegalAccessException ex) {
-                                throw new RuntimeException(ex);
-                            }
-                        }
-                    },
-                    reflectionFormBuilder);
+            return null;
         }
-        return new ImmutablePair<JComponent, ComponentResettable>(retValue, fieldHandler);
+        retValue = fieldHandler.handle(field,
+                instance,
+                new FieldUpdateListener<FieldUpdateEvent<?>>() {
+                    @Override
+                    public void onUpdate(FieldUpdateEvent<?> event) {
+                        try {
+                            field.set(instance, event.getNewValue());
+                        } catch (IllegalArgumentException | IllegalAccessException ex) {
+                            throw new RuntimeException(ex);
+                        }
+                    }
+                },
+                reflectionFormBuilder);
+        componentResettable = fieldHandler;
+        return new ImmutablePair<JComponent, ComponentResettable<?>>(retValue, componentResettable);
     }
 
     /**
@@ -149,7 +148,7 @@ public class MappingFieldHandler<T, E extends FieldUpdateEvent<T>, R extends Ref
      * check if field types are entities)
      * @return
      */
-    public FieldHandler retrieveFieldHandler(Type fieldType, Map<Type, FieldHandler<?,?, ?, ?>> classMapping) {
+    public FieldHandler retrieveFieldHandler(Type fieldType, Map<Type, FieldHandler<?, ?, ?, ?>> classMapping) {
         Type classMappingKey = fieldType;
         if (fieldType instanceof ParameterizedType) {
             classMappingKey = retrieveClassMappingBestMatch((ParameterizedType) fieldType);
@@ -250,11 +249,4 @@ public class MappingFieldHandler<T, E extends FieldUpdateEvent<T>, R extends Ref
         }
         return retValue;
     }
-
-    @Override
-    public void reset(C component) {
-        ComponentResettable classPartHandler = this.componentMapping.get(component);
-        classPartHandler.reset(component);
-    }
-
 }

@@ -16,6 +16,9 @@ package richtercloud.reflection.form.builder.typehandler;
 
 import java.lang.reflect.Type;
 import javax.swing.JComponent;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
+import richtercloud.reflection.form.builder.ComponentResettable;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
 import richtercloud.reflection.form.builder.fieldhandler.FieldHandlingException;
 import richtercloud.reflection.form.builder.fieldhandler.FieldUpdateEvent;
@@ -40,7 +43,7 @@ public class DoubleTypeHandler implements TypeHandler<Double, FieldUpdateEvent<D
     }
 
     @Override
-    public JComponent handle(Type type,
+    public Pair<JComponent, ComponentResettable<?>> handle(Type type,
             Double fieldValue,
             String fieldName,
             Class<?> declaringClass,
@@ -58,7 +61,7 @@ public class DoubleTypeHandler implements TypeHandler<Double, FieldUpdateEvent<D
                 updateListener.onUpdate(new FieldUpdateEvent<>(retValue.retrieveValue()));
             }
         });
-        return retValue;
+        return new ImmutablePair<JComponent, ComponentResettable<?>>(retValue, this);
     }
 
     @Override

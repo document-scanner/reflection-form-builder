@@ -54,7 +54,7 @@ public class FloatFieldHandler implements FieldHandler<Float, FieldUpdateEvent<F
                 field.getName(), //fieldName,
                 field.getDeclaringClass(), //declaringClass
                 updateListener,
-                reflectionFormBuilder);
+                reflectionFormBuilder).getKey();
     }
 
     @Override

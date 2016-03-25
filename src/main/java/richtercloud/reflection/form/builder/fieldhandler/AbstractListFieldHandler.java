@@ -18,6 +18,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
 import javax.swing.JComponent;
+import org.apache.commons.lang3.tuple.Pair;
+import richtercloud.reflection.form.builder.ComponentResettable;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
 import richtercloud.reflection.form.builder.message.MessageHandler;
 import richtercloud.reflection.form.builder.panels.AbstractListPanel;
@@ -47,13 +49,13 @@ public abstract class AbstractListFieldHandler<T, E extends FieldUpdateEvent<T>,
             FieldUpdateListener<E> updateListener,
             R reflectionFormBuilder) throws IllegalArgumentException, IllegalAccessException, FieldHandlingException, InstantiationException, InvocationTargetException {
         Type fieldGenericType = field.getGenericType();
-        JComponent retValue = this.typeHandler.handle(fieldGenericType,
+        Pair<JComponent, ComponentResettable<?>> retValue = this.typeHandler.handle(fieldGenericType,
                 (T) field.get(instance), //fieldValue
                 field.getName(),
                 field.getDeclaringClass(), //declaringClass
                 updateListener,
                 reflectionFormBuilder);
-        return retValue;
+        return retValue.getKey();
     }
 
     @Override

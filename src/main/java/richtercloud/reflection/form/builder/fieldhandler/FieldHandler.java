@@ -18,6 +18,7 @@ import java.awt.Component;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import javax.swing.JComponent;
+import org.apache.commons.lang3.tuple.Pair;
 import richtercloud.reflection.form.builder.ComponentResettable;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
 
@@ -67,7 +68,10 @@ JComponent level in order to be able to write values on JComponents (otherwise t
 public interface FieldHandler<T, E extends FieldUpdateEvent<T>, R extends ReflectionFormBuilder, C extends Component> extends ComponentResettable<C> {
 
     /**
-     * Information about the field value can be retrieved with {@link Field#get(java.lang.Object) } and {@code instance}, about the field name with {@link Field#getName() } and about the declaring class with {@link Field#getDeclaringClass() }.
+     * Information about the field value can be retrieved with
+     * {@link Field#get(java.lang.Object) } and {@code instance}, about the
+     * field name with {@link Field#getName() } and about the declaring class
+     * with {@link Field#getDeclaringClass() }.
      *
      * @param field the {@link Field} to be handled
      * @param instance
@@ -80,10 +84,13 @@ public interface FieldHandler<T, E extends FieldUpdateEvent<T>, R extends Reflec
      */
     /*
     internal implementation notes:
-    - should pass java.lang.reflect.Field and the containing instance (don't
+    - Should pass java.lang.reflect.Field and the containing instance (don't
     call it entity because the base implementation works also without JPA) in
     order to provide a maximum of information which is also necessary, e.g. in
     order to do cross-field evaluation, e.g. in LongIdPanel.
+    - The delegation to TypeHandlers in several FieldHandlers (e.g. all
+    primitive wrapper handlers) requires returning of a Pair with information
+    about the generating ComponentResettable in FieldHandler as well.
     */
     JComponent handle(Field field,
             Object instance,

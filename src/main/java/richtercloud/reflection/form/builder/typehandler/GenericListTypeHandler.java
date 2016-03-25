@@ -22,6 +22,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import javax.swing.JComponent;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
+import richtercloud.reflection.form.builder.ComponentResettable;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
 import richtercloud.reflection.form.builder.fieldhandler.FieldHandlingException;
 import richtercloud.reflection.form.builder.fieldhandler.FieldUpdateEvent;
@@ -72,7 +75,7 @@ public abstract class GenericListTypeHandler<R extends ReflectionFormBuilder, C 
      * @throws InvocationTargetException
      */
     @Override
-    public JComponent handle(Type type,
+    public Pair<JComponent, ComponentResettable<?>> handle(Type type,
             List<Object> fieldValue,
             String fieldName,
             Class<?> declaringClass,
@@ -100,7 +103,7 @@ public abstract class GenericListTypeHandler<R extends ReflectionFormBuilder, C 
         //check for an exact match (including all nested generics) first
         TypeHandler fieldTypeHandler = this.typeHandlerMapping.get(type);
         if(fieldTypeHandler != null) {
-            JComponent retValue = fieldTypeHandler.handle(type,
+            Pair<JComponent, ComponentResettable<?>> retValue = fieldTypeHandler.handle(type,
                     fieldValue,
                     fieldName,
                     declaringClass,
@@ -137,7 +140,7 @@ public abstract class GenericListTypeHandler<R extends ReflectionFormBuilder, C 
                 reflectionFormBuilder);
     }
 
-    protected abstract JComponent handleGenericType(Type type,
+    protected abstract Pair<JComponent, ComponentResettable<?>> handleGenericType(Type type,
             List<Object> fieldValue,
             String fieldName,
             Class<?> declaringClass,

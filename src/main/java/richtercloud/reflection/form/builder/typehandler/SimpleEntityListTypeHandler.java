@@ -18,8 +18,11 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
 import javax.swing.JComponent;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import richtercloud.reflection.form.builder.ComponentResettable;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
 import richtercloud.reflection.form.builder.fieldhandler.FieldUpdateEvent;
 import richtercloud.reflection.form.builder.fieldhandler.FieldUpdateListener;
@@ -40,7 +43,7 @@ public class SimpleEntityListTypeHandler extends AbstractListTypeHandler<List<Ob
     }
 
     @Override
-    public JComponent handle0(Type type,
+    public Pair<JComponent, ComponentResettable<?>> handle0(Type type,
             List<Object> fieldValue,
             final FieldUpdateListener<FieldUpdateEvent<List<Object>>> updateListener,
             ReflectionFormBuilder reflectionFormBuilder) {
@@ -85,6 +88,6 @@ public class SimpleEntityListTypeHandler extends AbstractListTypeHandler<List<Ob
                 updateListener.onUpdate(new FieldUpdateEvent<>(event.getItem()));
             }
         });
-        return retValue;
+        return new ImmutablePair<JComponent, ComponentResettable<?>>(retValue, this);
     }
 }

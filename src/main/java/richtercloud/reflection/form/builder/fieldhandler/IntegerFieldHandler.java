@@ -53,7 +53,7 @@ public class IntegerFieldHandler implements FieldHandler<Integer, FieldUpdateEve
                 field.getName(), //fieldName,
                 field.getDeclaringClass(), //declaringClass
                 updateListener,
-                reflectionFormBuilder);
+                reflectionFormBuilder).getKey();
     }
 
     @Override

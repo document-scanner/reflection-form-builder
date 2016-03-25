@@ -19,6 +19,9 @@ import java.awt.event.ActionListener;
 import java.lang.reflect.Type;
 import java.sql.Date;
 import javax.swing.JComponent;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
+import richtercloud.reflection.form.builder.ComponentResettable;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
 import richtercloud.reflection.form.builder.components.SqlDatePicker;
 import richtercloud.reflection.form.builder.fieldhandler.FieldHandlingException;
@@ -41,7 +44,7 @@ public class SqlDateTypeHandler implements TypeHandler<Date, FieldUpdateEvent<Da
     }
 
     @Override
-    public JComponent handle(Type type,
+    public Pair<JComponent, ComponentResettable<?>> handle(Type type,
             Date fieldValue,
             String fieldName,
             Class<?> declaringClass,
@@ -58,7 +61,7 @@ public class SqlDateTypeHandler implements TypeHandler<Date, FieldUpdateEvent<Da
                 updateListener.onUpdate(new FieldUpdateEvent<>(retValue.getModel().getValue()));
             }
         });
-        return retValue;
+        return new ImmutablePair<JComponent, ComponentResettable<?>>(retValue, this);
     }
 
     @Override

@@ -17,6 +17,8 @@ package richtercloud.reflection.form.builder.fieldhandler;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import javax.swing.JComponent;
+import org.apache.commons.lang3.tuple.Pair;
+import richtercloud.reflection.form.builder.ComponentResettable;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
 import richtercloud.reflection.form.builder.panels.NumberPanel;
 import richtercloud.reflection.form.builder.typehandler.NumberTypeHandler;
@@ -25,7 +27,7 @@ import richtercloud.reflection.form.builder.typehandler.NumberTypeHandler;
  *
  * @author richter
  */
-public class NumberFieldHandler implements FieldHandler<Number, FieldUpdateEvent<Number>, ReflectionFormBuilder, NumberPanel> {
+public class NumberFieldHandler extends ResettableFieldHandler<Number, FieldUpdateEvent<Number>, ReflectionFormBuilder, NumberPanel> {
     private final static NumberFieldHandler INSTANCE = new NumberFieldHandler();
 
     public static NumberFieldHandler getInstance() {
@@ -42,7 +44,7 @@ public class NumberFieldHandler implements FieldHandler<Number, FieldUpdateEvent
     }
 
     @Override
-    public JComponent handle(Field field,
+    public Pair<JComponent, ComponentResettable<?>> handle0(Field field,
             Object instance,
             final FieldUpdateListener<FieldUpdateEvent<Number>> updateListener,
             ReflectionFormBuilder reflectionFormBuilder) throws IllegalArgumentException, IllegalAccessException, FieldHandlingException {

@@ -54,7 +54,7 @@ public class SqlDateFieldHandler implements FieldHandler<java.sql.Date,FieldUpda
                 field.getName(), //fieldName,
                 field.getDeclaringClass(), //declaringClass
                 updateListener,
-                reflectionFormBuilder);
+                reflectionFormBuilder).getKey();
     }
 
     @Override

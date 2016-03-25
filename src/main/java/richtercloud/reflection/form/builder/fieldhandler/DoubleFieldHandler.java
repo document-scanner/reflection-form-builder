@@ -53,7 +53,7 @@ public class DoubleFieldHandler implements FieldHandler<Double, FieldUpdateEvent
                 field.getName(), //fieldName,
                 field.getDeclaringClass(), //declaringClass
                 updateListener,
-                reflectionFormBuilder);
+                reflectionFormBuilder).getKey();
     }
 
     @Override
