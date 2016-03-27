@@ -21,6 +21,7 @@ import java.util.Map;
 import org.jscience.economics.money.Money;
 import org.jscience.physics.amount.Amount;
 import richtercloud.reflection.form.builder.components.AmountMoneyCurrencyStorage;
+import richtercloud.reflection.form.builder.components.AmountMoneyExchangeRateRetriever;
 import richtercloud.reflection.form.builder.components.AmountMoneyUsageStatisticsStorage;
 import richtercloud.reflection.form.builder.fieldhandler.AmountMoneyFieldHandler;
 import richtercloud.reflection.form.builder.fieldhandler.FieldHandler;
@@ -38,13 +39,16 @@ public class AmountMoneyMappingFieldHandlerFactory extends MappingFieldHandlerFa
     }
     private final AmountMoneyUsageStatisticsStorage amountMoneyUsageStatisticsStorage;
     private final AmountMoneyCurrencyStorage amountMoneyCurrencyStorage;
+    private final AmountMoneyExchangeRateRetriever amountMoneyConversionRateRetriever;
 
     public AmountMoneyMappingFieldHandlerFactory(AmountMoneyUsageStatisticsStorage amountMoneyUsageStatisticsStorage,
             AmountMoneyCurrencyStorage amountMoneyCurrencyStorage,
+            AmountMoneyExchangeRateRetriever amountMoneyConversionRateRetriever,
             MessageHandler messageHandler) {
         super(messageHandler);
         this.amountMoneyUsageStatisticsStorage = amountMoneyUsageStatisticsStorage;
         this.amountMoneyCurrencyStorage = amountMoneyCurrencyStorage;
+        this.amountMoneyConversionRateRetriever = amountMoneyConversionRateRetriever;
     }
 
     /**
@@ -58,6 +62,7 @@ public class AmountMoneyMappingFieldHandlerFactory extends MappingFieldHandlerFa
         Map<Type, FieldHandler<?, ?, ?, ?>> classMapping0 = new HashMap<>(super.generateClassMapping());
         classMapping0.put(createAmountMoneyTypeToken(),
                 new AmountMoneyFieldHandler(amountMoneyUsageStatisticsStorage,
+                        amountMoneyConversionRateRetriever,
                         amountMoneyCurrencyStorage,
                         getMessageHandler()));
         return classMapping0;

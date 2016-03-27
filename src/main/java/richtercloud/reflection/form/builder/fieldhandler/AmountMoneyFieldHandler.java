@@ -29,6 +29,7 @@ import richtercloud.reflection.form.builder.components.AmountMoneyPanelUpdateEve
 import richtercloud.reflection.form.builder.components.AmountMoneyPanelUpdateListener;
 import richtercloud.reflection.form.builder.components.AmountMoneyUsageStatisticsStorage;
 import richtercloud.reflection.form.builder.message.MessageHandler;
+import richtercloud.reflection.form.builder.components.AmountMoneyExchangeRateRetriever;
 
 /**
  *
@@ -41,13 +42,16 @@ types
 */
 public class AmountMoneyFieldHandler implements FieldHandler<Amount<Money>, FieldUpdateEvent<Amount<Money>>, ReflectionFormBuilder, AmountMoneyPanel> {
     private final AmountMoneyUsageStatisticsStorage amountMoneyUsageStatisticsStorage;
+    private final AmountMoneyExchangeRateRetriever amountMoneyConversionRateRetriever;
     private final AmountMoneyCurrencyStorage additionalCurrencies;
     private final MessageHandler messageHandler;
 
     public AmountMoneyFieldHandler(AmountMoneyUsageStatisticsStorage amountMoneyUsageStatisticsStorage,
+            AmountMoneyExchangeRateRetriever amountMoneyConversionRateRetriever,
             AmountMoneyCurrencyStorage additionalCurrencies,
             MessageHandler messageHandler) {
         this.amountMoneyUsageStatisticsStorage = amountMoneyUsageStatisticsStorage;
+        this.amountMoneyConversionRateRetriever = amountMoneyConversionRateRetriever;
         this.additionalCurrencies = additionalCurrencies;
         this.messageHandler = messageHandler;
     }
@@ -61,6 +65,7 @@ public class AmountMoneyFieldHandler implements FieldHandler<Amount<Money>, Fiel
         try {
             retValue = new AmountMoneyPanel(additionalCurrencies,
                     amountMoneyUsageStatisticsStorage,
+                    amountMoneyConversionRateRetriever,
                     messageHandler);
         } catch (AmountMoneyCurrencyStorageException ex) {
             throw new FieldHandlingException(ex);

@@ -16,10 +16,7 @@ package richtercloud.reflection.form.builder.components;
 
 import java.awt.Frame;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.JOptionPane;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.jscience.economics.money.Currency;
-import richtercloud.reflection.form.builder.message.Message;
 import richtercloud.reflection.form.builder.message.MessageHandler;
 
 /**
@@ -28,9 +25,11 @@ import richtercloud.reflection.form.builder.message.MessageHandler;
  */
 public class AmountMoneyPanelEditDialog extends javax.swing.JDialog {
     private static final long serialVersionUID = 1L;
-    private final DefaultComboBoxModel<Currency> currencyComboBoxModel = new DefaultComboBoxModel<>();
+    private final DefaultComboBoxModel<Currency> referenceCurrencyComboBoxModel = new DefaultComboBoxModel<>();
     private final AmountMoneyCurrencyStorage amountMoneyCurrencyStorage;
+    private final AmountMoneyExchangeRateRetriever amountMoneyExchangeRateRetriever;
     private final MessageHandler messageHandler;
+    private Currency currency;
 
     /**
      * Creates new form AmountMoneyPanelEditDialog
@@ -40,11 +39,20 @@ public class AmountMoneyPanelEditDialog extends javax.swing.JDialog {
      * @param parent
      * @throws richtercloud.reflection.form.builder.components.AmountMoneyCurrencyStorageException
      */
+    /*
+    internal implementation notes:
+    - Since it's not possible to change code of a Currency, but the dialog ought
+    to provide the possibility to change it, there's no way to rely to the
+    passed reference to Currency in the constructor.
+    */
     public AmountMoneyPanelEditDialog(Currency currency,
             AmountMoneyCurrencyStorage amountMoneyCurrencyStorage,
+            AmountMoneyExchangeRateRetriever amountMoneyExchangeRateRetriever,
             MessageHandler messageHandler,
             Frame parent) throws AmountMoneyCurrencyStorageException {
-        super(parent, true);
+        super(parent,
+                true //modal
+        );
         this.messageHandler = messageHandler;
         if(currency != null) {
             if(!amountMoneyCurrencyStorage.getCurrencies().contains(currency)) {
@@ -54,10 +62,16 @@ public class AmountMoneyPanelEditDialog extends javax.swing.JDialog {
             exchangeRateSpinner.setValue(currency.getExchangeRate());
         }
         for(Currency currency0 : amountMoneyCurrencyStorage.getCurrencies()) {
-            this.currencyComboBoxModel.addElement(currency0);
+            this.referenceCurrencyComboBoxModel.addElement(currency0);
         }
+        this.currency = currency;
         this.amountMoneyCurrencyStorage = amountMoneyCurrencyStorage;
+        this.amountMoneyExchangeRateRetriever = amountMoneyExchangeRateRetriever;
         initComponents();
+    }
+
+    public Currency getCurrency() {
+        return currency;
     }
 
     /**
@@ -71,8 +85,8 @@ public class AmountMoneyPanelEditDialog extends javax.swing.JDialog {
 
         codeTextField = new javax.swing.JTextField();
         codeTextFieldLabel = new javax.swing.JLabel();
-        referenceComboBox = new javax.swing.JComboBox<>();
-        referenceComboBoxLabel = new javax.swing.JLabel();
+        referenceCurrencyComboBox = new javax.swing.JComboBox<>();
+        referenceCurrencyComboBoxLabel = new javax.swing.JLabel();
         exchangeRateSpinner = new javax.swing.JSpinner();
         exchangeRateSpinnerLabel = new javax.swing.JLabel();
         cancelButton = new javax.swing.JButton();
@@ -82,10 +96,11 @@ public class AmountMoneyPanelEditDialog extends javax.swing.JDialog {
 
         codeTextFieldLabel.setText("Code");
 
-        referenceComboBox.setModel(currencyComboBoxModel);
+        referenceCurrencyComboBox.setModel(referenceCurrencyComboBoxModel);
 
-        referenceComboBoxLabel.setText("Reference currency");
+        referenceCurrencyComboBoxLabel.setText("Reference currency");
 
+        exchangeRateSpinner.setModel(new javax.swing.SpinnerNumberModel(0.0d, 0.0d, null, 1.0d));
         exchangeRateSpinner.setValue(1.0);
 
         exchangeRateSpinnerLabel.setText("Exchange rate to reference currency");
@@ -114,11 +129,11 @@ public class AmountMoneyPanelEditDialog extends javax.swing.JDialog {
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(codeTextFieldLabel)
-                            .addComponent(referenceComboBoxLabel)
+                            .addComponent(referenceCurrencyComboBoxLabel)
                             .addComponent(exchangeRateSpinnerLabel))
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(referenceComboBox, 0, 100, Short.MAX_VALUE)
+                            .addComponent(referenceCurrencyComboBox, 0, 100, Short.MAX_VALUE)
                             .addComponent(codeTextField)
                             .addComponent(exchangeRateSpinner, javax.swing.GroupLayout.Alignment.TRAILING)))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
@@ -137,8 +152,8 @@ public class AmountMoneyPanelEditDialog extends javax.swing.JDialog {
                     .addComponent(codeTextFieldLabel))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(referenceComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(referenceComboBoxLabel))
+                    .addComponent(referenceCurrencyComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(referenceCurrencyComboBoxLabel))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(exchangeRateSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -160,16 +175,29 @@ public class AmountMoneyPanelEditDialog extends javax.swing.JDialog {
 
     private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
         String code = this.codeTextField.getText();
-        Currency reference = (Currency) this.referenceComboBox.getSelectedItem();
+        Currency referenceCurrency = (Currency) this.referenceCurrencyComboBox.getSelectedItem();
         Double exchangeRate = (Double) this.exchangeRateSpinner.getValue();
-        Currency newCurrency = new Currency(code);
-        Currency.setReferenceCurrency(reference);
-        newCurrency.setExchangeRate(exchangeRate);
-        try {
-            this.amountMoneyCurrencyStorage.saveCurrency(newCurrency);
-        } catch (AmountMoneyCurrencyStorageException ex) {
-            this.messageHandler.handle(new Message(String.format("An exception occured during retrieval of currencies from the storage: %s", ExceptionUtils.getRootCauseMessage(ex)), JOptionPane.ERROR_MESSAGE));
+        if(currency == null) {
+            currency = new Currency(code);
         }
+        if(Currency.getReferenceCurrency() == null) {
+            //reference currency has to be set in order to make setting exchange
+            //rates work below
+            Currency.setReferenceCurrency(AmountMoneyPanel.REFERENCE_CURRENCY);
+        }
+        if(!referenceCurrency.equals(Currency.getReferenceCurrency())) {
+            //if the reference currency used to enter the exchange rate isn't
+            //the same as the one internally used in the system, another
+            //conversion has to be performed
+            try {
+                this.amountMoneyExchangeRateRetriever.retrieveExchangeRate(referenceCurrency);
+            } catch (AmountMoneyCurrencyStorageException ex) {
+                throw new RuntimeException(ex);
+            }
+            exchangeRate = referenceCurrency.getConverterTo(Currency.getReferenceCurrency()).convert(exchangeRate);
+        }
+        currency.setExchangeRate(exchangeRate);
+        //handle changes to amountMoneyCurrencyStorage in caller
         this.setVisible(false);
         this.dispose(); //reset at close
     }//GEN-LAST:event_saveButtonActionPerformed
@@ -180,8 +208,8 @@ public class AmountMoneyPanelEditDialog extends javax.swing.JDialog {
     private javax.swing.JLabel codeTextFieldLabel;
     private javax.swing.JSpinner exchangeRateSpinner;
     private javax.swing.JLabel exchangeRateSpinnerLabel;
-    private javax.swing.JComboBox<Currency> referenceComboBox;
-    private javax.swing.JLabel referenceComboBoxLabel;
+    private javax.swing.JComboBox<Currency> referenceCurrencyComboBox;
+    private javax.swing.JLabel referenceCurrencyComboBoxLabel;
     private javax.swing.JButton saveButton;
     // End of variables declaration//GEN-END:variables
 }

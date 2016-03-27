@@ -17,9 +17,13 @@ package richtercloud.reflection.form.builder.components;
 import java.awt.Frame;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import javax.measure.converter.ConversionException;
+import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 import javax.swing.MutableComboBoxModel;
@@ -59,10 +63,12 @@ public class AmountMoneyPanel extends javax.swing.JPanel {
             Currency.KRW,
             Currency.TWD,
             Currency.USD));
+    public final static Currency REFERENCE_CURRENCY = Currency.EUR;
     private final Set<AmountMoneyPanelUpdateListener> updateListeners = new HashSet<>();
     private final AmountMoneyCurrencyStorage amountMoneyCurrencyStorage;
     private final AmountMoneyUsageStatisticsStorage amountMoneyUsageStatisticsStorage;
     private final MessageHandler messageHandler;
+    private final AmountMoneyExchangeRateRetriever amountMoneyExchangeRateRetriever;
 
     /**
      * Creates a new AmountMoneyPanel with {@link #DEFAULT_CURRENCIES}.
@@ -74,6 +80,7 @@ public class AmountMoneyPanel extends javax.swing.JPanel {
             MessageHandler messageHandler) throws AmountMoneyCurrencyStorageException {
         this(null,
                 amountMoneyUsageStatisticsStorage,
+                new FixerAmountMoneyExchangeRateRetriever(),
                 messageHandler);
     }
 
@@ -82,11 +89,13 @@ public class AmountMoneyPanel extends javax.swing.JPanel {
      * {@code additionalCurrencies}.
      * @param amountMoneyCurrencyStorage
      * @param amountMoneyUsageStatisticsStorage
+     * @param amountMoneyConversionRateRetriever
      * @param messageHandler
      * @throws richtercloud.reflection.form.builder.components.AmountMoneyCurrencyStorageException
      */
     public AmountMoneyPanel(AmountMoneyCurrencyStorage amountMoneyCurrencyStorage,
             AmountMoneyUsageStatisticsStorage amountMoneyUsageStatisticsStorage,
+            AmountMoneyExchangeRateRetriever amountMoneyConversionRateRetriever,
             MessageHandler messageHandler) throws AmountMoneyCurrencyStorageException {
         this.messageHandler = messageHandler;
         for(Currency currency : amountMoneyCurrencyStorage.getCurrencies()) {
@@ -111,13 +120,29 @@ public class AmountMoneyPanel extends javax.swing.JPanel {
         });
         this.currencyComboBox.addItemListener(new ItemListener() {
             @Override
-            public void itemStateChanged(ItemEvent e) {
+            public void itemStateChanged(ItemEvent itemEvent) {
                 //convert after currency change (not necessary, but useful)
-                Currency oldCurrency = (Currency) e.getItem();
-                Currency newCurrency = (Currency) e.getItemSelectable().getSelectedObjects()[0];
-                double newAmount = oldCurrency.getConverterTo(newCurrency).convert(retrieveAmount());
+                Currency oldCurrency = (Currency) itemEvent.getItem();
+                Currency newCurrency = (Currency) itemEvent.getItemSelectable().getSelectedObjects()[0];
+                double newAmount;
+                try {
+                    newAmount = oldCurrency.getConverterTo(newCurrency).convert(retrieveAmount());
+                } catch(ConversionException ex) {
+                    try {
+                        //if the exchange rate isn't set
+                        AmountMoneyPanel.this.amountMoneyExchangeRateRetriever.retrieveExchangeRate(newCurrency);
+                        AmountMoneyPanel.this.amountMoneyExchangeRateRetriever.retrieveExchangeRate(oldCurrency);
+                        newAmount = oldCurrency.getConverterTo(newCurrency).convert(retrieveAmount());
+                    } catch (AmountMoneyCurrencyStorageException amountMoneyCurrencyStorageException) {
+                        throw new RuntimeException(amountMoneyCurrencyStorageException);
+                    }
+                }
                 AmountMoneyPanel.this.amountIntegerSpinner.setValue((int)newAmount);
-                AmountMoneyPanel.this.amountDecimalSpinner.setValue(newAmount%1);
+                BigDecimal bd = new BigDecimal(newAmount*100);
+                bd = bd.setScale(0, //newScale
+                        RoundingMode.HALF_UP //the rounding mode "taught in school"
+                );
+                AmountMoneyPanel.this.amountDecimalSpinner.setValue(bd.intValue()%100);
                 //notify registered update listeners
                 for(AmountMoneyPanelUpdateListener updateListener : AmountMoneyPanel.this.updateListeners) {
                     updateListener.onUpdate(new AmountMoneyPanelUpdateEvent(retrieveAmountMoney()));
@@ -126,10 +151,13 @@ public class AmountMoneyPanel extends javax.swing.JPanel {
         });
         this.amountMoneyCurrencyStorage = amountMoneyCurrencyStorage;
         this.amountMoneyUsageStatisticsStorage = amountMoneyUsageStatisticsStorage;
+        this.amountMoneyExchangeRateRetriever = amountMoneyConversionRateRetriever;
     }
 
     private double retrieveAmount() {
-        double amount = ((double)amountIntegerSpinner.getValue())+((double)amountDecimalSpinner.getValue());
+        double amount = Double.valueOf(String.format("%d.%02d",
+                (Integer)amountIntegerSpinner.getValue(),
+                (Integer)amountDecimalSpinner.getValue()));
         return amount;
     }
 
@@ -173,6 +201,8 @@ public class AmountMoneyPanel extends javax.swing.JPanel {
 
         currencyLabel.setText("Curreny:");
 
+        amountDecimalSpinner.setModel(new javax.swing.SpinnerNumberModel(0, 0, 99, 1));
+        amountDecimalSpinner.setEditor(new javax.swing.JSpinner.NumberEditor(amountDecimalSpinner, "00"));
         amountDecimalSpinner.setMinimumSize(new java.awt.Dimension(40, 28));
 
         amountIntegerSpinner.setMinimumSize(new java.awt.Dimension(40, 28));
@@ -224,6 +254,7 @@ public class AmountMoneyPanel extends javax.swing.JPanel {
         AmountMoneyPanelManageDialog amountMoneyPanelManageDialog;
         try {
             amountMoneyPanelManageDialog = new AmountMoneyPanelManageDialog(amountMoneyCurrencyStorage,
+                    amountMoneyExchangeRateRetriever,
                     messageHandler,
                     (Frame) SwingUtilities.getWindowAncestor(this));
         } catch (AmountMoneyCurrencyStorageException ex) {
@@ -231,10 +262,50 @@ public class AmountMoneyPanel extends javax.swing.JPanel {
             return;
         }
         amountMoneyPanelManageDialog.pack();
-        amountMoneyPanelManageDialog.setLocationRelativeTo(this);
         amountMoneyPanelManageDialog.setVisible(true);
+        //handle manipulation result
+        Currency selectedCurrency = (Currency) currencyComboBoxModel.getSelectedItem();
+        //if currencyComboBoxModel is emptied item by item an item change event
+        //is triggered for every removal which trigger conversion and thus
+        //requires to fetch all exchange rates -> diff the model and the storage
+        Set<Currency> storedCurrencies;
+        try {
+            storedCurrencies = amountMoneyCurrencyStorage.getCurrencies();
+        } catch (AmountMoneyCurrencyStorageException ex) {
+            throw new RuntimeException(ex);
+        }
+        for(Currency storedCurrency : storedCurrencies) {
+            if(!comboBoxModelContains(currencyComboBoxModel, storedCurrency)) {
+                currencyComboBoxModel.addElement(storedCurrency);
+            }
+        }
+        for(int i=0; i<currencyComboBoxModel.getSize(); i++) {
+            Currency modelCurrency = currencyComboBoxModel.getElementAt(i);
+            if(!storedCurrencies.contains(modelCurrency)) {
+                currencyComboBoxModel.removeElement(modelCurrency);
+            }
+        }
+        if(!storedCurrencies.contains(selectedCurrency)) {
+            currencyComboBoxModel.setSelectedItem(currencyComboBoxModel.getElementAt(0));
+        }else {
+            currencyComboBoxModel.setSelectedItem(selectedCurrency);
+        }
     }//GEN-LAST:event_currencyManageButtonActionPerformed
 
+    /**
+     * Not even {@link DefaultComboBoxModel} has a "contains" method.
+     * @param currency
+     * @return {@code true} if {@code comboBoxModel} contains {@code currency},
+     * {@code false} otherwise
+     */
+    private boolean comboBoxModelContains(ComboBoxModel<?> comboBoxModel, Currency currency) {
+        for(int i=0; i<comboBoxModel.getSize(); i++) {
+            if(comboBoxModel.getElementAt(i).equals(currency)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JSpinner amountDecimalSpinner;

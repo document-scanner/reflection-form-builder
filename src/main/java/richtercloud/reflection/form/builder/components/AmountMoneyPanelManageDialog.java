@@ -30,24 +30,30 @@ import richtercloud.reflection.form.builder.message.MessageHandler;
 public class AmountMoneyPanelManageDialog extends javax.swing.JDialog {
     private static final long serialVersionUID = 1L;
     private final AmountMoneyCurrencyStorage amountMoneyCurrencyStorage;
+    private final AmountMoneyExchangeRateRetriever amountMoneyExchangeRateRetriever;
     private final DefaultListModel<Currency> currencyListModel = new DefaultListModel<>();
     private final MessageHandler messageHandler;
 
     /**
      * Creates new form AmountMoneyPanelManageDialog
      * @param amountMoneyCurrencyStorage
+     * @param amountMoneyExchangeRateRetriever
      * @param messageHandler
      * @param parent
      * @throws richtercloud.reflection.form.builder.components.AmountMoneyCurrencyStorageException
      */
     public AmountMoneyPanelManageDialog(AmountMoneyCurrencyStorage amountMoneyCurrencyStorage,
+            AmountMoneyExchangeRateRetriever amountMoneyExchangeRateRetriever,
             MessageHandler messageHandler,
             Frame parent) throws AmountMoneyCurrencyStorageException {
-        super(parent, true);
+        super(parent,
+                true //modal
+        );
         for(Currency currency : amountMoneyCurrencyStorage.getCurrencies()) {
             currencyListModel.addElement(currency);
         }
         this.amountMoneyCurrencyStorage = amountMoneyCurrencyStorage;
+        this.amountMoneyExchangeRateRetriever = amountMoneyExchangeRateRetriever;
         this.messageHandler = messageHandler;
         initComponents();
     }
@@ -98,6 +104,11 @@ public class AmountMoneyPanelManageDialog extends javax.swing.JDialog {
         resetUsageCountButton.setText("Reset usage count");
 
         closeButton.setText("Close");
+        closeButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                closeButtonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -147,6 +158,7 @@ public class AmountMoneyPanelManageDialog extends javax.swing.JDialog {
         try {
             amountMoneyPanelEditDialog = new AmountMoneyPanelEditDialog(null, //currency (null indicates creation of a new currency)
                     this.amountMoneyCurrencyStorage,
+                    this.amountMoneyExchangeRateRetriever,
                     this.messageHandler,
                     (Frame) SwingUtilities.getWindowAncestor(this) //parent
             );
@@ -156,13 +168,28 @@ public class AmountMoneyPanelManageDialog extends javax.swing.JDialog {
         }
         amountMoneyPanelEditDialog.pack();
         amountMoneyPanelEditDialog.setVisible(true);
+        Currency newCurrency = amountMoneyPanelEditDialog.getCurrency();
+        try {
+            this.amountMoneyCurrencyStorage.saveCurrency(newCurrency);
+        } catch (AmountMoneyCurrencyStorageException ex) {
+            this.messageHandler.handle(new Message(String.format("An exception occured during retrieval of currencies from the storage: %s", ExceptionUtils.getRootCauseMessage(ex)), JOptionPane.ERROR_MESSAGE));
+        }
+        currencyListModel.add(0, newCurrency);
     }//GEN-LAST:event_addButtonActionPerformed
 
     private void removeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeButtonActionPerformed
-        if(currencyList.getSelectedIndex() == -1) {
+        Currency selectedCurrency = currencyList.getSelectedValue();
+        if(selectedCurrency == null) {
             return;
         }
-        currencyList.remove(currencyList.getSelectedIndex());
+        try {
+            //since AmountMoneyCurrencyStorage doesn't keep track of the order of
+            //currencies, simply remove and add the old and new instance
+            this.amountMoneyCurrencyStorage.removeCurrency(selectedCurrency);
+        } catch (AmountMoneyCurrencyStorageException ex) {
+            this.messageHandler.handle(new Message(String.format("An exception occured during retrieval of currencies from the storage: %s", ExceptionUtils.getRootCauseMessage(ex)), JOptionPane.ERROR_MESSAGE));
+        }
+        currencyListModel.remove(currencyList.getSelectedIndex());
     }//GEN-LAST:event_removeButtonActionPerformed
 
     private void editButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editButtonActionPerformed
@@ -171,6 +198,7 @@ public class AmountMoneyPanelManageDialog extends javax.swing.JDialog {
         try {
             amountMoneyPanelEditDialog = new AmountMoneyPanelEditDialog(selectedCurrency, //currency
                     this.amountMoneyCurrencyStorage,
+                    this.amountMoneyExchangeRateRetriever,
                     this.messageHandler,
                     (Frame) SwingUtilities.getWindowAncestor(this) //parent
             );
@@ -180,7 +208,23 @@ public class AmountMoneyPanelManageDialog extends javax.swing.JDialog {
         }
         amountMoneyPanelEditDialog.pack();
         amountMoneyPanelEditDialog.setVisible(true);
+        Currency editedCurrency = amountMoneyPanelEditDialog.getCurrency();
+        try {
+            //since AmountMoneyCurrencyStorage doesn't keep track of the order of
+            //currencies, simply remove and add the old and new instance
+            this.amountMoneyCurrencyStorage.removeCurrency(selectedCurrency);
+            this.amountMoneyCurrencyStorage.saveCurrency(editedCurrency);
+        } catch (AmountMoneyCurrencyStorageException ex) {
+            this.messageHandler.handle(new Message(String.format("An exception occured during retrieval of currencies from the storage: %s", ExceptionUtils.getRootCauseMessage(ex)), JOptionPane.ERROR_MESSAGE));
+        }
+        int selectedCurrencyIndex = currencyListModel.indexOf(selectedCurrency);
+        currencyListModel.remove(selectedCurrencyIndex);
+        currencyListModel.add(selectedCurrencyIndex, editedCurrency);
     }//GEN-LAST:event_editButtonActionPerformed
+
+    private void closeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_closeButtonActionPerformed
+        this.setVisible(false);
+    }//GEN-LAST:event_closeButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addButton;
