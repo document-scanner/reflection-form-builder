@@ -154,7 +154,7 @@ public abstract class GenericListTypeHandler<R extends ReflectionFormBuilder, C 
             @ElementCollection
             private List objectList;
             declaration*/
-            retValue = Object.class;
+            return type;
         }else {
             ParameterizedType fieldTypeParameterized = (ParameterizedType) type;
             Type[] genericTypeArguments = fieldTypeParameterized.getActualTypeArguments();

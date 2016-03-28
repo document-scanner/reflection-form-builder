@@ -38,6 +38,7 @@ public class BooleanListPanel extends AbstractSingleColumnListPanel<Boolean, Edi
                 AbstractSingleColumnListPanel.<Boolean>createMainListModel(Boolean.class),
                 initialValues,
                 messageHandler);
+        reset();
     }
 
     @Override

@@ -50,11 +50,7 @@ public class SimpleEntityListPanel<T> extends AbstractSingleColumnListPanel<T, L
                 AbstractSingleColumnListPanel.<T>createMainListModel(entityClass),
                 initialValues,
                 messageHandler);
-        if(initialValues != null) {
-            for(T initialValue : initialValues) {
-                this.getMainListModel().setValueAt(initialValue, this.getMainListModel().getRowCount(), 0);
-            }
-        }
+        reset();
     }
 
     /**

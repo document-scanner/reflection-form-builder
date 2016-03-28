@@ -88,16 +88,23 @@ public abstract class AbstractListPanel<T, L extends ListPanelItemListener<T>, M
     private final List<T> initialValues;
 
     /**
+     * Subclasses are strongly recommended to call {@link #reset() } to
+     * initialize the values.
      *
      * @param reflectionFormBuilder
      * @param mainListCellEditor
      * @param mainListCellRenderer
      * @param mainListModel
-     * @param mainListColumnModel
+     * @param initialValues
      * @param messageHandler
      * @param tableHeader a table header object which allows control over the
      * height of the table column header
      */
+    /*
+    internal implementation notes:
+    - reset isn't called here because it uses an overridable call to
+    TableModel.setValueAt which causes trouble in subclasses
+    */
     public AbstractListPanel(R reflectionFormBuilder,
             ListPanelTableCellEditor mainListCellEditor,
             ListPanelTableCellRenderer mainListCellRenderer,
@@ -120,7 +127,6 @@ public abstract class AbstractListPanel<T, L extends ListPanelItemListener<T>, M
         this.mainList.setDefaultEditor(Object.class, mainListCellEditor);
         this.messageHandler = messageHandler;
         this.initialValues = initialValues;
-        reset0();
     }
 
     public void addItemListener(L itemListener) {
@@ -412,11 +418,8 @@ public abstract class AbstractListPanel<T, L extends ListPanelItemListener<T>, M
         return mainListCellEditor;
     }
 
-    public void reset() {
-        reset0();
-    }
-
-    private void reset0() {
+    @SuppressWarnings("FinalMethod")
+    public final void reset() {
         while(this.getMainListModel().getRowCount() > 0) {
             this.getMainListModel().removeElement(0);
         }

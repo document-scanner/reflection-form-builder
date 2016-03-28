@@ -55,11 +55,7 @@ public class IntegerListPanel extends AbstractSingleColumnListPanel<Integer, Edi
                 //do nothing because there're no changes to the model
             }
         });
-        if(initialValues != null) {
-            for(Integer initialValue : initialValues) {
-                this.getMainListModel().setValueAt(initialValue, this.getMainListModel().getRowCount(), 0);
-            }
-        }
+        reset();
     }
 
     @Override
