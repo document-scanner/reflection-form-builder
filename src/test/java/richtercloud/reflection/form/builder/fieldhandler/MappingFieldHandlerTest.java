@@ -155,15 +155,15 @@ public class MappingFieldHandlerTest {
                 classMappingFactory.generatePrimitiveMapping());
         //test 0
         int result = instance.retrieveAnyCountRecursively((ParameterizedType) new TypeToken<List<Set<Integer>>>() {
-}.getType());
+            }.getType());
         assertEquals(0, result);
         //test 1
         result = instance.retrieveAnyCountRecursively((ParameterizedType) new TypeToken<List<Set<AnyType>>>() {
-}.getType());
+            }.getType());
         assertEquals(1, result);
         //test nested
         result = instance.retrieveAnyCountRecursively((ParameterizedType) new TypeToken<Map<Set<AnyType>, AnyType>>() {
-}.getType());
+            }.getType());
         assertEquals(2, result);
     }
 

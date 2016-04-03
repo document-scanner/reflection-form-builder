@@ -42,11 +42,11 @@ import richtercloud.reflection.form.builder.panels.BooleanListPanel;
  * @author richter
  */
 public class ReflectionFormBuilderTest {
-    private final static Logger logger = LoggerFactory.getLogger(ReflectionFormBuilderTest.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(ReflectionFormBuilderTest.class);
     private final MessageHandler messageHandler = new MessageHandler() {
         @Override
         public void handle(Message message) {
-            logger.info(message.getText());
+            LOGGER.info(message.getText());
         }
     };
 
