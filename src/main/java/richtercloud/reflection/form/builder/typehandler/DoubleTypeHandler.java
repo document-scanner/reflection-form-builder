@@ -58,7 +58,7 @@ public class DoubleTypeHandler implements TypeHandler<Double, FieldUpdateEvent<D
 
             @Override
             public void onUpdate(NumberPanelUpdateEvent<Double> event) {
-                updateListener.onUpdate(new FieldUpdateEvent<>(retValue.retrieveValue()));
+                updateListener.onUpdate(new FieldUpdateEvent<>(retValue.getValue()));
             }
         });
         return new ImmutablePair<JComponent, ComponentResettable<?>>(retValue, this);

@@ -57,7 +57,7 @@ public class FloatTypeHandler implements TypeHandler<Float, FieldUpdateEvent<Flo
 
             @Override
             public void onUpdate(NumberPanelUpdateEvent<Float> event) {
-                updateListener.onUpdate(new FieldUpdateEvent<>(retValue.retrieveValue()));
+                updateListener.onUpdate(new FieldUpdateEvent<>(retValue.getValue()));
             }
         });
         return new ImmutablePair<JComponent, ComponentResettable<?>>(retValue, this);

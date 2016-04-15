@@ -14,6 +14,7 @@
  */
 package richtercloud.reflection.form.builder.components;
 
+import java.util.Set;
 import org.jscience.economics.money.Currency;
 
 /**
@@ -27,7 +28,6 @@ public interface AmountMoneyExchangeRateRetriever {
      * relative to a reference currency.
      *
      * @param currency
-     * @return
      * @throws AmountMoneyCurrencyStorageException
      */
     /*
@@ -37,4 +37,12 @@ public interface AmountMoneyExchangeRateRetriever {
     callers
     */
     void retrieveExchangeRate(Currency currency) throws AmountMoneyCurrencyStorageException;
+
+    /**
+     * Gets a set of supported currencies from the mechanism used for retrieval
+     * of exchange rates.
+     * @return
+     * @throws AmountMoneyCurrencyStorageException
+     */
+    Set<Currency> getSupportedCurrencies() throws AmountMoneyCurrencyStorageException;
 }

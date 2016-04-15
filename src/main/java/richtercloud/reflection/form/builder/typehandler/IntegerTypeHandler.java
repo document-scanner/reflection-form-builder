@@ -58,7 +58,7 @@ public class IntegerTypeHandler implements TypeHandler<Integer, FieldUpdateEvent
 
             @Override
             public void onUpdate(NumberPanelUpdateEvent<Integer> event) {
-                updateListener.onUpdate(new FieldUpdateEvent<>(retValue.retrieveValue()));
+                updateListener.onUpdate(new FieldUpdateEvent<>(retValue.getValue()));
             }
         });
         return new ImmutablePair<JComponent, ComponentResettable<?>>(retValue, this);

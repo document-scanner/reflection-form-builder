@@ -20,6 +20,8 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.HashSet;
+import java.util.Set;
 import org.apache.commons.io.IOUtils;
 import org.jscience.economics.money.Currency;
 import org.slf4j.Logger;
@@ -29,31 +31,26 @@ import org.slf4j.LoggerFactory;
  *
  * @author richter
  */
-public class FixerAmountMoneyExchangeRateRetriever extends OnlineAmountMoneyExchangeRateRetriever {
+/*
+it's fine to cache the HTTP response here although
+CachedOnlineAmountMoneyExchangeRateRetriever already caches interface return
+values because it's a different thing and the interface can't know that
+fetchConversionRate and getSupportedCurrencies are retrieved from the same
+response; consider abstracting a HTTP/JSON retriever to share the code for
+caching responses
+*/
+public class FixerAmountMoneyExchangeRateRetriever extends CachedOnlineAmountMoneyExchangeRateRetriever {
     private final static Logger LOGGER = LoggerFactory.getLogger(FixerAmountMoneyExchangeRateRetriever.class);
     private final static String FIXER_URL = "http://api.fixer.io/latest";
 
-    @Override
-    protected double fetchConversionRate(Currency currency) throws AmountMoneyCurrencyStorageException {
+    private FixerJsonResponse retrieveResponse() throws AmountMoneyCurrencyStorageException {
         try {
             URLConnection uRLConnection = new URL(FIXER_URL).openConnection();
             InputStream inputStream = uRLConnection.getInputStream();
             String responseJsonString = IOUtils.toString(inputStream);
             LOGGER.debug(String.format("%s replied: %s", FIXER_URL, responseJsonString));
             FixerJsonResponse response = new ObjectMapper().readValue(responseJsonString, FixerJsonResponse.class);
-            Currency referenceCurrency = getReferenceCurrency(response.getBase());
-            if(Currency.getReferenceCurrency() == null) {
-                Currency.setReferenceCurrency(referenceCurrency);
-            }else {
-                if(!Currency.getReferenceCurrency().equals(referenceCurrency)) {
-                    throw new IllegalStateException("Online response base/reference currency changed"); //@TODO: this should be handled better
-                }
-            }
-            Double exchangeRate = response.getRates().get(currency.getCode());
-            if(exchangeRate == null) {
-                throw new AmountMoneyCurrencyStorageException(String.format("The fixer API response from URL %s didn't contain the key for the currency %s", FIXER_URL, currency));
-            }
-            return exchangeRate;
+            return response;
         } catch (MalformedURLException ex) {
             throw new AmountMoneyCurrencyStorageException(ex);
         } catch (IOException ex) {
@@ -61,18 +58,62 @@ public class FixerAmountMoneyExchangeRateRetriever extends OnlineAmountMoneyExch
         }
     }
 
-    /**
-     * The base of a {@link FixerJsonResponse}.
-     *
-     * @param base
-     * @return
-     */
-    private Currency getReferenceCurrency(String base) {
-        for(Currency currency : AmountMoneyPanel.DEFAULT_CURRENCIES) {
-            if(base.equals(currency.getCode())) {
-                return currency;
+    @Override
+    protected double fetchConversionRate0(Currency currency) throws AmountMoneyCurrencyStorageException {
+        FixerJsonResponse response = retrieveResponse();
+        Currency referenceCurrency = new Currency(response.getBase());
+        if(Currency.getReferenceCurrency() == null) {
+            Currency.setReferenceCurrency(referenceCurrency);
+        }else {
+            if(!Currency.getReferenceCurrency().equals(referenceCurrency)) {
+                throw new IllegalStateException("Online response base/reference currency changed"); //@TODO: this should be handled better
             }
         }
-        return null;
+
+        //fill cache
+        for(String currencyCode : response.getRates().keySet()) {
+            Double exchangeRate = response.getRates().get(currencyCode);
+            if(exchangeRate == null) {
+                throw new AmountMoneyCurrencyStorageException(String.format("The fixer API response from URL %s contained key %s, but no exchange rate for it",
+                        FIXER_URL,
+                        currencyCode));
+            }
+            Currency newCurrency = new Currency(currencyCode);
+            newCurrency.setExchangeRate(exchangeRate);
+            getCache().put(newCurrency, exchangeRate);
+        }
+        getCache().put(new Currency(response.getBase()), 1.0);
+
+        //handle return value
+        if(currency.equals(referenceCurrency)) {
+            return 1.0;
+        }
+        Double retValue = response.getRates().get(currency.getCode());
+        if(retValue == null) {
+            throw new AmountMoneyCurrencyStorageException(String.format("The fixer API response from URL %s didn't contain the key for the currency %s",
+                    FIXER_URL,
+                    currency));
+        }
+        return retValue;
+    }
+
+    /**
+     *
+     * @return
+     * @throws AmountMoneyCurrencyStorageException
+     */
+    /*
+    internal implementation notes:
+    - this wastes one request as long as the HTTP/JSON response isn't cached
+    */
+    @Override
+    public Set<Currency> getSupportedCurrencies0() throws AmountMoneyCurrencyStorageException {
+        FixerJsonResponse response = retrieveResponse();
+        Set<Currency> retValue = new HashSet<>();
+        for(String currencyCode : response.getRates().keySet()) {
+            retValue.add(new Currency(currencyCode));
+        }
+        retValue.add(new Currency(response.getBase()));
+        return retValue;
     }
 }

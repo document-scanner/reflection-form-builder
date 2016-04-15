@@ -22,8 +22,8 @@ import javax.swing.JOptionPane;
  * @author richter
  */
 public class DialogMessageHandler implements MessageHandler {
-    private Frame parent;
-    private String title;
+    private final Frame parent;
+    private final String title;
 
     /**
      *
@@ -44,5 +44,4 @@ public class DialogMessageHandler implements MessageHandler {
                 title,
                 message.getType());
     }
-
 }

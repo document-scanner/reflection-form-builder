@@ -56,7 +56,7 @@ public class LongTypeHandler implements TypeHandler<Long, FieldUpdateEvent<Long>
 
             @Override
             public void onUpdate(NumberPanelUpdateEvent<Long> event) {
-                updateListener.onUpdate(new FieldUpdateEvent<>(retValue.retrieveValue()));
+                updateListener.onUpdate(new FieldUpdateEvent<>(retValue.getValue()));
             }
         });
         return new ImmutablePair<JComponent, ComponentResettable<?>>(retValue, this);

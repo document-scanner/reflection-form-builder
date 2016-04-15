@@ -14,6 +14,8 @@
  */
 package richtercloud.reflection.form.builder.panels;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -49,6 +51,8 @@ NetBeans GUI builder because it shouldn't influence the programming style
 and because it doesn't have a disadvantage there's no simple getter for the
 value property by a retrieval method retrieveValue which evaluates component
 state -> value isn't changed after component update (only the UI state)
+- Since the value is made of multiple components, don't expose them publicly,
+but provide methods to retrieve and set the value only.
 */
 public abstract class NumberPanel<N extends Number> extends JPanel {
     private static final long serialVersionUID = 1L;
@@ -66,16 +70,20 @@ public abstract class NumberPanel<N extends Number> extends JPanel {
             @Override
             public void stateChanged(ChangeEvent e) {
                 for(NumberPanelUpdateListener<N> updateListener : NumberPanel.this.updateListeners) {
-                    updateListener.onUpdate(new NumberPanelUpdateEvent<>(retrieveValue()));
+                    updateListener.onUpdate(new NumberPanelUpdateEvent<>(getValue()));
+                }
+            }
+        });
+        this.nullCheckBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                for(NumberPanelUpdateListener<N> updateListener : NumberPanel.this.updateListeners) {
+                    updateListener.onUpdate(new NumberPanelUpdateEvent<>(getValue()));
                 }
             }
         });
         this.initialValue = initialValue;
         reset0();
-    }
-
-    public JSpinner getValueSpinner() {
-        return valueSpinner;
     }
 
     public void addUpdateListener(NumberPanelUpdateListener<N> updateListener) {
@@ -90,12 +98,21 @@ public abstract class NumberPanel<N extends Number> extends JPanel {
         return Collections.unmodifiableSet(updateListeners);
     }
 
-    public N retrieveValue() {
-        return (N) (getNullCheckBox().isSelected() ? null : getValueSpinner().getValue());
+    public N getValue() {
+        return (N) (nullCheckBox.isSelected() ? null : valueSpinner.getValue());
     }
 
-    public JCheckBox getNullCheckBox() {
-        return nullCheckBox;
+    public void setValue(N value) {
+        if(value == null) {
+            nullCheckBox.setSelected(true);
+            valueSpinner.setEnabled(false);
+            //don't set value to 0 because it will trigger more than one update
+            //event
+        }else {
+            nullCheckBox.setSelected(false);
+            valueSpinner.setEnabled(true);
+            valueSpinner.setValue(value);
+        }
     }
 
     /**
@@ -156,7 +173,7 @@ public abstract class NumberPanel<N extends Number> extends JPanel {
             this.valueSpinner.setEnabled(true);
         }
         for(NumberPanelUpdateListener<N> updateListener : this.updateListeners) {
-            updateListener.onUpdate(new NumberPanelUpdateEvent<>(retrieveValue()));
+            updateListener.onUpdate(new NumberPanelUpdateEvent<>(getValue()));
         }
     }
 

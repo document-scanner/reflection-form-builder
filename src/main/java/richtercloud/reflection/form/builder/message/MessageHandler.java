@@ -19,6 +19,14 @@ package richtercloud.reflection.form.builder.message;
  * warnings, errors, etc.) to the user and log files.
  * @author richter
  */
+/*
+internal implementation notes:
+- There's no sense in handling logging of message in MessageHandler because it's
+hard to define a generic interface and SLF4J logger doesn't make it too easy to
+log exceptions based on metadata (there's no even a method to log with a numeric
+severity) and logging at the place where the exception occurs/is caught provides
+more information anyway.
+*/
 public interface MessageHandler {
 
     void handle(Message message);

@@ -16,20 +16,18 @@ package richtercloud.reflection.form.builder.fieldhandler;
 
 import java.lang.reflect.Field;
 import javax.swing.JComponent;
-import org.apache.commons.lang3.tuple.Pair;
 import org.jscience.economics.money.Currency;
 import org.jscience.economics.money.Money;
 import org.jscience.physics.amount.Amount;
-import richtercloud.reflection.form.builder.ComponentResettable;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
 import richtercloud.reflection.form.builder.components.AmountMoneyCurrencyStorage;
 import richtercloud.reflection.form.builder.components.AmountMoneyCurrencyStorageException;
+import richtercloud.reflection.form.builder.components.AmountMoneyExchangeRateRetriever;
 import richtercloud.reflection.form.builder.components.AmountMoneyPanel;
 import richtercloud.reflection.form.builder.components.AmountMoneyPanelUpdateEvent;
 import richtercloud.reflection.form.builder.components.AmountMoneyPanelUpdateListener;
 import richtercloud.reflection.form.builder.components.AmountMoneyUsageStatisticsStorage;
 import richtercloud.reflection.form.builder.message.MessageHandler;
-import richtercloud.reflection.form.builder.components.AmountMoneyExchangeRateRetriever;
 
 /**
  *
@@ -73,7 +71,7 @@ public class AmountMoneyFieldHandler implements FieldHandler<Amount<Money>, Fiel
         retValue.addUpdateListener(new AmountMoneyPanelUpdateListener() {
             @Override
             public void onUpdate(AmountMoneyPanelUpdateEvent amountMoneyPanelUpdateEvent) {
-                updateListener.onUpdate(new FieldUpdateEvent<>(retValue.retrieveAmountMoney()));
+                updateListener.onUpdate(new FieldUpdateEvent<>(retValue.getValue()));
             }
         });
         return retValue;
@@ -82,6 +80,6 @@ public class AmountMoneyFieldHandler implements FieldHandler<Amount<Money>, Fiel
     @Override
     public void reset(AmountMoneyPanel component) {
         Amount<Money> fieldResetValue = Amount.valueOf(0.0, Currency.getReferenceCurrency());
-        component.applyAmountMoney(fieldResetValue);
+        component.setValue(fieldResetValue);
     }
 }

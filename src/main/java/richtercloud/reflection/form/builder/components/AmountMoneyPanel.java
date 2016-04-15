@@ -27,6 +27,7 @@ import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 import javax.swing.MutableComboBoxModel;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -61,7 +62,8 @@ public class AmountMoneyPanel extends javax.swing.JPanel {
             Currency.GBP,
             Currency.JPY,
             Currency.KRW,
-            Currency.TWD,
+            //Currency.TWD, disabled because it's not supported by
+                //FixerAmountMoneyExchangeRateRetriever
             Currency.USD));
     public final static Currency REFERENCE_CURRENCY = Currency.EUR;
     private final Set<AmountMoneyPanelUpdateListener> updateListeners = new HashSet<>();
@@ -69,6 +71,19 @@ public class AmountMoneyPanel extends javax.swing.JPanel {
     private final AmountMoneyUsageStatisticsStorage amountMoneyUsageStatisticsStorage;
     private final MessageHandler messageHandler;
     private final AmountMoneyExchangeRateRetriever amountMoneyExchangeRateRetriever;
+    private final static float MINIMAL_STEP = 0.01f;
+    private final static double INTEGER_SPINNER_MAX_VALUE = Double.MAX_VALUE*MINIMAL_STEP;
+
+    public static Currency getReferenceCurrency() {
+        if(Currency.getReferenceCurrency() == null) {
+            Currency.setReferenceCurrency(REFERENCE_CURRENCY);
+        }else {
+            if(!Currency.getReferenceCurrency().equals(REFERENCE_CURRENCY)) {
+                throw new IllegalStateException("reference currency has been changed externally");
+            }
+        }
+        return REFERENCE_CURRENCY;
+    }
 
     /**
      * Creates a new AmountMoneyPanel with {@link #DEFAULT_CURRENCIES}.
@@ -89,24 +104,34 @@ public class AmountMoneyPanel extends javax.swing.JPanel {
      * {@code additionalCurrencies}.
      * @param amountMoneyCurrencyStorage
      * @param amountMoneyUsageStatisticsStorage
-     * @param amountMoneyConversionRateRetriever
+     * @param amountMoneyExchangeRateRetriever
      * @param messageHandler
      * @throws richtercloud.reflection.form.builder.components.AmountMoneyCurrencyStorageException
      */
     public AmountMoneyPanel(AmountMoneyCurrencyStorage amountMoneyCurrencyStorage,
             AmountMoneyUsageStatisticsStorage amountMoneyUsageStatisticsStorage,
-            AmountMoneyExchangeRateRetriever amountMoneyConversionRateRetriever,
+            AmountMoneyExchangeRateRetriever amountMoneyExchangeRateRetriever,
             MessageHandler messageHandler) throws AmountMoneyCurrencyStorageException {
         this.messageHandler = messageHandler;
+        Set<Currency> exchangeRateRetrieverSupportedCurrencies = amountMoneyExchangeRateRetriever.getSupportedCurrencies();
         for(Currency currency : amountMoneyCurrencyStorage.getCurrencies()) {
+            if(!exchangeRateRetrieverSupportedCurrencies.contains(currency)) {
+                try {
+                    currency.getExchangeRate();
+                }catch(ConversionException ex) {
+                    throw new IllegalArgumentException(String.format("Currency %s isn't supported by exchange rate retriever and doesn't have an exchange rate set",
+                            currency));
+                }
+            }
             currencyComboBoxModel.addElement(currency);
         }
         initComponents();
+        ((SpinnerNumberModel)amountIntegerSpinner.getModel()).setMaximum(Double.MAX_VALUE*MINIMAL_STEP);
         this.amountIntegerSpinner.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
                 for(AmountMoneyPanelUpdateListener updateListener : AmountMoneyPanel.this.updateListeners) {
-                    updateListener.onUpdate(new AmountMoneyPanelUpdateEvent(retrieveAmountMoney()));
+                    updateListener.onUpdate(new AmountMoneyPanelUpdateEvent(getValue()));
                 }
             }
         });
@@ -114,7 +139,7 @@ public class AmountMoneyPanel extends javax.swing.JPanel {
             @Override
             public void stateChanged(ChangeEvent e) {
                 for(AmountMoneyPanelUpdateListener updateListener : AmountMoneyPanel.this.updateListeners) {
-                    updateListener.onUpdate(new AmountMoneyPanelUpdateEvent(retrieveAmountMoney()));
+                    updateListener.onUpdate(new AmountMoneyPanelUpdateEvent(getValue()));
                 }
             }
         });
@@ -126,13 +151,13 @@ public class AmountMoneyPanel extends javax.swing.JPanel {
                 Currency newCurrency = (Currency) itemEvent.getItemSelectable().getSelectedObjects()[0];
                 double newAmount;
                 try {
-                    newAmount = oldCurrency.getConverterTo(newCurrency).convert(retrieveAmount());
+                    newAmount = oldCurrency.getConverterTo(newCurrency).convert(getAmount());
                 } catch(ConversionException ex) {
                     try {
                         //if the exchange rate isn't set
                         AmountMoneyPanel.this.amountMoneyExchangeRateRetriever.retrieveExchangeRate(newCurrency);
                         AmountMoneyPanel.this.amountMoneyExchangeRateRetriever.retrieveExchangeRate(oldCurrency);
-                        newAmount = oldCurrency.getConverterTo(newCurrency).convert(retrieveAmount());
+                        newAmount = oldCurrency.getConverterTo(newCurrency).convert(getAmount());
                     } catch (AmountMoneyCurrencyStorageException amountMoneyCurrencyStorageException) {
                         throw new RuntimeException(amountMoneyCurrencyStorageException);
                     }
@@ -145,32 +170,68 @@ public class AmountMoneyPanel extends javax.swing.JPanel {
                 AmountMoneyPanel.this.amountDecimalSpinner.setValue(bd.intValue()%100);
                 //notify registered update listeners
                 for(AmountMoneyPanelUpdateListener updateListener : AmountMoneyPanel.this.updateListeners) {
-                    updateListener.onUpdate(new AmountMoneyPanelUpdateEvent(retrieveAmountMoney()));
+                    updateListener.onUpdate(new AmountMoneyPanelUpdateEvent(getValue()));
                 }
             }
         });
         this.amountMoneyCurrencyStorage = amountMoneyCurrencyStorage;
         this.amountMoneyUsageStatisticsStorage = amountMoneyUsageStatisticsStorage;
-        this.amountMoneyExchangeRateRetriever = amountMoneyConversionRateRetriever;
+        this.amountMoneyExchangeRateRetriever = amountMoneyExchangeRateRetriever;
     }
 
-    private double retrieveAmount() {
-        double amount = Double.valueOf(String.format("%d.%02d",
-                (Integer)amountIntegerSpinner.getValue(),
-                (Integer)amountDecimalSpinner.getValue()));
+    //@TODO: might be handled more efficiently than parsing a String
+    private double getAmount() {
+        double amount = ((Number)amountIntegerSpinner.getValue()).doubleValue()
+                + ((Number)amountDecimalSpinner.getValue()).intValue()/100.0;
         return amount;
     }
 
-    public Amount<Money> retrieveAmountMoney() {
-        double amount = retrieveAmount();
-        return Amount.valueOf(amount, (Currency)currencyComboBoxModel.getSelectedItem());
+    public Amount<Money> getValue() {
+        double amount = getAmount();
+        return Amount.valueOf(amount,
+                (Currency)currencyComboBoxModel.getSelectedItem());
     }
 
-    public void applyAmountMoney(Amount<Money> amountMoney) {
-        double amount = amountMoney.doubleValue(amountMoney.getUnit());
-        this.amountIntegerSpinner.setValue((int)amount);
+    public static Amount<Money> parseValue(String value) {
+        //retrieve number part of value
+        String valueTrim = value.trim();
+        StringBuilder digitsBuilder = new StringBuilder();
+        int nonDigitOffset = 0;
+        for(char c : valueTrim.toCharArray()) {
+            if(!Character.isDigit(c)) {
+                break;
+            }
+            digitsBuilder.append(c);
+            nonDigitOffset += 1;
+        }
+        String digits = digitsBuilder.toString();
+        double amount = Double.valueOf(digits);
+        char[] valueTrail = new char[valueTrim.length()-nonDigitOffset];
+        System.arraycopy(valueTrim.toCharArray(), nonDigitOffset, valueTrail, 0, valueTrail.length);
+        String valueTrailTrim = new String(valueTrail).trim();
+        StringBuilder currencyCodeBuilder = new StringBuilder();
+        for(char c : valueTrailTrim.toCharArray()) {
+            currencyCodeBuilder.append(c);
+        }
+        String currencyCode = currencyCodeBuilder.toString();
+        Currency currency;
+        try {
+            currency = new Currency(currencyCode);
+        }catch(IllegalArgumentException ex) {
+            currency = getReferenceCurrency();
+        }
+        return Amount.valueOf(amount, currency);
+    }
+
+    public void setValue(Amount<Money> value) {
+        double amount = value.doubleValue(value.getUnit());
+        if(amount >= INTEGER_SPINNER_MAX_VALUE) {
+            throw new IllegalArgumentException(String.format("values larger than %f not supported",
+                    INTEGER_SPINNER_MAX_VALUE));
+        }
+        this.amountIntegerSpinner.setValue((long)amount);
         this.amountDecimalSpinner.setValue(amount % 1);
-        this.currencyComboBox.setSelectedItem(amountMoney.getUnit());
+        this.currencyComboBox.setSelectedItem(value.getUnit());
     }
 
     public void addUpdateListener(AmountMoneyPanelUpdateListener updateListener) {
@@ -205,6 +266,7 @@ public class AmountMoneyPanel extends javax.swing.JPanel {
         amountDecimalSpinner.setEditor(new javax.swing.JSpinner.NumberEditor(amountDecimalSpinner, "00"));
         amountDecimalSpinner.setMinimumSize(new java.awt.Dimension(40, 28));
 
+        amountIntegerSpinner.setModel(new javax.swing.SpinnerNumberModel(0L, null, null, 1L));
         amountIntegerSpinner.setMinimumSize(new java.awt.Dimension(40, 28));
 
         amountLabel.setText("Amount:");
