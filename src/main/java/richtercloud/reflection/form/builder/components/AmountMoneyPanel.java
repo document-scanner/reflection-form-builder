@@ -230,7 +230,7 @@ public class AmountMoneyPanel extends javax.swing.JPanel {
                     INTEGER_SPINNER_MAX_VALUE));
         }
         this.amountIntegerSpinner.setValue((long)amount);
-        this.amountDecimalSpinner.setValue(amount % 1);
+        this.amountDecimalSpinner.setValue((amount % 1)*100);
         this.currencyComboBox.setSelectedItem(value.getUnit());
     }
 
