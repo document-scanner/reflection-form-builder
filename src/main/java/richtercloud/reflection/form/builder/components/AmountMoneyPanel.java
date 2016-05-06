@@ -126,7 +126,10 @@ public class AmountMoneyPanel extends javax.swing.JPanel {
             currencyComboBoxModel.addElement(currency);
         }
         initComponents();
-        ((SpinnerNumberModel)amountIntegerSpinner.getModel()).setMaximum(Double.MAX_VALUE*MINIMAL_STEP);
+        ((SpinnerNumberModel)amountIntegerSpinner.getModel()).setMaximum(
+                ((long)(Double.MAX_VALUE*MINIMAL_STEP)));
+            //cast to long is necessary to make ChangeListener of
+            //amountIntegerSpinner be notified
         this.amountIntegerSpinner.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
