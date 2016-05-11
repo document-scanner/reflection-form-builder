@@ -27,7 +27,7 @@ log exceptions based on metadata (there's no even a method to log with a numeric
 severity) and logging at the place where the exception occurs/is caught provides
 more information anyway.
 */
-public interface MessageHandler {
+public interface MessageHandler<M extends Message> {
 
-    void handle(Message message);
+    void handle(M message);
 }
