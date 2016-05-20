@@ -367,8 +367,10 @@ public abstract class AbstractListPanel<T, L extends ListPanelItemListener<T>, M
         try {
             editRow();
         } catch (FieldHandlingException ex) {
-            messageHandler.handle(new Message(String.format("An exception during editing the row occured: %s", ExceptionUtils.getRootCauseMessage(ex)),
-                    JOptionPane.ERROR_MESSAGE));
+            messageHandler.handle(new Message(String.format("An exception during editing the row occured: %s",
+                    ExceptionUtils.getRootCauseMessage(ex)),
+                    JOptionPane.ERROR_MESSAGE,
+                    "Exception occured"));
         }
     }
 

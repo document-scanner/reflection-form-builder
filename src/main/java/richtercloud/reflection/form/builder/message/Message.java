@@ -28,6 +28,8 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 internal implementation notes:
 - reusage of Java Message Service API classes doesn't work because
 javax.jms.Message provides too many options
+- moving summary (e.g. to be used in a dialog) to a subclass causes trouble
+using MessageHandler in library classes
 */
 public class Message {
     public final static Set<Integer> ALLOWED_TYPES = new HashSet<>(Arrays.asList(JOptionPane.ERROR_MESSAGE,
@@ -35,22 +37,30 @@ public class Message {
             JOptionPane.PLAIN_MESSAGE,
             JOptionPane.WARNING_MESSAGE,
             JOptionPane.QUESTION_MESSAGE));
-    private String text;
+    private final String text;
     /**
      * reuse {@link JOptionPane#ERROR_MESSAGE}, {@link JOptionPane#INFORMATION_MESSAGE}, {@link JOptionPane#PLAIN_MESSAGE}, {@link JOptionPane#WARNING_MESSAGE} ({@link JOptionPane#QUESTION_MESSAGE} isn't used because {@link MessageHandler} doesn't allow interaction.
      */
-    private int type;
+    private final int type;
+    /**
+     * A summary of the message which can be used in a dialog title, but isn't
+     * necessarily specified.
+     */
+    private final String summary;
 
-    public Message(String text, int type) {
+    public Message(String text, int type, String summary) {
         if(!ALLOWED_TYPES.contains(type)) {
             throw new IllegalArgumentException(String.format("type has to be one of '%s'", ALLOWED_TYPES));
         }
         this.text = text;
         this.type = type;
+        this.summary = summary;
     }
 
     public Message(Throwable throwable, int type) {
-        this(ExceptionUtils.getRootCauseMessage(throwable), type);
+        this(ExceptionUtils.getRootCauseMessage(throwable),
+                type,
+                throwable.getClass().getSimpleName());
     }
 
     public int getType() {
@@ -59,5 +69,9 @@ public class Message {
 
     public String getText() {
         return text;
+    }
+
+    public String getSummary() {
+        return summary;
     }
 }

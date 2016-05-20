@@ -163,7 +163,9 @@ public class AmountMoneyPanelManageDialog extends javax.swing.JDialog {
                     (Frame) SwingUtilities.getWindowAncestor(this) //parent
             );
         } catch (AmountMoneyCurrencyStorageException ex) {
-            this.messageHandler.handle(new Message(String.format("An exception occured during retrieval of currencies from the storage: %s", ExceptionUtils.getRootCauseMessage(ex)), JOptionPane.ERROR_MESSAGE));
+            this.messageHandler.handle(new Message(String.format("An exception occured during retrieval of currencies from the storage: %s", ExceptionUtils.getRootCauseMessage(ex)),
+                    JOptionPane.ERROR_MESSAGE,
+                    "Exception occured"));
             return;
         }
         amountMoneyPanelEditDialog.pack();
@@ -172,7 +174,9 @@ public class AmountMoneyPanelManageDialog extends javax.swing.JDialog {
         try {
             this.amountMoneyCurrencyStorage.saveCurrency(newCurrency);
         } catch (AmountMoneyCurrencyStorageException ex) {
-            this.messageHandler.handle(new Message(String.format("An exception occured during retrieval of currencies from the storage: %s", ExceptionUtils.getRootCauseMessage(ex)), JOptionPane.ERROR_MESSAGE));
+            this.messageHandler.handle(new Message(String.format("An exception occured during retrieval of currencies from the storage: %s", ExceptionUtils.getRootCauseMessage(ex)),
+                    JOptionPane.ERROR_MESSAGE,
+                    "Exception occured"));
         }
         currencyListModel.add(0, newCurrency);
     }//GEN-LAST:event_addButtonActionPerformed
@@ -187,7 +191,9 @@ public class AmountMoneyPanelManageDialog extends javax.swing.JDialog {
             //currencies, simply remove and add the old and new instance
             this.amountMoneyCurrencyStorage.removeCurrency(selectedCurrency);
         } catch (AmountMoneyCurrencyStorageException ex) {
-            this.messageHandler.handle(new Message(String.format("An exception occured during retrieval of currencies from the storage: %s", ExceptionUtils.getRootCauseMessage(ex)), JOptionPane.ERROR_MESSAGE));
+            this.messageHandler.handle(new Message(String.format("An exception occured during retrieval of currencies from the storage: %s", ExceptionUtils.getRootCauseMessage(ex)),
+                    JOptionPane.ERROR_MESSAGE,
+                    "Exception occured"));
         }
         currencyListModel.remove(currencyList.getSelectedIndex());
     }//GEN-LAST:event_removeButtonActionPerformed
@@ -203,7 +209,9 @@ public class AmountMoneyPanelManageDialog extends javax.swing.JDialog {
                     (Frame) SwingUtilities.getWindowAncestor(this) //parent
             );
         } catch (AmountMoneyCurrencyStorageException ex) {
-            this.messageHandler.handle(new Message(String.format("An exception occured during retrieval of currencies from the storage: %s", ExceptionUtils.getRootCauseMessage(ex)), JOptionPane.ERROR_MESSAGE));
+            this.messageHandler.handle(new Message(String.format("An exception occured during retrieval of currencies from the storage: %s", ExceptionUtils.getRootCauseMessage(ex)),
+                    JOptionPane.ERROR_MESSAGE,
+                    "Exception occured"));
             return;
         }
         amountMoneyPanelEditDialog.pack();
@@ -215,7 +223,9 @@ public class AmountMoneyPanelManageDialog extends javax.swing.JDialog {
             this.amountMoneyCurrencyStorage.removeCurrency(selectedCurrency);
             this.amountMoneyCurrencyStorage.saveCurrency(editedCurrency);
         } catch (AmountMoneyCurrencyStorageException ex) {
-            this.messageHandler.handle(new Message(String.format("An exception occured during retrieval of currencies from the storage: %s", ExceptionUtils.getRootCauseMessage(ex)), JOptionPane.ERROR_MESSAGE));
+            this.messageHandler.handle(new Message(String.format("An exception occured during retrieval of currencies from the storage: %s", ExceptionUtils.getRootCauseMessage(ex)),
+                    JOptionPane.ERROR_MESSAGE,
+                    "Exception occured"));
         }
         int selectedCurrencyIndex = currencyListModel.indexOf(selectedCurrency);
         currencyListModel.remove(selectedCurrencyIndex);

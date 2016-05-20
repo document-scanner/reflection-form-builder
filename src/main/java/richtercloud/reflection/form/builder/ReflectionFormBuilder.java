@@ -53,7 +53,8 @@ import richtercloud.reflection.form.builder.message.MessageHandler;
  */
 /*
  internal implementation notes:
- - an existing entity can be updated through the transform method, but is not preserved as class property in order to maximize immutability
+ - an existing entity can be updated through the transform method, but is not
+preserved as class property in order to maximize immutability
 - ignores: in order to allow overriding of precedences which are static
 in order to KISS (for both users and developers) ignores need to be added. They
 can be specified at the level of the ReflectionFormBuilder, but then they don't

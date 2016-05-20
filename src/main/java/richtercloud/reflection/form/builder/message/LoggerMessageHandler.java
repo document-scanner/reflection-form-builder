@@ -20,7 +20,7 @@ import org.slf4j.Logger;
  * Forwards all messages as info messages to the specified logger.
  * @author richter
  */
-public class LoggerMessageHandler implements MessageHandler<Message> {
+public class LoggerMessageHandler implements MessageHandler {
     private Logger logger;
 
     public LoggerMessageHandler(Logger logger) {

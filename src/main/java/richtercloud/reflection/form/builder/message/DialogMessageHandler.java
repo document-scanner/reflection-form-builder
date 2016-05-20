@@ -21,7 +21,7 @@ import javax.swing.JOptionPane;
  *
  * @author richter
  */
-public class DialogMessageHandler implements MessageHandler<DialogMessage> {
+public class DialogMessageHandler implements MessageHandler {
     private final Frame parent;
 
     /**
@@ -34,10 +34,10 @@ public class DialogMessageHandler implements MessageHandler<DialogMessage> {
     }
 
     @Override
-    public void handle(DialogMessage message) {
+    public void handle(Message message) {
         JOptionPane.showMessageDialog(parent,
                 message.getText(),
-                message.getTitle(),
+                message.getSummary(),
                 message.getType());
     }
 }

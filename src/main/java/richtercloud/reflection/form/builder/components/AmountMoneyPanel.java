@@ -323,7 +323,9 @@ public class AmountMoneyPanel extends javax.swing.JPanel {
                     messageHandler,
                     (Frame) SwingUtilities.getWindowAncestor(this));
         } catch (AmountMoneyCurrencyStorageException ex) {
-            this.messageHandler.handle(new Message(String.format("An exception occured during retrieval of currencies from the storage: %s", ExceptionUtils.getRootCauseMessage(ex)), JOptionPane.ERROR_MESSAGE));
+            this.messageHandler.handle(new Message(String.format("An exception occured during retrieval of currencies from the storage: %s", ExceptionUtils.getRootCauseMessage(ex)),
+                    JOptionPane.ERROR_MESSAGE,
+                    "Exception occured"));
             return;
         }
         amountMoneyPanelManageDialog.pack();
