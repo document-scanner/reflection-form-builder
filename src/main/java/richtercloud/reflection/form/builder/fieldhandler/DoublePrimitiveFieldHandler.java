@@ -59,5 +59,4 @@ public class DoublePrimitiveFieldHandler implements FieldHandler<Double, FieldUp
     public void reset(JSpinner component) {
         component.setValue(0);
     }
-
 }

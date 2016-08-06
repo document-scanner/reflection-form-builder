@@ -18,7 +18,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import javax.swing.JComponent;
 import org.apache.commons.lang3.tuple.Pair;
-import richtercloud.reflection.form.builder.ComponentResettable;
+import richtercloud.reflection.form.builder.ComponentHandler;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
 import richtercloud.reflection.form.builder.panels.NumberPanel;
 import richtercloud.reflection.form.builder.typehandler.NumberTypeHandler;
@@ -44,7 +44,7 @@ public class NumberFieldHandler extends ResettableFieldHandler<Number, FieldUpda
     }
 
     @Override
-    public Pair<JComponent, ComponentResettable<?>> handle0(Field field,
+    public Pair<JComponent, ComponentHandler<?>> handle0(Field field,
             Object instance,
             final FieldUpdateListener<FieldUpdateEvent<Number>> updateListener,
             ReflectionFormBuilder reflectionFormBuilder) throws IllegalArgumentException, IllegalAccessException, FieldHandlingException {
@@ -62,5 +62,4 @@ public class NumberFieldHandler extends ResettableFieldHandler<Number, FieldUpda
     public void reset(NumberPanel component) {
         component.reset();
     }
-
 }

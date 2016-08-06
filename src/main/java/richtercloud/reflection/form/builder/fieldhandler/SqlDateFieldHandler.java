@@ -61,5 +61,4 @@ public class SqlDateFieldHandler implements FieldHandler<java.sql.Date,FieldUpda
     public void reset(SqlDatePicker component) {
         component.reset();
     }
-
 }

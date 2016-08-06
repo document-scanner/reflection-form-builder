@@ -22,7 +22,7 @@ import java.util.Map;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import org.apache.commons.lang3.tuple.Pair;
-import richtercloud.reflection.form.builder.ComponentResettable;
+import richtercloud.reflection.form.builder.ComponentHandler;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
 import richtercloud.reflection.form.builder.fieldhandler.FieldHandlingException;
 import richtercloud.reflection.form.builder.fieldhandler.FieldUpdateEvent;
@@ -38,21 +38,21 @@ public class MappingTypeHandler<T, E extends FieldUpdateEvent<T>, R extends Refl
      * Since the type handler delegates to mapped type handlers it's sufficient
      * to track the created components internally.
      */
-    private final Map<JComponent, ComponentResettable<?>> componentMapping = new HashMap<>();
+    private final Map<JComponent, ComponentHandler<?>> componentMapping = new HashMap<>();
 
     @Override
     @SuppressWarnings("FinalMethod") //enforce everything being handled in handle0
-    public final Pair<JComponent, ComponentResettable<?>> handle(Type type,
+    public final Pair<JComponent, ComponentHandler<?>> handle(Type type,
             T fieldValue,
             String fieldName,
             Class<?> declaringClass,
             FieldUpdateListener<E> updateListener,
             R reflectionFormBuilder) throws IllegalArgumentException, IllegalAccessException, FieldHandlingException, InstantiationException, InvocationTargetException {
-        Pair<JComponent, ComponentResettable<?>> retValueEntry = handle0(type, fieldValue, fieldName, declaringClass, updateListener, reflectionFormBuilder);
+        Pair<JComponent, ComponentHandler<?>> retValueEntry = handle0(type, fieldValue, fieldName, declaringClass, updateListener, reflectionFormBuilder);
         if(retValueEntry == null) {
             throw new IllegalArgumentException("handle0 mustn't return null");
         }
-        ComponentResettable<?> componentResettable = retValueEntry.getValue();
+        ComponentHandler<?> componentResettable = retValueEntry.getValue();
         if(componentResettable == null) {
             throw new IllegalArgumentException("ComponentResettable in Pair returned by handle0 mustn't be null");
         }
@@ -61,7 +61,7 @@ public class MappingTypeHandler<T, E extends FieldUpdateEvent<T>, R extends Refl
         return retValueEntry;
     }
 
-    protected Pair<JComponent, ComponentResettable<?>> handle0(Type type,
+    protected Pair<JComponent, ComponentHandler<?>> handle0(Type type,
             T fieldValue,
             String fieldName,
             Class<?> declaringClass,
@@ -71,7 +71,7 @@ public class MappingTypeHandler<T, E extends FieldUpdateEvent<T>, R extends Refl
         if(typeHandler == null) {
             throw new IllegalArgumentException(String.format("Type '%s' isn't mapped.", type));
         }
-        Pair<JComponent, ComponentResettable<?>> retValue = typeHandler.handle(type,
+        Pair<JComponent, ComponentHandler<?>> retValue = typeHandler.handle(type,
                 fieldValue,
                 fieldName,
                 declaringClass,
@@ -82,8 +82,7 @@ public class MappingTypeHandler<T, E extends FieldUpdateEvent<T>, R extends Refl
 
     @Override
     public void reset(Component component) {
-        ComponentResettable componentResettable = this.componentMapping.get(component);
+        ComponentHandler componentResettable = this.componentMapping.get(component);
         componentResettable.reset(component);
     }
-
 }

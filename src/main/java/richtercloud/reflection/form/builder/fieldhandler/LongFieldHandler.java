@@ -17,7 +17,6 @@ package richtercloud.reflection.form.builder.fieldhandler;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import javax.swing.JComponent;
-import org.apache.commons.lang3.tuple.Pair;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
 import richtercloud.reflection.form.builder.panels.LongPanel;
 import richtercloud.reflection.form.builder.typehandler.LongTypeHandler;
@@ -60,5 +59,4 @@ public class LongFieldHandler implements FieldHandler<Long, FieldUpdateEvent<Lon
     public void reset(LongPanel component) {
         component.reset();
     }
-
 }

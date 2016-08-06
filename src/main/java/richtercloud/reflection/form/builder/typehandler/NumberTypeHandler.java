@@ -22,7 +22,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import richtercloud.reflection.form.builder.ComponentResettable;
+import richtercloud.reflection.form.builder.ComponentHandler;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
 import richtercloud.reflection.form.builder.fieldhandler.FieldHandlingException;
 import richtercloud.reflection.form.builder.fieldhandler.FieldUpdateEvent;
@@ -33,7 +33,6 @@ import richtercloud.reflection.form.builder.fieldhandler.FieldUpdateListener;
  * @author richter
  */
 public class NumberTypeHandler implements TypeHandler<Number, FieldUpdateEvent<Number>,ReflectionFormBuilder, JSpinner> {
-
     private final static NumberTypeHandler INSTANCE = new NumberTypeHandler();
 
     public static NumberTypeHandler getInstance() {
@@ -44,7 +43,7 @@ public class NumberTypeHandler implements TypeHandler<Number, FieldUpdateEvent<N
     }
 
     @Override
-    public Pair<JComponent, ComponentResettable<?>> handle(Type type,
+    public Pair<JComponent, ComponentHandler<?>> handle(Type type,
             Number fieldValue,
             String fieldName,
             Class<?> declaringClass,
@@ -62,7 +61,7 @@ public class NumberTypeHandler implements TypeHandler<Number, FieldUpdateEvent<N
                 updateListener.onUpdate(new FieldUpdateEvent<>((Number) ((JSpinner)e.getSource()).getValue()));
             }
         });
-        return new ImmutablePair<JComponent, ComponentResettable<?>>(retValue, this);
+        return new ImmutablePair<JComponent, ComponentHandler<?>>(retValue, this);
     }
 
     @Override

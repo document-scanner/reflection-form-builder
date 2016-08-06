@@ -60,5 +60,4 @@ public class IntegerFieldHandler implements FieldHandler<Integer, FieldUpdateEve
     public void reset(IntegerPanel component) {
         component.reset();
     }
-
 }

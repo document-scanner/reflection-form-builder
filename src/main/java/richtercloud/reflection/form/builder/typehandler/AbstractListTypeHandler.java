@@ -19,7 +19,7 @@ import java.lang.reflect.Type;
 import java.util.List;
 import javax.swing.JComponent;
 import org.apache.commons.lang3.tuple.Pair;
-import richtercloud.reflection.form.builder.ComponentResettable;
+import richtercloud.reflection.form.builder.ComponentHandler;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
 import richtercloud.reflection.form.builder.fieldhandler.FieldHandlingException;
 import richtercloud.reflection.form.builder.fieldhandler.FieldUpdateEvent;
@@ -43,7 +43,7 @@ public abstract class AbstractListTypeHandler<T, E extends FieldUpdateEvent<T>, 
     }
 
     @Override
-    public Pair<JComponent, ComponentResettable<?>> handle(Type type,
+    public Pair<JComponent, ComponentHandler<?>> handle(Type type,
             T fieldValue,
             String fieldName,
             Class<?> declaringClass,
@@ -55,11 +55,11 @@ public abstract class AbstractListTypeHandler<T, E extends FieldUpdateEvent<T>, 
                 throw new IllegalArgumentException(String.format("list field handlers are only allowed to be used with types with raw type %s (type is %s)", List.class, type));
             }
         }
-        Pair<JComponent, ComponentResettable<?>> retValue = handle0(type, fieldValue, updateListener, reflectionFormBuilder);
+        Pair<JComponent, ComponentHandler<?>> retValue = handle0(type, fieldValue, updateListener, reflectionFormBuilder);
         return retValue;
     }
 
-    protected abstract Pair<JComponent, ComponentResettable<?>> handle0(Type type,
+    protected abstract Pair<JComponent, ComponentHandler<?>> handle0(Type type,
             T fieldValue,
             FieldUpdateListener<E> updateListener,
             ReflectionFormBuilder reflectionFormBuilder) throws IllegalArgumentException, IllegalAccessException;

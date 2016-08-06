@@ -19,7 +19,7 @@ import java.util.List;
 import javax.swing.JComponent;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import richtercloud.reflection.form.builder.ComponentResettable;
+import richtercloud.reflection.form.builder.ComponentHandler;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
 import richtercloud.reflection.form.builder.fieldhandler.FieldUpdateEvent;
 import richtercloud.reflection.form.builder.fieldhandler.FieldUpdateListener;
@@ -39,7 +39,7 @@ public class BooleanListTypeHandler extends AbstractListTypeHandler<List<Boolean
     }
 
     @Override
-    public Pair<JComponent, ComponentResettable<?>> handle0(Type type,
+    public Pair<JComponent, ComponentHandler<?>> handle0(Type type,
             List<Boolean> fieldValue,
             final FieldUpdateListener<FieldUpdateEvent<List<Boolean>>> updateListener,
             ReflectionFormBuilder reflectionFormBuilder) {
@@ -63,6 +63,6 @@ public class BooleanListTypeHandler extends AbstractListTypeHandler<List<Boolean
                 updateListener.onUpdate(new FieldUpdateEvent<>(event.getItem()));
             }
         });
-        return new ImmutablePair<JComponent, ComponentResettable<?>>(retValue, this);
+        return new ImmutablePair<JComponent, ComponentHandler<?>>(retValue, this);
     }
 }

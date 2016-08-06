@@ -59,5 +59,4 @@ public class LongPrimitiveFieldHandler implements FieldHandler<Long, FieldUpdate
     public void reset(JSpinner component) {
         component.setValue(0);
     }
-
 }

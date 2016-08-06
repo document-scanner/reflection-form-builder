@@ -22,7 +22,8 @@ import java.util.Map;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import org.apache.commons.lang3.tuple.Pair;
-import richtercloud.reflection.form.builder.ComponentResettable;
+import org.apache.commons.lang3.tuple.Triple;
+import richtercloud.reflection.form.builder.ComponentHandler;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
 
 /**
@@ -30,7 +31,7 @@ import richtercloud.reflection.form.builder.ReflectionFormBuilder;
  * @author richter
  */
 public abstract class ResettableFieldHandler<T, E extends FieldUpdateEvent<T>, R extends ReflectionFormBuilder, C extends Component> implements FieldHandler<T, E, R, C> {
-    private static final ComponentResettable<JLabel> JLABEL_COMPONENT_RESETTABLE = new ComponentResettable<JLabel>() {
+    private static final ComponentHandler<JLabel> JLABEL_COMPONENT_RESETTABLE = new ComponentHandler<JLabel>() {
         @Override
         public void reset(JLabel component) {
             component.setText("");
@@ -48,7 +49,7 @@ public abstract class ResettableFieldHandler<T, E extends FieldUpdateEvent<T>, R
     assigned with JLabel which is the fallback. No such type exists. -> A
     ClassCastException might occur in the reset method.
     */
-    private final Map<JComponent, ComponentResettable<?>> componentMapping = new HashMap<>();
+    private final Map<JComponent, ComponentHandler<?>> componentMapping = new HashMap<>();
 
     @Override
     @SuppressWarnings("FinalMethod") //enforce everything being handled in handle0
@@ -61,13 +62,13 @@ public abstract class ResettableFieldHandler<T, E extends FieldUpdateEvent<T>, R
             InvocationTargetException,
             NoSuchMethodException,
             InstantiationException {
-        Pair<JComponent, ComponentResettable<?>> retValueEntry = handle0(field, instance, updateListener, reflectionFormBuilder);
+        Pair<JComponent, ComponentHandler<?>> retValueEntry = handle0(field, instance, updateListener, reflectionFormBuilder);
         if(retValueEntry == null) {
             JLabel retValue = new JLabel(field.getType().getSimpleName());
             this.componentMapping.put(retValue, JLABEL_COMPONENT_RESETTABLE);
             return retValue;
         }
-        ComponentResettable<?> componentResettable = retValueEntry.getValue();
+        ComponentHandler<?> componentResettable = retValueEntry.getValue();
         if(componentResettable == null) {
             throw new IllegalArgumentException("ComponentResettable in Pair returned by handle0 mustn't be null");
         }
@@ -76,7 +77,7 @@ public abstract class ResettableFieldHandler<T, E extends FieldUpdateEvent<T>, R
         return retValue;
     }
 
-    protected abstract Pair<JComponent, ComponentResettable<?>> handle0(final Field field,
+    protected abstract Pair<JComponent, ComponentHandler<?>> handle0(final Field field,
             final Object instance,
             FieldUpdateListener<E> updateListener,
             R reflectionFormBuilder) throws IllegalArgumentException,
@@ -88,7 +89,7 @@ public abstract class ResettableFieldHandler<T, E extends FieldUpdateEvent<T>, R
 
     @Override
     public void reset(C component) {
-        ComponentResettable classPartHandler = this.componentMapping.get(component);
+        ComponentHandler classPartHandler = this.componentMapping.get(component);
         classPartHandler.reset(component);
     }
 }

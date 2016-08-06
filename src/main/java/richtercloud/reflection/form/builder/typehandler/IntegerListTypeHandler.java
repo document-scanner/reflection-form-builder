@@ -19,11 +19,12 @@ import java.util.List;
 import javax.swing.JComponent;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import richtercloud.reflection.form.builder.ComponentResettable;
+import richtercloud.reflection.form.builder.ComponentHandler;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
 import richtercloud.reflection.form.builder.fieldhandler.FieldUpdateEvent;
 import richtercloud.reflection.form.builder.fieldhandler.FieldUpdateListener;
 import richtercloud.reflection.form.builder.message.MessageHandler;
+import richtercloud.reflection.form.builder.panels.AbstractListPanel;
 import richtercloud.reflection.form.builder.panels.EditableListPanelItemListener;
 import richtercloud.reflection.form.builder.panels.IntegerListPanel;
 import richtercloud.reflection.form.builder.panels.ListPanelItemEvent;
@@ -39,7 +40,7 @@ public class IntegerListTypeHandler extends AbstractListTypeHandler<List<Integer
     }
 
     @Override
-    protected Pair<JComponent, ComponentResettable<?>> handle0(Type type,
+    protected Pair<JComponent, ComponentHandler<?>> handle0(Type type,
             List<Integer> fieldValue,
             final FieldUpdateListener<FieldUpdateEvent<List<Integer>>> updateListener,
             ReflectionFormBuilder reflectionFormBuilder) throws IllegalArgumentException, IllegalAccessException {
@@ -63,7 +64,6 @@ public class IntegerListTypeHandler extends AbstractListTypeHandler<List<Integer
                 updateListener.onUpdate(new FieldUpdateEvent<>(event.getItem()));
             }
         });
-        return new ImmutablePair<JComponent, ComponentResettable<?>>(retValue, this);
+        return new ImmutablePair<JComponent, ComponentHandler<?>>(retValue, this);
     }
-
 }

@@ -60,5 +60,4 @@ public class StringFieldHandler implements FieldHandler<String, FieldUpdateEvent
     public void reset(JTextField component) {
         component.setText("");
     }
-
 }

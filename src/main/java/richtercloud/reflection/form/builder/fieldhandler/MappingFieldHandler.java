@@ -27,11 +27,10 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import richtercloud.reflection.form.builder.AnyType;
-import richtercloud.reflection.form.builder.ComponentResettable;
+import richtercloud.reflection.form.builder.ComponentHandler;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
 import richtercloud.reflection.form.builder.typehandler.TypeHandler;
 
@@ -93,7 +92,7 @@ public class MappingFieldHandler<T, E extends FieldUpdateEvent<T>, R extends Ref
      * @throws NoSuchMethodException
      * @throws InstantiationException
      */
-    protected Pair<JComponent, ComponentResettable<?>> handle0(final Field field,
+    protected Pair<JComponent, ComponentHandler<?>> handle0(final Field field,
             final Object instance,
             FieldUpdateListener<E> updateListener,
             R reflectionFormBuilder) throws IllegalArgumentException,
@@ -118,7 +117,7 @@ public class MappingFieldHandler<T, E extends FieldUpdateEvent<T>, R extends Ref
             // check exact type match
             fieldHandler = retrieveFieldHandler(field.getGenericType(), classMapping);
         }
-        ComponentResettable<?> componentResettable;
+        ComponentHandler<?> componentResettable;
         if (fieldHandler == null) {
             return null;
         }
@@ -136,7 +135,7 @@ public class MappingFieldHandler<T, E extends FieldUpdateEvent<T>, R extends Ref
                 },
                 reflectionFormBuilder);
         componentResettable = fieldHandler;
-        return new ImmutablePair<JComponent, ComponentResettable<?>>(retValue, componentResettable);
+        return new ImmutablePair<JComponent, ComponentHandler<?>>(retValue, componentResettable);
     }
 
     /**

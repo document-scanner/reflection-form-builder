@@ -22,7 +22,7 @@ import javax.swing.JComponent;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jdatepicker.JUtilDatePanel;
-import richtercloud.reflection.form.builder.ComponentResettable;
+import richtercloud.reflection.form.builder.ComponentHandler;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
 import richtercloud.reflection.form.builder.components.UtilDatePicker;
 import richtercloud.reflection.form.builder.fieldhandler.FieldHandlingException;
@@ -34,7 +34,6 @@ import richtercloud.reflection.form.builder.fieldhandler.FieldUpdateListener;
  * @author richter
  */
 public class DateTypeHandler implements TypeHandler<Date, FieldUpdateEvent<Date>,ReflectionFormBuilder, UtilDatePicker> {
-
     private final static DateTypeHandler INSTANCE = new DateTypeHandler();
 
     public static DateTypeHandler getInstance() {
@@ -45,7 +44,7 @@ public class DateTypeHandler implements TypeHandler<Date, FieldUpdateEvent<Date>
     }
 
     @Override
-    public Pair<JComponent, ComponentResettable<?>> handle(Type type,
+    public Pair<JComponent, ComponentHandler<?>> handle(Type type,
             Date fieldValue,
             String fieldName,
             Class<?> declaringClass,
@@ -62,7 +61,7 @@ public class DateTypeHandler implements TypeHandler<Date, FieldUpdateEvent<Date>
                 updateListener.onUpdate(new FieldUpdateEvent<>(((JUtilDatePanel)e.getSource()).getModel().getValue()));
             }
         });
-        return new ImmutablePair<JComponent, ComponentResettable<?>>(retValue, this);
+        return new ImmutablePair<JComponent, ComponentHandler<?>>(retValue, this);
     }
 
     @Override

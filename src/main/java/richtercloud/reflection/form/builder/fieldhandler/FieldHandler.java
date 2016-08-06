@@ -18,8 +18,7 @@ import java.awt.Component;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import javax.swing.JComponent;
-import org.apache.commons.lang3.tuple.Pair;
-import richtercloud.reflection.form.builder.ComponentResettable;
+import richtercloud.reflection.form.builder.ComponentHandler;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
 
 /**
@@ -65,7 +64,7 @@ JComponent level in order to be able to write values on JComponents (otherwise t
 
   - ; FIXME event handler
 */
-public interface FieldHandler<T, E extends FieldUpdateEvent<T>, R extends ReflectionFormBuilder, C extends Component> extends ComponentResettable<C> {
+public interface FieldHandler<T, E extends FieldUpdateEvent<T>, R extends ReflectionFormBuilder, C extends Component> extends ComponentHandler<C> {
 
     /**
      * Information about the field value can be retrieved with

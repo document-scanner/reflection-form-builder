@@ -20,8 +20,6 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import org.apache.commons.lang3.tuple.Pair;
-import richtercloud.reflection.form.builder.ComponentResettable;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
 
 /**
@@ -61,5 +59,4 @@ public class IntegerPrimitiveFieldHandler implements FieldHandler<Integer, Field
     public void reset(JSpinner component) {
         component.setValue(0);
     }
-
 }

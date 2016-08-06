@@ -60,5 +60,4 @@ public class DoubleFieldHandler implements FieldHandler<Double, FieldUpdateEvent
     public void reset(DoublePanel component) {
         component.reset();
     }
-
 }

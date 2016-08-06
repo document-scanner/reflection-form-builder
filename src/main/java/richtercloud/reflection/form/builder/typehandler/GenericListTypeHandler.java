@@ -24,7 +24,7 @@ import java.util.Map;
 import javax.swing.JComponent;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import richtercloud.reflection.form.builder.ComponentResettable;
+import richtercloud.reflection.form.builder.ComponentHandler;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
 import richtercloud.reflection.form.builder.fieldhandler.FieldHandlingException;
 import richtercloud.reflection.form.builder.fieldhandler.FieldUpdateEvent;
@@ -75,7 +75,7 @@ public abstract class GenericListTypeHandler<R extends ReflectionFormBuilder, C 
      * @throws InvocationTargetException
      */
     @Override
-    public Pair<JComponent, ComponentResettable<?>> handle(Type type,
+    public Pair<JComponent, ComponentHandler<?>> handle(Type type,
             List<Object> fieldValue,
             String fieldName,
             Class<?> declaringClass,
@@ -103,7 +103,7 @@ public abstract class GenericListTypeHandler<R extends ReflectionFormBuilder, C 
         //check for an exact match (including all nested generics) first
         TypeHandler fieldTypeHandler = this.typeHandlerMapping.get(type);
         if(fieldTypeHandler != null) {
-            Pair<JComponent, ComponentResettable<?>> retValue = fieldTypeHandler.handle(type,
+            Pair<JComponent, ComponentHandler<?>> retValue = fieldTypeHandler.handle(type,
                     fieldValue,
                     fieldName,
                     declaringClass,
@@ -140,7 +140,7 @@ public abstract class GenericListTypeHandler<R extends ReflectionFormBuilder, C 
                 reflectionFormBuilder);
     }
 
-    protected abstract Pair<JComponent, ComponentResettable<?>> handleGenericType(Type type,
+    protected abstract Pair<JComponent, ComponentHandler<?>> handleGenericType(Type type,
             List<Object> fieldValue,
             String fieldName,
             Class<?> declaringClass,

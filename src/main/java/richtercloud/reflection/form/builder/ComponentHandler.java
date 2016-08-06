@@ -15,19 +15,28 @@
 package richtercloud.reflection.form.builder;
 
 import java.awt.Component;
+import java.awt.Container;
 import richtercloud.reflection.form.builder.fieldhandler.FieldHandler;
 
 /**
  * A superclass for all handlers of class properties ({@link FieldHandler},
  * {@link FieldAnnotationHandler}, {@link ClassAnnotationHandler}, etc.) which
  * defines methods to reset a handled field (which all handlers should have in
- * common). Since the resetting is done on a component level this interface
+ * common) and allows to start a component after it has been added to a
+ * {@link Container}.
+ *
+ * Since the resetting is done on a component level this interface
  * can be used for both field handlers and handlers a field handler might
  * delegate to.
  *
  * @author richter
  */
-public interface ComponentResettable<C extends Component> {
+/*
+internal implementation notes:
+- start method could be in a separate interface, but it isn't much more elegant
+to separate it.
+*/
+public interface ComponentHandler<C extends Component> {
 
     void reset(C component);
 }

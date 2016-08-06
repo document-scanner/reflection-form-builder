@@ -18,8 +18,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.Date;
 import javax.swing.JComponent;
-import org.apache.commons.lang3.tuple.Pair;
-import richtercloud.reflection.form.builder.ComponentResettable;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
 import richtercloud.reflection.form.builder.components.UtilDatePicker;
 import richtercloud.reflection.form.builder.typehandler.DateTypeHandler;
@@ -63,5 +61,4 @@ public class DateFieldHandler implements FieldHandler<Date, FieldUpdateEvent<Dat
     public void reset(UtilDatePicker component) {
         component.reset();
     }
-
 }
