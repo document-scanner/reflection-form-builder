@@ -23,7 +23,7 @@ import org.jscience.economics.money.Currency;
  *
  * @author richter
  */
-public class MemoryAmountMoneyCurrencyStorage implements AmountMoneyCurrencyStorage {
+public class MemoryAmountMoneyCurrencyStorage extends AbstractAmountMoneyCurrencyStorage {
     private Set<Currency> currencies = new HashSet<>();
 
     @Override

@@ -52,7 +52,7 @@ Continuing ...
 `static final` constants in `Currency` work) -> use XStream with custom
 `Converter`
 */
-public class FileAmountMoneyCurrencyStorage implements AmountMoneyCurrencyStorage {
+public class FileAmountMoneyCurrencyStorage extends AbstractAmountMoneyCurrencyStorage {
     private final static Logger LOGGER = LoggerFactory.getLogger(FileAmountMoneyCurrencyStorage.class);
     private final static String CURRENCY_CODE_ATTRIBUTE_NAME = "code";
     private final static String CURRENCY_EXCHANGE_RATE_ATTRIBUTE_NAME = "exchangeRate";

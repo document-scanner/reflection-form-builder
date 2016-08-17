@@ -32,4 +32,13 @@ public interface AmountMoneyCurrencyStorage {
     void saveCurrency(Currency currency) throws AmountMoneyCurrencyStorageException;
 
     void removeCurrency(Currency currency) throws AmountMoneyCurrencyStorageException;
+
+    /**
+     * Since Java currencies aren't really usable there's need for a
+     * translation.
+     * @param currency
+     * @return the translated JScience currency representation
+     * @throws AmountMoneyCurrencyStorageException is an exception accessing the internal set of available currencies occurs
+     */
+    Currency translate(java.util.Currency currency)  throws AmountMoneyCurrencyStorageException;
 }
