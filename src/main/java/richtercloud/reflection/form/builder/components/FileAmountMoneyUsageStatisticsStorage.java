@@ -30,10 +30,19 @@ public class FileAmountMoneyUsageStatisticsStorage implements AmountMoneyUsageSt
     private final File file;
     private final Properties properties;
 
+    /**
+     * Creates a {@code FileAmountMoneyUsageStatisticsStorage} and loads info
+     * from {@code file} if it exists.
+     * @param file the file to load info from
+     * @throws IOException if an {@link IOException} occurs during loading of
+     * info from {@code file}.
+     */
     public FileAmountMoneyUsageStatisticsStorage(File file) throws IOException {
         this.file = file;
         this.properties = new Properties();
-        this.properties.loadFromXML(new FileInputStream(file));
+        if(file.exists()) {
+            this.properties.loadFromXML(new FileInputStream(file));
+        }
     }
 
     @Override
