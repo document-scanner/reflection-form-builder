@@ -24,7 +24,6 @@ import richtercloud.reflection.form.builder.ReflectionFormBuilder;
 import richtercloud.reflection.form.builder.fieldhandler.FieldUpdateEvent;
 import richtercloud.reflection.form.builder.fieldhandler.FieldUpdateListener;
 import richtercloud.reflection.form.builder.message.MessageHandler;
-import richtercloud.reflection.form.builder.panels.AbstractListPanel;
 import richtercloud.reflection.form.builder.panels.EditableListPanelItemListener;
 import richtercloud.reflection.form.builder.panels.IntegerListPanel;
 import richtercloud.reflection.form.builder.panels.ListPanelItemEvent;

@@ -19,7 +19,6 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import javax.swing.Icon;
 
 /**
  * Allows storage of information of classes (an official or

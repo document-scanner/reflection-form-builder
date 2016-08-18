@@ -15,8 +15,6 @@
 package richtercloud.reflection.form.builder;
 
 import java.awt.Component;
-import java.awt.Container;
-import richtercloud.reflection.form.builder.fieldhandler.FieldHandler;
 
 /**
  * A superclass for all handlers of class properties ({@link FieldHandler},

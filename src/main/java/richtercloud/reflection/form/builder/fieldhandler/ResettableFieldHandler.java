@@ -22,7 +22,6 @@ import java.util.Map;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.commons.lang3.tuple.Triple;
 import richtercloud.reflection.form.builder.ComponentHandler;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
 
