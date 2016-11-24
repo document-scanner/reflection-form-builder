@@ -21,11 +21,11 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import richtercloud.reflection.form.builder.components.AmountMoneyCurrencyStorage;
-import richtercloud.reflection.form.builder.components.AmountMoneyUsageStatisticsStorage;
+import richtercloud.message.handler.LoggerMessageHandler;
+import richtercloud.message.handler.MessageHandler;
+import richtercloud.reflection.form.builder.components.money.AmountMoneyCurrencyStorage;
+import richtercloud.reflection.form.builder.components.money.AmountMoneyUsageStatisticsStorage;
 import richtercloud.reflection.form.builder.fieldhandler.FieldHandler;
-import richtercloud.reflection.form.builder.message.LoggerMessageHandler;
-import richtercloud.reflection.form.builder.message.MessageHandler;
 import richtercloud.reflection.form.builder.typehandler.TypeHandler;
 
 /**
@@ -34,6 +34,7 @@ import richtercloud.reflection.form.builder.typehandler.TypeHandler;
  */
 public class MappingFieldHandlerFactoryTest {
     private final static Logger LOGGER = LoggerFactory.getLogger(MappingFieldHandlerFactoryTest.class);
+    private final MessageHandler messageHandler = new LoggerMessageHandler(LOGGER);
 
     /**
      * Test of generateClassMapping method, of class MappingFieldHandler.
@@ -41,7 +42,6 @@ public class MappingFieldHandlerFactoryTest {
     @Test
     public void testGenerateClassMapping() {
         System.out.println("generateClassMapping");
-        MessageHandler messageHandler = null;
         AmountMoneyUsageStatisticsStorage amountMoneyUsageStatisticsStorage = null;
         AmountMoneyCurrencyStorage additionalCurrencies = null;
         MappingFieldHandlerFactory instance = new MappingFieldHandlerFactory(messageHandler);
@@ -63,7 +63,6 @@ public class MappingFieldHandlerFactoryTest {
         }catch(IllegalArgumentException ex) {
             //expected
         }
-        MessageHandler messageHandler = new LoggerMessageHandler(LOGGER);
         MappingFieldHandlerFactory result = new MappingFieldHandlerFactory(messageHandler);
         assertNotNull(result);
     }
@@ -74,7 +73,6 @@ public class MappingFieldHandlerFactoryTest {
     @Test
     public void testGeneratePrimitiveMapping() {
         System.out.println("generateTypeHandlerMapping");
-        MessageHandler messageHandler = null;
         MappingFieldHandlerFactory instance = null;
         Map<Type, TypeHandler<?, ?, ?, ?>> expResult = null;
         Map<Class<?>, FieldHandler<?, ?, ?, ?>> result = instance.generatePrimitiveMapping();
@@ -82,5 +80,4 @@ public class MappingFieldHandlerFactoryTest {
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
-
 }

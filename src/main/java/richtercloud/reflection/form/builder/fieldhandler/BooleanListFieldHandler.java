@@ -15,8 +15,8 @@
 package richtercloud.reflection.form.builder.fieldhandler;
 
 import java.util.List;
+import richtercloud.message.handler.MessageHandler;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
-import richtercloud.reflection.form.builder.message.MessageHandler;
 import richtercloud.reflection.form.builder.panels.AbstractListPanel;
 import richtercloud.reflection.form.builder.typehandler.BooleanListTypeHandler;
 import richtercloud.reflection.form.builder.typehandler.TypeHandler;

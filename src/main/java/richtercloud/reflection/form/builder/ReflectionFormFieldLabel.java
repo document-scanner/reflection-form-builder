@@ -74,7 +74,10 @@ public class ReflectionFormFieldLabel extends JPanel {
         JLabel fieldNameLabel = new JLabel(String.format("<html>%s</html>", fieldName));
         Group layoutHorizontalGroup = layout.createSequentialGroup();
         Group layoutVerticalGroup = layout.createParallelGroup(GroupLayout.Alignment.BASELINE);
-        layoutHorizontalGroup.addComponent(fieldNameLabel, GroupLayout.DEFAULT_SIZE, labelMaxWidth, GroupLayout.PREFERRED_SIZE);
+        layoutHorizontalGroup.addComponent(fieldNameLabel,
+                GroupLayout.DEFAULT_SIZE,
+                labelMaxWidth,
+                GroupLayout.PREFERRED_SIZE);
         layoutVerticalGroup.addComponent(fieldNameLabel);
         if(!fieldDescription.isEmpty()) {
             fieldNameLabel.setToolTipText(fieldDescription);

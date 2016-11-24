@@ -17,8 +17,8 @@ package richtercloud.reflection.form.builder.panels;
 import java.util.List;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.TableColumn;
+import richtercloud.message.handler.MessageHandler;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
-import richtercloud.reflection.form.builder.message.MessageHandler;
 
 /**
  * An {@link AbstractListPanel} which displays only editable components in one

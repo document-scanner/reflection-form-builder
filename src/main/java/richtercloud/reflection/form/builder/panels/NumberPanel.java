@@ -64,7 +64,15 @@ public abstract class NumberPanel<N extends Number> extends JPanel {
     private JCheckBox nullCheckBox;
     private final Number initialValue;
 
-    public NumberPanel(N initialValue) {
+    /**
+     * Creates a {@code NumberPanel}.
+     * @param initialValue
+     * @param readOnly if {@code true} there'll be no possibility to set the
+     * value in the GUI, but programmatically and the value will be displayed
+     * and updated
+     */
+    public NumberPanel(N initialValue,
+            boolean readOnly) {
         initComponents();
         this.valueSpinner.addChangeListener(new ChangeListener() {
             @Override
@@ -83,6 +91,9 @@ public abstract class NumberPanel<N extends Number> extends JPanel {
             }
         });
         this.initialValue = initialValue;
+        if(readOnly) {
+            this.valueSpinner.setEnabled(false);
+        }
         reset0();
     }
 
@@ -102,6 +113,10 @@ public abstract class NumberPanel<N extends Number> extends JPanel {
         return (N) (nullCheckBox.isSelected() ? null : valueSpinner.getValue());
     }
 
+    /**
+     * Sets the value no matter whether the panel is read-only or not.
+     * @param value the value to set
+     */
     public void setValue(N value) {
         if(value == null) {
             nullCheckBox.setSelected(true);
@@ -144,11 +159,17 @@ public abstract class NumberPanel<N extends Number> extends JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(nullCheckBox)
                 .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(valueSpinner, GroupLayout.DEFAULT_SIZE, 397, Short.MAX_VALUE))
+                .addComponent(valueSpinner,
+                        0,
+                        GroupLayout.DEFAULT_SIZE,
+                        Short.MAX_VALUE))
         );
         layout.setVerticalGroup(this.layoutVerticalGroup
             .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                .addComponent(valueSpinner, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addComponent(valueSpinner,
+                        GroupLayout.PREFERRED_SIZE,
+                        GroupLayout.DEFAULT_SIZE,
+                        GroupLayout.PREFERRED_SIZE)
                 .addComponent(nullCheckBox))
         );
     }

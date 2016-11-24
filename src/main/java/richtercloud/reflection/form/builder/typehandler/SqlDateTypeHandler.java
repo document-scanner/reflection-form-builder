@@ -14,8 +14,6 @@
  */
 package richtercloud.reflection.form.builder.typehandler;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.lang.reflect.Type;
 import java.sql.Date;
 import javax.swing.JComponent;
@@ -23,7 +21,9 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import richtercloud.reflection.form.builder.ComponentHandler;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
-import richtercloud.reflection.form.builder.components.SqlDatePicker;
+import richtercloud.reflection.form.builder.components.NullableComponentUpdateEvent;
+import richtercloud.reflection.form.builder.components.NullableComponentUpdateListener;
+import richtercloud.reflection.form.builder.components.date.SqlDatePicker;
 import richtercloud.reflection.form.builder.fieldhandler.FieldHandlingException;
 import richtercloud.reflection.form.builder.fieldhandler.FieldUpdateEvent;
 import richtercloud.reflection.form.builder.fieldhandler.FieldUpdateListener;
@@ -53,12 +53,10 @@ public class SqlDateTypeHandler implements TypeHandler<Date, FieldUpdateEvent<Da
             IllegalAccessException,
             FieldHandlingException {
         final SqlDatePicker retValue = new SqlDatePicker(fieldValue);
-        retValue.addActionListener(new ActionListener() {
-
+        retValue.addUpdateListener(new NullableComponentUpdateListener<NullableComponentUpdateEvent<Date>>() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                //e.getSource points to a org.jdatepicker.JUtilDatePanel (which isn't 100 % correct given the fact that the action listener is added to a JDatePicker)
-                updateListener.onUpdate(new FieldUpdateEvent<>(retValue.getModel().getValue()));
+            public void onUpdate(NullableComponentUpdateEvent<Date> updateEvent) {
+                updateListener.onUpdate(new FieldUpdateEvent<>(updateEvent.getNewValue()));
             }
         });
         return new ImmutablePair<JComponent, ComponentHandler<?>>(retValue, this);

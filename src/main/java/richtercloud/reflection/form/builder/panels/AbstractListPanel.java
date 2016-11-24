@@ -29,10 +29,10 @@ import javax.swing.table.JTableHeader;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import richtercloud.message.handler.Message;
+import richtercloud.message.handler.MessageHandler;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
 import richtercloud.reflection.form.builder.fieldhandler.FieldHandlingException;
-import richtercloud.reflection.form.builder.message.Message;
-import richtercloud.reflection.form.builder.message.MessageHandler;
 
 /**
  * The superclass of all list panel (both with one or multiple columns). It supports multiple selection, also in multiple intervals of a size >= 1. Provides buttons to add a new item and remove the selected intervals(s). Provides a buttons to move the selected items up and down the list (if multiple items are selected they're moved as if they were the only selected one by one). The up button does nothing for the topmost item if it is selected as does the down button for the bottommost item. The edit button starts editing the item; implementation is up to subclasses (in {@link #editRow() }). The "Select all" and "Invert selection" buttons select all items and invert the selection of items respectively.
@@ -127,6 +127,27 @@ public abstract class AbstractListPanel<T, L extends ListPanelItemListener<T>, M
         this.mainList.setDefaultEditor(Object.class, mainListCellEditor);
         this.messageHandler = messageHandler;
         this.initialValues = initialValues;
+    }
+
+    public void addValue(T value) {
+        this.getMainListModel().addElement(value);
+        for (L listener : this.getItemListeners()) {
+            try {
+                listener.onItemAdded(new ListPanelItemEvent<>(ListPanelItemEvent.EVENT_TYPE_ADDED,
+                        AbstractListPanel.this.getMainListModel().getRowCount(),
+                        AbstractListPanel.this.getMainListModel().getData()));
+            } catch (ListPanelItemEventVetoException ex) {
+                messageHandler.handle(new Message(ex, JOptionPane.ERROR_MESSAGE));
+                return;
+            }
+        }
+        this.mainListModel.fireTableDataChanged();
+        this.updateRowHeights();
+        //open editing dialog immediately because the probability that the user
+        //wants to edit immediately is high
+        this.getMainList().getSelectionModel().setSelectionInterval(this.getMainListModel().getRowCount()-1,
+                this.getMainListModel().getRowCount()-1);
+        editRow0();
     }
 
     public void addItemListener(L itemListener) {
@@ -261,19 +282,7 @@ public abstract class AbstractListPanel<T, L extends ListPanelItemListener<T>, M
         //can't check field annotations, but class annotations and, of course,
         //use field handler
         T newElement = createNewElement();
-        this.getMainListModel().addElement(newElement);
-        for (L listener : this.getItemListeners()) {
-            listener.onItemAdded(new ListPanelItemEvent<>(ListPanelItemEvent.EVENT_TYPE_ADDED,
-                    AbstractListPanel.this.getMainListModel().getRowCount(),
-                    AbstractListPanel.this.getMainListModel().getData()));
-        }
-        this.mainListModel.fireTableDataChanged();
-        this.updateRowHeights();
-        //open editing dialog immediately because the probability that the user
-        //wants to edit immediately is high
-        this.getMainList().getSelectionModel().setSelectionInterval(this.getMainListModel().getRowCount()-1,
-                this.getMainListModel().getRowCount()-1);
-        editRow0();
+        addValue(newElement);
     }//GEN-LAST:event_addButtonActionPerformed
 
     private void removeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeButtonActionPerformed
@@ -300,9 +309,14 @@ public abstract class AbstractListPanel<T, L extends ListPanelItemListener<T>, M
         for (int selectedRow : selectedRowsSorted) {
             this.mainListModel.removeElement(selectedRow); //handles event firing
             for (ListPanelItemListener<T> itemListener : this.getItemListeners()) {
-                itemListener.onItemRemoved(new ListPanelItemEvent<>(ListPanelItemEvent.EVENT_TYPE_REMOVED,
-                        selectedRow,
-                        this.mainListModel.getData()));
+                try {
+                    itemListener.onItemRemoved(new ListPanelItemEvent<>(ListPanelItemEvent.EVENT_TYPE_REMOVED,
+                            selectedRow,
+                            this.mainListModel.getData()));
+                } catch (ListPanelItemEventVetoException ex) {
+                    messageHandler.handle(new Message(ex, JOptionPane.ERROR_MESSAGE));
+                    return;
+                }
             }
         }
         this.mainListModel.fireTableDataChanged();

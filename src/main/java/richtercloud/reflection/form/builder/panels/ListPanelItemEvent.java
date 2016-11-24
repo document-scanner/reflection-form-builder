@@ -14,6 +14,7 @@
  */
 package richtercloud.reflection.form.builder.panels;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -65,7 +66,7 @@ public class ListPanelItemEvent<T> {
     - must not be unmodifiable because Hibernate will invoke clear on it
     */
     public List<T> getItem() {
-        return item;
+        return Collections.unmodifiableList(item);
     }
 
     public int getIndex() {

@@ -19,7 +19,7 @@ import java.lang.reflect.Type;
 import java.util.Date;
 import javax.swing.JComponent;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
-import richtercloud.reflection.form.builder.components.UtilDatePicker;
+import richtercloud.reflection.form.builder.components.date.UtilDatePicker;
 import richtercloud.reflection.form.builder.typehandler.DateTypeHandler;
 
 /**

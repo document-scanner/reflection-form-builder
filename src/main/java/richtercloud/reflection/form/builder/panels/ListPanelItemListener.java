@@ -15,12 +15,14 @@
 package richtercloud.reflection.form.builder.panels;
 
 /**
+ * A listener to track adding and removing from selection lists in different
+ * list panels.
  *
  * @author richter
  */
 public interface ListPanelItemListener<T> {
 
-    void onItemAdded(ListPanelItemEvent<T> event);
+    void onItemAdded(ListPanelItemEvent<T> event) throws ListPanelItemEventVetoException;
 
-    void onItemRemoved(ListPanelItemEvent<T> event);
+    void onItemRemoved(ListPanelItemEvent<T> event) throws ListPanelItemEventVetoException;
 }

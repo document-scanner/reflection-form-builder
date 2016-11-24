@@ -26,11 +26,11 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import richtercloud.message.handler.LoggerMessageHandler;
+import richtercloud.message.handler.MessageHandler;
 import richtercloud.reflection.form.builder.fieldhandler.FieldHandler;
 import richtercloud.reflection.form.builder.fieldhandler.FieldHandlingException;
 import richtercloud.reflection.form.builder.fieldhandler.FieldUpdateListener;
-import richtercloud.reflection.form.builder.message.LoggerMessageHandler;
-import richtercloud.reflection.form.builder.message.MessageHandler;
 
 /**
  *

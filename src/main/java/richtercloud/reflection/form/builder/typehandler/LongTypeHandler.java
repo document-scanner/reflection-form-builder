@@ -50,7 +50,9 @@ public class LongTypeHandler implements TypeHandler<Long, FieldUpdateEvent<Long>
             ReflectionFormBuilder reflectionFormBuilder) throws IllegalArgumentException,
             IllegalAccessException,
             FieldHandlingException {
-        final LongPanel retValue = new LongPanel(fieldValue);
+        final LongPanel retValue = new LongPanel(fieldValue,
+                false //readOnly (doesn't make sense to specify true)
+        );
         retValue.addUpdateListener(new NumberPanelUpdateListener<Long>() {
 
             @Override

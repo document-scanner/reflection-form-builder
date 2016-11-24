@@ -21,6 +21,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import richtercloud.message.handler.MessageHandler;
 import richtercloud.reflection.form.builder.AnyType;
 import richtercloud.reflection.form.builder.fieldhandler.BooleanFieldHandler;
 import richtercloud.reflection.form.builder.fieldhandler.BooleanListFieldHandler;
@@ -41,7 +42,6 @@ import richtercloud.reflection.form.builder.fieldhandler.SimpleEntityListFieldHa
 import richtercloud.reflection.form.builder.fieldhandler.SqlDateFieldHandler;
 import richtercloud.reflection.form.builder.fieldhandler.StringFieldHandler;
 import richtercloud.reflection.form.builder.fieldhandler.StringListFieldHandler;
-import richtercloud.reflection.form.builder.message.MessageHandler;
 
 /**
  *

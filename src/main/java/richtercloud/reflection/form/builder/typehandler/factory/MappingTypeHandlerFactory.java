@@ -18,6 +18,7 @@ import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import richtercloud.message.handler.MessageHandler;
 import static richtercloud.reflection.form.builder.fieldhandler.factory.MappingFieldHandlerFactory.createAnyTypeListTypeToken;
 import static richtercloud.reflection.form.builder.fieldhandler.factory.MappingFieldHandlerFactory.createBooleanListTypeToken;
 import static richtercloud.reflection.form.builder.fieldhandler.factory.MappingFieldHandlerFactory.createBooleanTypeToken;
@@ -31,7 +32,6 @@ import static richtercloud.reflection.form.builder.fieldhandler.factory.MappingF
 import static richtercloud.reflection.form.builder.fieldhandler.factory.MappingFieldHandlerFactory.createSqlDateTypeToken;
 import static richtercloud.reflection.form.builder.fieldhandler.factory.MappingFieldHandlerFactory.createStringListTypeToken;
 import static richtercloud.reflection.form.builder.fieldhandler.factory.MappingFieldHandlerFactory.createStringTypeToken;
-import richtercloud.reflection.form.builder.message.MessageHandler;
 import richtercloud.reflection.form.builder.typehandler.BooleanListTypeHandler;
 import richtercloud.reflection.form.builder.typehandler.BooleanTypeHandler;
 import richtercloud.reflection.form.builder.typehandler.DateTypeHandler;

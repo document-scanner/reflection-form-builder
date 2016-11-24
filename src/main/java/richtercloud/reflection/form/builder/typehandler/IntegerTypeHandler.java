@@ -52,7 +52,9 @@ public class IntegerTypeHandler implements TypeHandler<Integer, FieldUpdateEvent
             FieldHandlingException {
         //@TODO: handle validaton annotations (should cover all cases, so no
         // need to develop own annotations
-        final IntegerPanel retValue = new IntegerPanel(fieldValue);
+        final IntegerPanel retValue = new IntegerPanel(fieldValue,
+                false //readOnly (doesn't make sense to specify true)
+        );
         retValue.addUpdateListener(new NumberPanelUpdateListener<Integer>() {
 
             @Override

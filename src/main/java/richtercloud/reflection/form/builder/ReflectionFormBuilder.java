@@ -25,11 +25,11 @@ import javax.swing.GroupLayout.Group;
 import javax.swing.JComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import richtercloud.message.handler.MessageHandler;
 import richtercloud.reflection.form.builder.fieldhandler.FieldHandler;
 import richtercloud.reflection.form.builder.fieldhandler.FieldHandlingException;
 import richtercloud.reflection.form.builder.fieldhandler.FieldUpdateEvent;
 import richtercloud.reflection.form.builder.fieldhandler.FieldUpdateListener;
-import richtercloud.reflection.form.builder.message.MessageHandler;
 
 /**
  * Builds a {@link ReflectionFormPanel} by recursing over all fields of all
@@ -163,7 +163,7 @@ public class ReflectionFormBuilder<F extends FieldRetriever> {
                     @Override
                     public void onUpdate(FieldUpdateEvent event) {
                         try {
-                            field.set(instance, event.getNewValue());
+                            onFieldUpdate(event, field, instance);
                         } catch (IllegalArgumentException | IllegalAccessException ex) {
                             throw new RuntimeException(ex);
                         }
@@ -171,6 +171,10 @@ public class ReflectionFormBuilder<F extends FieldRetriever> {
                 },
                 this);
         return retValue;
+    }
+
+    protected void onFieldUpdate(FieldUpdateEvent event, Field field, Object instance) throws IllegalArgumentException, IllegalAccessException {
+        field.set(instance, event.getNewValue());
     }
 
     /**

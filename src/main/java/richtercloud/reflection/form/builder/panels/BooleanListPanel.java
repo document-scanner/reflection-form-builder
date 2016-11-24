@@ -19,8 +19,8 @@ import java.awt.event.MouseEvent;
 import java.util.List;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
+import richtercloud.message.handler.MessageHandler;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
-import richtercloud.reflection.form.builder.message.MessageHandler;
 
 /**
  *

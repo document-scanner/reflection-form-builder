@@ -30,13 +30,13 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import richtercloud.message.handler.LoggerMessageHandler;
+import richtercloud.message.handler.MessageHandler;
 import richtercloud.reflection.form.builder.AnyType;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
 import richtercloud.reflection.form.builder.TestEntity;
 import richtercloud.reflection.form.builder.TestEntityCollection;
 import richtercloud.reflection.form.builder.fieldhandler.factory.MappingFieldHandlerFactory;
-import richtercloud.reflection.form.builder.message.LoggerMessageHandler;
-import richtercloud.reflection.form.builder.message.MessageHandler;
 
 /**
  *

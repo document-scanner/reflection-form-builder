@@ -58,7 +58,7 @@ public class ReflectionFormPanel<U extends ReflectionFormPanelUpdateListener> ex
     private GroupLayout.Group horizontalSequentialGroup;
     private GroupLayout.Group verticalSequentialGroup;
     private Map<Field, JComponent> fieldMapping = new HashMap<>();
-    private Object instance;
+    private final Object instance;
     private Class<?> entityClass;
     private final Set<U> updateListeners = new HashSet<>();
     /**
@@ -129,7 +129,12 @@ public class ReflectionFormPanel<U extends ReflectionFormPanelUpdateListener> ex
         return this.fieldMapping.get(field);
     }
 
-    public Object retrieveInstance() throws IllegalArgumentException, IllegalAccessException {
+    /**
+     * The instance which this {@code ReflectionFormPanel} manages as it's
+     * passed at creation of the panel.
+     * @return
+     */
+    public Object retrieveInstance() {
         return this.instance;
     }
 

@@ -53,7 +53,9 @@ public class DoubleTypeHandler implements TypeHandler<Double, FieldUpdateEvent<D
             FieldHandlingException {
         //@TODO: handle validaton annotations (should cover all cases, so no
         // need to develop own annotations
-        final DoublePanel retValue = new DoublePanel(fieldValue);
+        final DoublePanel retValue = new DoublePanel(fieldValue,
+                false //readOnly (doesn't make sense to specify true)
+        );
         retValue.addUpdateListener(new NumberPanelUpdateListener<Double>() {
 
             @Override

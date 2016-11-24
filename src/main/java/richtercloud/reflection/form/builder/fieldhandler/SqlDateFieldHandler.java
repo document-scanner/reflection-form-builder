@@ -19,7 +19,7 @@ import java.lang.reflect.Type;
 import java.sql.Date;
 import javax.swing.JComponent;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
-import richtercloud.reflection.form.builder.components.SqlDatePicker;
+import richtercloud.reflection.form.builder.components.date.SqlDatePicker;
 import richtercloud.reflection.form.builder.typehandler.SqlDateTypeHandler;
 
 /**

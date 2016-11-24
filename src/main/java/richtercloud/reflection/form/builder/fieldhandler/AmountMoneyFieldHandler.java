@@ -19,15 +19,16 @@ import javax.swing.JComponent;
 import org.jscience.economics.money.Currency;
 import org.jscience.economics.money.Money;
 import org.jscience.physics.amount.Amount;
+import richtercloud.message.handler.MessageHandler;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
-import richtercloud.reflection.form.builder.components.AmountMoneyCurrencyStorage;
-import richtercloud.reflection.form.builder.components.AmountMoneyCurrencyStorageException;
-import richtercloud.reflection.form.builder.components.AmountMoneyExchangeRateRetriever;
-import richtercloud.reflection.form.builder.components.AmountMoneyPanel;
-import richtercloud.reflection.form.builder.components.AmountMoneyPanelUpdateEvent;
-import richtercloud.reflection.form.builder.components.AmountMoneyPanelUpdateListener;
-import richtercloud.reflection.form.builder.components.AmountMoneyUsageStatisticsStorage;
-import richtercloud.reflection.form.builder.message.MessageHandler;
+import richtercloud.reflection.form.builder.components.NullableComponentUpdateEvent;
+import richtercloud.reflection.form.builder.components.NullableComponentUpdateListener;
+import richtercloud.reflection.form.builder.components.money.AmountMoneyCurrencyStorage;
+import richtercloud.reflection.form.builder.components.money.AmountMoneyCurrencyStorageException;
+import richtercloud.reflection.form.builder.components.money.AmountMoneyExchangeRateRetriever;
+import richtercloud.reflection.form.builder.components.money.AmountMoneyExchangeRateRetrieverException;
+import richtercloud.reflection.form.builder.components.money.AmountMoneyPanel;
+import richtercloud.reflection.form.builder.components.money.AmountMoneyUsageStatisticsStorage;
 
 /**
  *
@@ -40,17 +41,17 @@ types
 */
 public class AmountMoneyFieldHandler implements FieldHandler<Amount<Money>, FieldUpdateEvent<Amount<Money>>, ReflectionFormBuilder, AmountMoneyPanel> {
     private final AmountMoneyUsageStatisticsStorage amountMoneyUsageStatisticsStorage;
-    private final AmountMoneyExchangeRateRetriever amountMoneyConversionRateRetriever;
-    private final AmountMoneyCurrencyStorage additionalCurrencies;
+    private final AmountMoneyExchangeRateRetriever amountMoneyExchangeRateRetriever;
+    private final AmountMoneyCurrencyStorage amountMoneyCurrencyStorage;
     private final MessageHandler messageHandler;
 
     public AmountMoneyFieldHandler(AmountMoneyUsageStatisticsStorage amountMoneyUsageStatisticsStorage,
             AmountMoneyExchangeRateRetriever amountMoneyConversionRateRetriever,
-            AmountMoneyCurrencyStorage additionalCurrencies,
+            AmountMoneyCurrencyStorage amountMoneyCurrencyStorage,
             MessageHandler messageHandler) {
         this.amountMoneyUsageStatisticsStorage = amountMoneyUsageStatisticsStorage;
-        this.amountMoneyConversionRateRetriever = amountMoneyConversionRateRetriever;
-        this.additionalCurrencies = additionalCurrencies;
+        this.amountMoneyExchangeRateRetriever = amountMoneyConversionRateRetriever;
+        this.amountMoneyCurrencyStorage = amountMoneyCurrencyStorage;
         this.messageHandler = messageHandler;
     }
 
@@ -58,20 +59,22 @@ public class AmountMoneyFieldHandler implements FieldHandler<Amount<Money>, Fiel
     public JComponent handle(Field field,
             Object instance,
             final FieldUpdateListener<FieldUpdateEvent<Amount<Money>>> updateListener,
-            ReflectionFormBuilder reflectionFormBuilder) throws FieldHandlingException {
+            ReflectionFormBuilder reflectionFormBuilder) throws FieldHandlingException, IllegalArgumentException, IllegalAccessException {
         final AmountMoneyPanel retValue;
         try {
-            retValue = new AmountMoneyPanel(additionalCurrencies,
+            Amount<Money> fieldValue = (Amount<Money>) field.get(instance);
+            retValue = new AmountMoneyPanel(fieldValue, //initialValue
+                    amountMoneyCurrencyStorage,
                     amountMoneyUsageStatisticsStorage,
-                    amountMoneyConversionRateRetriever,
+                    amountMoneyExchangeRateRetriever,
                     messageHandler);
-        } catch (AmountMoneyCurrencyStorageException ex) {
+        } catch (AmountMoneyExchangeRateRetrieverException | AmountMoneyCurrencyStorageException ex) {
             throw new FieldHandlingException(ex);
         }
-        retValue.addUpdateListener(new AmountMoneyPanelUpdateListener() {
+        retValue.addUpdateListener(new NullableComponentUpdateListener<NullableComponentUpdateEvent<Amount<Money>>>() {
             @Override
-            public void onUpdate(AmountMoneyPanelUpdateEvent amountMoneyPanelUpdateEvent) {
-                updateListener.onUpdate(new FieldUpdateEvent<>(retValue.getValue()));
+            public void onUpdate(NullableComponentUpdateEvent<Amount<Money>> amountMoneyPanelUpdateEvent) {
+                updateListener.onUpdate(new FieldUpdateEvent<>(amountMoneyPanelUpdateEvent.getNewValue()));
             }
         });
         return retValue;

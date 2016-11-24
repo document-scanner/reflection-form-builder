@@ -21,8 +21,10 @@ package richtercloud.reflection.form.builder.panels;
 public class LongPanel extends NumberPanel<Long> {
     private static final long serialVersionUID = 1L;
 
-    public LongPanel(Long initialValue) {
-        super(initialValue);
+    public LongPanel(Long initialValue,
+            boolean readOnly) {
+        super(initialValue,
+                readOnly);
     }
 
 }

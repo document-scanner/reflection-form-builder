@@ -21,8 +21,10 @@ package richtercloud.reflection.form.builder.panels;
 public class FloatPanel extends NumberPanel<Float> {
     private static final long serialVersionUID = 1L;
 
-    public FloatPanel(Float initialValue) {
-        super(initialValue);
+    public FloatPanel(Float initialValue,
+            boolean readOnly) {
+        super(initialValue,
+                readOnly);
     }
 
 }

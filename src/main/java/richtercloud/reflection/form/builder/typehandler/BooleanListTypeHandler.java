@@ -15,15 +15,16 @@
 package richtercloud.reflection.form.builder.typehandler;
 
 import java.lang.reflect.Type;
+import java.util.LinkedList;
 import java.util.List;
 import javax.swing.JComponent;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import richtercloud.message.handler.MessageHandler;
 import richtercloud.reflection.form.builder.ComponentHandler;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
 import richtercloud.reflection.form.builder.fieldhandler.FieldUpdateEvent;
 import richtercloud.reflection.form.builder.fieldhandler.FieldUpdateListener;
-import richtercloud.reflection.form.builder.message.MessageHandler;
 import richtercloud.reflection.form.builder.panels.BooleanListPanel;
 import richtercloud.reflection.form.builder.panels.EditableListPanelItemListener;
 import richtercloud.reflection.form.builder.panels.ListPanelItemEvent;
@@ -50,17 +51,17 @@ public class BooleanListTypeHandler extends AbstractListTypeHandler<List<Boolean
 
             @Override
             public void onItemChanged(ListPanelItemEvent<Boolean> event) {
-                updateListener.onUpdate(new FieldUpdateEvent<>(event.getItem()));
+                updateListener.onUpdate(new FieldUpdateEvent<List<Boolean>>(new LinkedList<>(event.getItem())));
             }
 
             @Override
             public void onItemAdded(ListPanelItemEvent<Boolean> event) {
-                updateListener.onUpdate(new FieldUpdateEvent<>(event.getItem()));
+                updateListener.onUpdate(new FieldUpdateEvent<List<Boolean>>(new LinkedList<>(event.getItem())));
             }
 
             @Override
             public void onItemRemoved(ListPanelItemEvent<Boolean> event) {
-                updateListener.onUpdate(new FieldUpdateEvent<>(event.getItem()));
+                updateListener.onUpdate(new FieldUpdateEvent<List<Boolean>>(new LinkedList<>(event.getItem())));
             }
         });
         return new ImmutablePair<JComponent, ComponentHandler<?>>(retValue, this);
