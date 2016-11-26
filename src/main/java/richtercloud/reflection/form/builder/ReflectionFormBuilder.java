@@ -231,7 +231,8 @@ public class ReflectionFormBuilder<F extends FieldRetriever> {
             ReflectionFormFieldLabel label = new ReflectionFormFieldLabel(fieldName,
                     fieldDescription,
                     fieldDescriptionDialogTitle);
-            horizontalLabelParallelGroup.addComponent(label, (int) (label.getMinimumSize().getWidth() < LABEL_WIDTH_MIN ? label.getMinimumSize().getWidth() : LABEL_WIDTH_MIN), //min
+            horizontalLabelParallelGroup.addComponent(label,
+                    (int) (label.getMinimumSize().getWidth() < LABEL_WIDTH_MIN ? label.getMinimumSize().getWidth() : LABEL_WIDTH_MIN), //min
                     javax.swing.GroupLayout.PREFERRED_SIZE, //pref
                     javax.swing.GroupLayout.PREFERRED_SIZE //max
             );
@@ -245,10 +246,13 @@ public class ReflectionFormBuilder<F extends FieldRetriever> {
             Group verticalFieldGroup = layout.createParallelGroup(GroupLayout.Alignment.BASELINE);
             verticalFieldGroup.addComponent(label);
             verticalFieldGroup.addComponent(comp);
-            reflectionFormPanel.getVerticalMainGroup().addGroup(verticalFieldGroup);
+            reflectionFormPanel.getVerticalMainGroup()
+                    .addGroup(verticalFieldGroup);
             fieldMapping.put(field, comp);
         }
-        reflectionFormPanel.getHorizontalMainGroup().addGroup(horizontalLabelParallelGroup).addGroup(horizontalCompParallelGroup);
+        reflectionFormPanel.getHorizontalMainGroup()
+                .addGroup(horizontalLabelParallelGroup)
+                .addGroup(horizontalCompParallelGroup);
         reflectionFormPanel.revalidate();
         reflectionFormPanel.repaint();
     }
