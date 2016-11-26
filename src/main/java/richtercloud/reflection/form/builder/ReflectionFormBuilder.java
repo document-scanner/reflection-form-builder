@@ -253,8 +253,6 @@ public class ReflectionFormBuilder<F extends FieldRetriever> {
         reflectionFormPanel.getHorizontalMainGroup()
                 .addGroup(horizontalLabelParallelGroup)
                 .addGroup(horizontalCompParallelGroup);
-        reflectionFormPanel.revalidate();
-        reflectionFormPanel.repaint();
     }
 
     /**
