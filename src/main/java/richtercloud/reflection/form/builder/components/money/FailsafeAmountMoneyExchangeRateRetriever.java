@@ -15,10 +15,7 @@
 package richtercloud.reflection.form.builder.components.money;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
-import java.util.ListIterator;
 import java.util.Queue;
 import java.util.Set;
 import org.jscience.economics.money.Currency;
@@ -29,15 +26,37 @@ import org.jscience.economics.money.Currency;
  * in a try-catch block and delegates to the next candidate if the call to the
  * preceeding fails.
  *
+ * Supported currencies are those supported by at least one
+ * {@link AmountMoneyExchangeRateRetriever} which returns a result. That's
+ * necessary because otherwise one failing
+ * {@link AmountMoneyExchangeRateRetriever} causes the
+ * {@link FailsafeAmountMoneyExchangeRateRetriever} to fail which isn't
+ * intended.
+ *
  * Note that this doesn't make the call really, but only
  * almost failsafe. The name is still fine imo.
  *
  * @author richter
  */
+/*
+internal implementation notes:
+- providing a flag to check availability at every operation is difficult because
+it interferes with caching functionality
+*/
 public class FailsafeAmountMoneyExchangeRateRetriever implements AmountMoneyExchangeRateRetriever {
+    public final static int AVAILABLE_RETRIEVER_MIN_DEFAULT = 1;
     private final Queue<AmountMoneyExchangeRateRetriever> retrieverQueue = new LinkedList<>();
+    /**
+     * How many {@link AmountMoneyExchangeRateRetriever} have to be available.
+     */
+    private final int availableRetrieverMin;
 
     public FailsafeAmountMoneyExchangeRateRetriever() {
+        this(AVAILABLE_RETRIEVER_MIN_DEFAULT);
+    }
+
+    public FailsafeAmountMoneyExchangeRateRetriever(int availableRetrieverMin) {
+        this.availableRetrieverMin = availableRetrieverMin;
         FixerAmountMoneyExchangeRateRetriever fixerAmountMoneyExchangeRateRetriever = new FixerAmountMoneyExchangeRateRetriever();
         ECBAmountMoneyExchangeRateRetriever eCBAmountMoneyExchangeRateRetriever = new ECBAmountMoneyExchangeRateRetriever();
         retrieverQueue.add(fixerAmountMoneyExchangeRateRetriever);
@@ -45,6 +64,12 @@ public class FailsafeAmountMoneyExchangeRateRetriever implements AmountMoneyExch
     }
 
     public FailsafeAmountMoneyExchangeRateRetriever(Set<AmountMoneyExchangeRateRetriever> fallbackRetrievers) {
+        this(AVAILABLE_RETRIEVER_MIN_DEFAULT, fallbackRetrievers);
+    }
+
+    public FailsafeAmountMoneyExchangeRateRetriever(int availableRetrieverMin,
+            Set<AmountMoneyExchangeRateRetriever> fallbackRetrievers) {
+        this.availableRetrieverMin = availableRetrieverMin;
         this.retrieverQueue.addAll(fallbackRetrievers);
     }
 
@@ -58,32 +83,23 @@ public class FailsafeAmountMoneyExchangeRateRetriever implements AmountMoneyExch
     public Set<Currency> getSupportedCurrencies() throws AmountMoneyExchangeRateRetrieverException {
         assert retrieverQueue.size() >= 2; //otherwise failsafe doesn't make
             //sense
-        Iterator<AmountMoneyExchangeRateRetriever> retrieverItr = retrieverQueue.iterator();
-            //needs to be a list in order to allow deletion with ListIterator
-            //below
-        List<Currency> firstRetrieverSupportedCurrencies = new LinkedList<>();
-        try {
-            firstRetrieverSupportedCurrencies = new LinkedList<>(retrieverItr.next().getSupportedCurrencies());
-        } catch(AmountMoneyExchangeRateRetrieverException ex) {
-            //skip (assertion tested above)
-        }
-        while(retrieverItr.hasNext()) {
-            AmountMoneyExchangeRateRetriever retrieverNxt = retrieverItr.next();
-            ListIterator<Currency> firstRetrieverSupportedCurrenciesItr = firstRetrieverSupportedCurrencies.listIterator();
-            while(firstRetrieverSupportedCurrenciesItr.hasNext()) {
-                Currency firstRetrieverSupportedCurrency = firstRetrieverSupportedCurrenciesItr.next();
-                Set<Currency> retrieverNxtSupportedCurrencies = new HashSet<>();
-                try {
-                    retrieverNxtSupportedCurrencies = retrieverNxt.getSupportedCurrencies();
-                }catch(AmountMoneyExchangeRateRetrieverException ex) {
-                    //skip
-                }
-                if(!retrieverNxtSupportedCurrencies.contains(firstRetrieverSupportedCurrency)) {
-                    firstRetrieverSupportedCurrenciesItr.remove();
-                }
+        Set<Currency> retValue = new HashSet<>();
+        int availableRetrieverCount = 0;
+        for(AmountMoneyExchangeRateRetriever retriever : retrieverQueue) {
+            try {
+                Set<Currency> retrieverSupportedCurrencies = retriever.getSupportedCurrencies();
+                retValue.addAll(retrieverSupportedCurrencies);
+                availableRetrieverCount++;
+            }catch(AmountMoneyExchangeRateRetrieverException ex) {
+                //skip (assertion checked above)
             }
         }
-        return new HashSet<>(firstRetrieverSupportedCurrencies);
+        if(availableRetrieverCount < this.availableRetrieverMin) {
+            throw new AmountMoneyExchangeRateRetrieverException(String.format("Only %d of %d required retrievers were available",
+                    availableRetrieverCount,
+                    this.availableRetrieverMin));
+        }
+        return retValue;
     }
 
     @Override

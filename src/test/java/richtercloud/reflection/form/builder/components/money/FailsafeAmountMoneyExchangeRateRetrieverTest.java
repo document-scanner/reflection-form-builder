@@ -41,7 +41,7 @@ public class FailsafeAmountMoneyExchangeRateRetrieverTest {
         when(retriever2.getSupportedCurrencies()).thenReturn(retriever2SupportedCurrencies);
         FailsafeAmountMoneyExchangeRateRetriever instance = new FailsafeAmountMoneyExchangeRateRetriever(new HashSet<>(Arrays.asList(retriever1,
                 retriever2)));
-        Set<Currency> expResult = new HashSet<>(Arrays.asList(Currency.CAD, Currency.CNY));
+        Set<Currency> expResult = new HashSet<>(Arrays.asList(Currency.AUD, Currency.CAD, Currency.CNY, Currency.EUR));
         Set<Currency> result = instance.getSupportedCurrencies();
         assertEquals(expResult, result);
     }
