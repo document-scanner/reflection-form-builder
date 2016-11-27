@@ -86,21 +86,6 @@ public class AmountMoneyComponent extends javax.swing.JPanel {
     }
 
     /**
-     * Creates a new AmountMoneyPanel with {@link #DEFAULT_CURRENCIES}.
-     * @param amountMoneyUsageStatisticsStorage
-     * @param messageHandler
-     * @throws richtercloud.reflection.form.builder.components.money.AmountMoneyCurrencyStorageException
-     */
-    public AmountMoneyComponent(AmountMoneyCurrencyStorage amountMoneyCurrencyStorage,
-            AmountMoneyUsageStatisticsStorage amountMoneyUsageStatisticsStorage,
-            MessageHandler messageHandler) throws AmountMoneyCurrencyStorageException, AmountMoneyExchangeRateRetrieverException {
-        this(amountMoneyCurrencyStorage,
-                amountMoneyUsageStatisticsStorage,
-                new FixerAmountMoneyExchangeRateRetriever(),
-                messageHandler);
-    }
-
-    /**
      * Creates a new AmountMoneyPanel with {@link #DEFAULT_CURRENCIES} and
      * {@code additionalCurrencies}.
      * @param amountMoneyCurrencyStorage

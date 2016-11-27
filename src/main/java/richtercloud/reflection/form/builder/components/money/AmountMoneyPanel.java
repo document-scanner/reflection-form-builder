@@ -37,6 +37,7 @@ public class AmountMoneyPanel extends NullableComponent<Amount<Money>, AmountMon
         super(initialValue,
                 new AmountMoneyComponent(amountMoneyCurrencyStorage,
                         amountMoneyUsageStatisticsStorage,
+                        amountMoneyExchangeRateRetriever,
                         messageHandler));
         getMainComponent().addUpdateListener(new AmountMoneyComponentUpdateListener() {
             @Override
