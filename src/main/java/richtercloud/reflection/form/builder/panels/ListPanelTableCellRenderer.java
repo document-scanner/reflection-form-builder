@@ -50,7 +50,6 @@ public abstract class ListPanelTableCellRenderer<C extends JComponent> implement
             this.componentPanel.setBorder(BorderFactory.createEmptyBorder());
             //this.componentPanel.setBackground(Color.white);
         }
-        this.componentPanel.validate();
         this.componentPanel.setSize(this.componentPanel.getPreferredSize());
         return this.componentPanel;
     }
