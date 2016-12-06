@@ -37,7 +37,7 @@ public abstract class CachedOnlineAmountMoneyExchangeRateRetriever extends Onlin
     private Pair<Map<Currency, Double>, Currency> result;
         //Needs to be one instance in order to allow passing of the result after
         //fetch in subclasses at once
-    private final Date cacheTimestamp = null;
+    private Date cacheTimestamp = null;
     private long cacheExpirationMillis = 60*60*1000; //1 hour
 
     public Pair<Map<Currency, Double>, Currency> getResult() throws AmountMoneyExchangeRateRetrieverException {
@@ -48,6 +48,7 @@ public abstract class CachedOnlineAmountMoneyExchangeRateRetriever extends Onlin
                 || cacheTimestamp == null
                 || cacheTimestampNew.getTime() - cacheTimestamp.getTime() > cacheExpirationMillis) {
             result = fetchResult();
+            cacheTimestamp = cacheTimestampNew;
         }
         return result;
     }
