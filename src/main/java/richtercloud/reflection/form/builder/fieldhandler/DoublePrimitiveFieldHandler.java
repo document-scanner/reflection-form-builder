@@ -44,7 +44,12 @@ public class DoublePrimitiveFieldHandler implements FieldHandler<Double, FieldUp
         //@TODO: handle validaton annotations (should cover all cases, so no
         // need to develop own annotations
         double fieldValue = field.getDouble(instance);
-        JSpinner retValue = new JSpinner(new SpinnerNumberModel((double) fieldValue, Double.MIN_VALUE, Double.MAX_VALUE, 0.1));
+        JSpinner retValue = new JSpinner(new SpinnerNumberModel((double) fieldValue,
+                Double.NEGATIVE_INFINITY, //minimum (Double.MIN_VALUE causes
+                    //fieldValue to be lesser than minimum because
+                    //Double.MIN_VALUE is > 0.0
+                Double.POSITIVE_INFINITY,
+                0.1));
         retValue.addChangeListener(new ChangeListener() {
 
             @Override
