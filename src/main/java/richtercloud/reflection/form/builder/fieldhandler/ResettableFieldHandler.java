@@ -89,6 +89,9 @@ public abstract class ResettableFieldHandler<T, E extends FieldUpdateEvent<T>, R
     @Override
     public void reset(C component) {
         ComponentHandler classPartHandler = this.componentMapping.get(component);
+        if(classPartHandler == null) {
+            throw new IllegalArgumentException(String.format("component '%s' doesn't have a %s mapped in componentMapping", component, ComponentHandler.class));
+        }
         classPartHandler.reset(component);
     }
 }
