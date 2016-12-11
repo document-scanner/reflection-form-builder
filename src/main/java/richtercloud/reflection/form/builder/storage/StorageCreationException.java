@@ -21,6 +21,10 @@ package richtercloud.reflection.form.builder.storage;
 public class StorageCreationException extends Exception {
     private static final long serialVersionUID = 1L;
 
+    public StorageCreationException(String message) {
+        super(message);
+    }
+
     public StorageCreationException(Exception cause) {
         super("An exception during creation of storage has occured, see nested exception for details",
                 cause);
