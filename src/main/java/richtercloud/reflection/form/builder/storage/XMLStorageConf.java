@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.List;
+import java.util.Objects;
 
 /**
  *
@@ -56,5 +57,30 @@ public class XMLStorageConf implements StorageConf {
     @Override
     public String getLongDescription() {
         return "Stores data in an XML file (quite inefficient)";
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 29 * hash + Objects.hashCode(this.file);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final XMLStorageConf other = (XMLStorageConf) obj;
+        if (!Objects.equals(this.file, other.file)) {
+            return false;
+        }
+        return true;
     }
 }
