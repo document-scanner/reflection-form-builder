@@ -40,12 +40,12 @@ public class XMLStorageConf implements StorageConf {
     }
 
     @Override
-    public void validate() throws StorageConfInitializationException {
+    public void validate() throws StorageConfValidationException {
         XStream xStream = new XStream();
         try {
             List<Object> existingObjects = (List<Object>) xStream.fromXML(new FileInputStream(file));
         } catch (FileNotFoundException ex) {
-            throw new StorageConfInitializationException(ex);
+            throw new StorageConfValidationException(ex);
         }
     }
 

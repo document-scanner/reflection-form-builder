@@ -81,6 +81,11 @@ public class XMLStorage<T extends Identifiable> implements Storage<T, XMLStorage
     }
 
     @Override
+    public void start() throws StorageCreationException {
+        //nothing to do
+    }
+
+    @Override
     public void shutdown() {
         //nothing to do
     }

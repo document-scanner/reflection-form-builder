@@ -26,7 +26,7 @@ public interface StorageConf {
      * guide if changes were detected).
      * @throws richtercloud.document.scanner.gui.conf.StorageConfInitializationException
      */
-    void validate() throws StorageConfInitializationException;
+    void validate() throws StorageConfValidationException;
 
     /**
      * A one line description (for displaying in a list or else).

@@ -15,24 +15,26 @@
 package richtercloud.reflection.form.builder.storage;
 
 /**
+ * Indicates an invalid {@link StorageConf} most likely spotted in
+ * {@link StorageConf#validate() }.
  *
  * @author richter
  */
-public class StorageConfInitializationException extends Exception {
+public class StorageConfValidationException extends Exception {
     private static final long serialVersionUID = 1L;
 
-    public StorageConfInitializationException() {
+    public StorageConfValidationException() {
     }
 
-    public StorageConfInitializationException(String message) {
+    public StorageConfValidationException(String message) {
         super(message);
     }
 
-    public StorageConfInitializationException(String message, Throwable cause) {
+    public StorageConfValidationException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public StorageConfInitializationException(Throwable cause) {
+    public StorageConfValidationException(Throwable cause) {
         super(cause);
     }
 

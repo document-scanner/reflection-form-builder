@@ -43,6 +43,24 @@ public interface Storage<T, C extends StorageConf> {
     void update(Object object) throws StorageException;
 
     /**
+     * Starts referenced resources. Needs to be called after creating an
+     * instance of any subclass (except if the subclass especially states that
+     * it's not necessary).
+     */
+    /*
+    internal implementation notes:
+    - This is necessary in order to keep process handling properties for MySQL
+    and PostgreSQL server process control output of AbstractPersistenceStorage
+    and keep a basic sanity which is lost easily when using overridable methods
+    in constructor of AbstractPersistenceStorage (and it's very bad style anyway
+    and for a reason). It's perfectly fine to ask to initialize resource after
+    object creation, especially if a shutdown method is provided.
+    - not sure, but this might be an interceptor pattern and it might be right
+    or wrong (there might be something easier) to use it here
+    */
+    void start() throws StorageCreationException;
+
+    /**
      * Frees eventually aquired resources.
      */
     void shutdown();
