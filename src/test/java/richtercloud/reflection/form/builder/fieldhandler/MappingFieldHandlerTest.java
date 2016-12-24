@@ -66,36 +66,6 @@ public class MappingFieldHandlerTest {
         }
     }
 
-    /**
-     * Test of handle method, of class MappingFieldHandler.
-     */
-    @Test
-    public void testHandle() throws Exception {
-        System.out.println("handle");
-        MappingFieldHandler instance = null;
-        JComponent expResult = null;
-//        JComponent result = instance.handle(null);
-//        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of retrieveFieldHandler method, of class MappingFieldHandler.
-     */
-    @Test
-    public void testRetrieveFieldHandler() {
-        System.out.println("retrieveFieldHandler");
-        Type fieldType = null;
-        Map<Type, FieldHandler<?, ?, ?, ?>> classMapping = null;
-        MappingFieldHandler instance = null;
-        FieldHandler expResult = null;
-        FieldHandler result = instance.retrieveFieldHandler(fieldType, classMapping);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
     @Test
     @SuppressWarnings("serial")
     public void testRetrieveClassMappingBestMatch() throws NoSuchFieldException {

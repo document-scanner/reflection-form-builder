@@ -155,6 +155,9 @@ public class MappingFieldHandlerFactory {
     private MessageHandler messageHandler;
 
     public MappingFieldHandlerFactory(MessageHandler messageHandler) {
+        if(messageHandler == null) {
+            throw new IllegalArgumentException("messageHandler mustn't be null");
+        }
         this.messageHandler = messageHandler;
     }
 

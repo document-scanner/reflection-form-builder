@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JTextField;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
@@ -34,8 +35,10 @@ import richtercloud.reflection.form.builder.fieldhandler.BooleanListFieldHandler
 import richtercloud.reflection.form.builder.fieldhandler.FieldHandler;
 import richtercloud.reflection.form.builder.fieldhandler.FieldHandlingException;
 import richtercloud.reflection.form.builder.fieldhandler.FieldUpdateListener;
+import richtercloud.reflection.form.builder.fieldhandler.MappingFieldHandler;
 import richtercloud.reflection.form.builder.fieldhandler.StringFieldHandler;
 import richtercloud.reflection.form.builder.panels.BooleanListPanel;
+import richtercloud.reflection.form.builder.typehandler.StringTypeHandler;
 
 /**
  *
@@ -52,17 +55,15 @@ public class ReflectionFormBuilderTest {
     @Test
     @SuppressWarnings("serial")
     public void testGetClassComponent() throws Exception {
-        FieldHandler fieldHandler = new FieldHandler() {
-            @Override
-            public JComponent handle(Field field, Object instance, FieldUpdateListener updateListener, ReflectionFormBuilder reflectionFormBuilder) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, InstantiationException, FieldHandlingException {
-                throw new UnsupportedOperationException("Won't ever be called.");
-            }
-
-            @Override
-            public void reset(Component component) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
-        };
+        final Map<Type, FieldHandler<?,?, ?, ?>> classMapping = new HashMap<>();
+        Type listAnyType = new TypeToken<List<AnyType>>() {}.getType();
+        Type listBooleanType = new TypeToken<List<Boolean>>() {}.getType();
+        classMapping.put(listAnyType, StringFieldHandler.getInstance());
+        classMapping.put(listBooleanType, new BooleanListFieldHandler(messageHandler));
+        classMapping.put(String.class,
+                new StringFieldHandler(StringTypeHandler.getInstance()));
+        FieldHandler fieldHandler = new MappingFieldHandler(classMapping,
+                new HashMap<>());
         ReflectionFormBuilder instance = new ReflectionFormBuilder(
                 "Field description",
                 messageHandler,
@@ -70,14 +71,12 @@ public class ReflectionFormBuilderTest {
         Class<?> entityClass = TestEntity.class;
         Field field = entityClass.getDeclaredField("a");
         TestEntity entity = TestEntity.class.getDeclaredConstructor().newInstance();
-        JComponent result = instance.getClassComponent(field, entityClass, entity, fieldHandler);
+        JComponent result = instance.getClassComponent(field,
+                entityClass,
+                entity,
+                fieldHandler);
         assertEquals(JTextField.class, result.getClass());
         //test that AnyType specifiecation is matched
-        Map<Type, FieldHandler<?,?, ?, ?>> classMapping = new HashMap<>();
-        Type listAnyType = new TypeToken<List<AnyType>>() {}.getType();
-        Type listBooleanType = new TypeToken<List<Boolean>>() {}.getType();
-        classMapping.put(listAnyType, StringFieldHandler.getInstance());
-        classMapping.put(listBooleanType, new BooleanListFieldHandler(messageHandler));
         Class<? extends TestEntityCollection> entityClassCollection = TestEntityCollection.class;
         TestEntityCollection entityCollection = TestEntityCollection.class.getDeclaredConstructor().newInstance();
         instance = new ReflectionFormBuilder("Field description",
@@ -101,7 +100,7 @@ public class ReflectionFormBuilderTest {
         FieldHandler fieldHandler = new FieldHandler() {
             @Override
             public JComponent handle(Field field, Object instance, FieldUpdateListener updateListener, ReflectionFormBuilder reflectionFormBuilder) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException, NoSuchMethodException, InstantiationException, FieldHandlingException {
-                throw new UnsupportedOperationException("Won't ever be called.");
+                return new JLabel("Test label");
             }
 
             @Override
