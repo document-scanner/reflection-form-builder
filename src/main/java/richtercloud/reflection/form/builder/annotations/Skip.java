@@ -24,7 +24,7 @@ import java.lang.annotation.Target;
  *
  * @author richter
  */
-@Target( { ElementType.TYPE })
+@Target( { ElementType.FIELD })
 @Retention(RUNTIME)
 @Documented
 public @interface Skip {

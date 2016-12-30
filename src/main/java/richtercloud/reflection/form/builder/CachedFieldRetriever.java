@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
+import richtercloud.reflection.form.builder.annotations.Skip;
 
 /**
  *
@@ -37,18 +38,15 @@ public class CachedFieldRetriever implements FieldRetriever {
     private Map<Class<?>, List<Field>> relevantFieldsCache = new HashMap<>();
 
     /**
-     * recursively retrieves all fields from the inheritance hierachy of
-     * {@code entityClass}, except {@code static} and {@code transient} fields.
+     * Recursively retrieves all fields from the inheritance hierachy of
+     * {@code entityClass}, except {@code static} and {@code transient} fields
+     * and those annotated with {@link Skip}.
+     *
      * Results are cached in order to ensure that future calls return the same
      * result for the same argument value.
      *
      * @param clazz
      * @return
-     */
-    /*
-     internal implementation notes:
-     - return a List in order to be able to modify order (it'd be nice to have
-     @Id annotated property first
      */
     @Override
     public List<Field> retrieveRelevantFields(Class<?> clazz) {
@@ -79,6 +77,11 @@ public class CachedFieldRetriever implements FieldRetriever {
                 continue;
             }
             if (seenEntityClassFields.contains(entityClassFieldsNxt)) {
+                entityClassFieldsIt.remove();
+                continue;
+            }
+            Skip entityClassFieldNxtSkip = entityClassFieldsNxt.getAnnotation(Skip.class);
+            if(entityClassFieldNxtSkip != null) {
                 entityClassFieldsIt.remove();
                 continue;
             }

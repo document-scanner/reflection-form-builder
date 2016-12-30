@@ -30,5 +30,15 @@ sharing with ReflectionFormPanel and follows "composition over inheritance"
 */
 public interface FieldRetriever {
 
+    /**
+     * Retrieves relevant fields. What that means in up to the implementation.
+     * @param clazz
+     * @return the list of relevant field as specified by implementation
+     */
+    /*
+     internal implementation notes:
+     - return a List in order to be able to modify order (it's nice to have
+     @Id annotated property first)
+     */
     List<Field> retrieveRelevantFields(Class<?> clazz);
 }
