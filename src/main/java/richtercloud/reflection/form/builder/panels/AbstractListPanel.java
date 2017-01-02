@@ -91,7 +91,8 @@ public abstract class AbstractListPanel<T, L extends ListPanelItemListener<T>, M
      * Subclasses are strongly recommended to call {@link #reset() } to
      * initialize the values.
      *
-     * @param reflectionFormBuilder
+     * @param reflectionFormBuilder the {@link ReflectionFormBuilder} used to
+     * create rows in this list panel
      * @param mainListCellEditor
      * @param mainListCellRenderer
      * @param mainListModel

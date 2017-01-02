@@ -50,6 +50,7 @@ import richtercloud.reflection.form.builder.fieldhandler.FieldUpdateListener;
  * entires in class mapping.
  *
  * @author richter
+ * @param <F> allows enforcing a type of {@link FieldRetriever}
  */
 /*
  internal implementation notes:
@@ -77,12 +78,6 @@ expections for default use cases
 public class ReflectionFormBuilder<F extends FieldRetriever> {
     private final static Logger LOGGER = LoggerFactory.getLogger(ReflectionFormBuilder.class);
     private final static int LABEL_WIDTH_MIN = 150;
-    /**
-     * Dialog title used for creating {@link ReflectionFormFieldLabel}s.
-     */
-    private final String fieldDescriptionDialogTitle;
-    private MessageHandler messageHandler;
-
     public static void validateMapping(Map<?,?> mapping, String argumentName) {
         if (mapping == null) {
             throw new IllegalArgumentException(String.format("%s mustn't be null", argumentName));
@@ -91,12 +86,17 @@ public class ReflectionFormBuilder<F extends FieldRetriever> {
             throw new IllegalArgumentException(String.format("%s mustn't contain null values", argumentName));
         }
     }
+    /**
+     * Dialog title used for creating {@link ReflectionFormFieldLabel}s.
+     */
+    private final String fieldDescriptionDialogTitle;
+    private MessageHandler messageHandler;
+
     private final F fieldRetriever;
 
     /**
      *
-     * @param fieldHandler
-     * @param valueRetrieverMapping
+     * @param fieldRetriever
      * @param fieldDescriptionDialogTitle
      * @param messageHandler
      */
@@ -121,7 +121,7 @@ public class ReflectionFormBuilder<F extends FieldRetriever> {
         return messageHandler;
     }
 
-    public F getFieldRetriever() {
+    protected F getFieldRetriever() {
         return fieldRetriever;
     }
 
@@ -136,11 +136,13 @@ public class ReflectionFormBuilder<F extends FieldRetriever> {
      * @throws IllegalAccessException
      * @throws IllegalArgumentException
      * @throws java.lang.reflect.InvocationTargetException
-     * @throws richtercloud.reflection.form.builder.FieldHandlingException
      * @throws java.lang.InstantiationException
      */
     /*
-     internal implementation entityClass is added here for subclasses
+    internal implementation notes:
+    - entityClass is added here to allow subclasses to get the root entity class
+    - don't allow returning of null in order to indicate that field ought to be
+    skipped because that's the task of FieldRetriever
      */
     protected JComponent getClassComponent(final Field field,
             Class<?> entityClass,

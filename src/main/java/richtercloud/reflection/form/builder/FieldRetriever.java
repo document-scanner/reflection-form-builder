@@ -18,22 +18,38 @@ import java.lang.reflect.Field;
 import java.util.List;
 
 /**
- * Interface to share code of field retrieval in a class hierarchy. Implementations
- * might implement caching and such.
+ * Handles order of relevant fields (e.g. JPA-based implementations might want
+ * to return the {@code @Id} field at the first position always) and exclusion
+ * of irrelevant fields for different implementations and use cases (e.g.
+ * JPA-based implementations might always want to exclude {@code @Transient}
+ * annotated fields. Different components might need different retrievers (e.g.
+ * read-only component might want to include read-only fields, forms not).
+ *
+ * Implementations might take care about caching and such.
  *
  * @author richter
  */
 /*
 internal implementation notes:
-- this interface might appear unnecessary, but it allows very elegant code
-sharing with ReflectionFormPanel and follows "composition over inheritance"
+- This interface allows ReflectionFormBuilder to concentrate on creating
+components (which is enforced by forbidding
+ReflectionFormBuilder.getClassComponent to return null). This design follows
+"composition over inheritance"
+- It's unlikely to avoid retrieving all fields in a superclass and then removing
+from them since that bloats up code complexity for the sake of saving a few
+comparisons - limited by a realistic number of class fields, i.e. most certainly
+below 50.
 */
 public interface FieldRetriever {
 
     /**
-     * Retrieves relevant fields. What that means in up to the implementation.
+     * Retrieves relevant fields of {@code clazz}. What that means (especially
+     * whether superclass' fields ought to be included) in up to the
+     * implementation.
+     *
      * @param clazz
-     * @return the list of relevant field as specified by implementation
+     * @return the list of relevant field as specified by implementation,
+     * never {@code null}
      */
     /*
      internal implementation notes:

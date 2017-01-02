@@ -63,7 +63,7 @@ public abstract class ResettableFieldHandler<T, E extends FieldUpdateEvent<T>, R
             InstantiationException {
         Pair<JComponent, ComponentHandler<?>> retValueEntry = handle0(field, instance, updateListener, reflectionFormBuilder);
         if(retValueEntry == null) {
-            JLabel retValue = new JLabel(field.getType().getSimpleName());
+            JComponent retValue = retrieveDefaultComponent(field);
             this.componentMapping.put(retValue, JLABEL_COMPONENT_RESETTABLE);
             return retValue;
         }
@@ -73,6 +73,11 @@ public abstract class ResettableFieldHandler<T, E extends FieldUpdateEvent<T>, R
         }
         JComponent retValue = retValueEntry.getKey();
         this.componentMapping.put(retValue, componentResettable);
+        return retValue;
+    }
+
+    public JComponent retrieveDefaultComponent(Field field) {
+        JComponent retValue = new JLabel(field.getType().getSimpleName());
         return retValue;
     }
 
