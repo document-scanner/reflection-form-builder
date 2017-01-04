@@ -41,7 +41,7 @@ public interface Storage<T, C extends StorageConf> {
     */
     T retrieve(Object id, Class<? extends T> clazz) throws StorageException;
 
-    void update(Object object) throws StorageException;
+    void update(T object) throws StorageException;
 
     /**
      * Starts referenced resources. Needs to be called after creating an

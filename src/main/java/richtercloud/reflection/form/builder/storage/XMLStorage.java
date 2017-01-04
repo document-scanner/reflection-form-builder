@@ -24,6 +24,7 @@ import java.util.List;
 /**
  *
  * @author richter
+ * @param <T> allows enforcing subtypes of {@link Identifiable}
  */
 public class XMLStorage<T extends Identifiable> implements Storage<T, XMLStorageConf> {
     private File file;
@@ -35,7 +36,7 @@ public class XMLStorage<T extends Identifiable> implements Storage<T, XMLStorage
     }
 
     @Override
-    public void store(Object object) throws StorageException {
+    public void store(T object) throws StorageException {
         XStream xStream = new XStream();
         List<Object> existingObjects;
         try {
@@ -71,12 +72,12 @@ public class XMLStorage<T extends Identifiable> implements Storage<T, XMLStorage
     }
 
     @Override
-    public void update(Object object) throws StorageException {
+    public void update(T object) throws StorageException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public void delete(Object object) throws StorageException {
+    public void delete(T object) throws StorageException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
