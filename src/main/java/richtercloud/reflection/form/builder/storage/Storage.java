@@ -31,6 +31,8 @@ public interface Storage<T, C extends StorageConf> {
      * storage.
      * @param id
      * @param clazz
+     * @param <U> allows enforcing a subtype of the type of the storage via the
+     * {@code clazz} parameter
      * @return
      * @throws StorageException
      */
@@ -39,7 +41,7 @@ public interface Storage<T, C extends StorageConf> {
     - id should be a of type Object in order be able to support composite id
     keys in JPA implementations
     */
-    T retrieve(Object id, Class<? extends T> clazz) throws StorageException;
+    <U extends T> U retrieve(Object id, Class<U> clazz) throws StorageException;
 
     void update(T object) throws StorageException;
 

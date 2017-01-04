@@ -54,16 +54,16 @@ public class XMLStorage<T extends Identifiable> implements Storage<T, XMLStorage
     }
 
     @Override
-    public T retrieve(Object id, Class<? extends T> clazz) throws StorageException {
+    public <U extends T> U retrieve(Object id, Class<U> clazz) throws StorageException {
         //@TODO: this is most certainly more efficient when implemented with an XStream ObjectInputStream
         XStream xStream = new XStream();
-        List<T> existingObjects;
+        List<U> existingObjects;
         try {
-            existingObjects = (List<T>) xStream.fromXML(new FileInputStream(file));
+            existingObjects = (List<U>) xStream.fromXML(new FileInputStream(file));
         } catch (FileNotFoundException ex) {
             throw new StorageException(ex);
         }
-        for(T existingObject : existingObjects) {
+        for(U existingObject : existingObjects) {
             if(existingObject.getId().equals(id)) {
                 return existingObject;
             }
