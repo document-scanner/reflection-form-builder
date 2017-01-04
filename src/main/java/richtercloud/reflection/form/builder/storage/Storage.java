@@ -17,13 +17,14 @@ package richtercloud.reflection.form.builder.storage;
 /**
  *
  * @author richter
- * @param <T>
+ * @param <T> the type the storage ought to be restricted
+ * @param <C> the type of configuration this type of storage needs
  */
 public interface Storage<T, C extends StorageConf> {
 
-    void delete(Object object) throws StorageException;
+    void delete(T object) throws StorageException;
 
-    void store(Object object) throws StorageException;
+    void store(T object) throws StorageException;
 
     /**
      * Retrieves the instance with ID {@code id} of type {@code clazz} from
@@ -46,6 +47,8 @@ public interface Storage<T, C extends StorageConf> {
      * Starts referenced resources. Needs to be called after creating an
      * instance of any subclass (except if the subclass especially states that
      * it's not necessary).
+     * @throws richtercloud.reflection.form.builder.storage.StorageCreationException
+     * wraps any exception which occurs during the creation of this storage
      */
     /*
     internal implementation notes:

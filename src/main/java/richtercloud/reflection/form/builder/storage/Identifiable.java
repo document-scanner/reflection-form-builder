@@ -17,8 +17,11 @@ package richtercloud.reflection.form.builder.storage;
 import java.io.Serializable;
 
 /**
- * Instances which ought to be persisted using {@link Storage} somehow need to
- * be identified. Therefore the minimal requirement is to have an idea.
+ * Instances which ought to be persisted using certain {@link Storage}s somehow
+ * need to be identified. Therefore the minimal requirement is to have a way to
+ * distinguish entities. Some implementations of {@link Storage} might not need
+ * to rely on having persisted instances implement this interface (e.g.
+ * JPA-based implementations).
  *
  * It'd also be possible to enforce implementation of {@link #hashCode() }, but
  * that's troublesome and provide a {@link #getId() } isn't too much to ask.
