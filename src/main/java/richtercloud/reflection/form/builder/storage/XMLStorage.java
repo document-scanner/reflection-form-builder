@@ -82,6 +82,11 @@ public class XMLStorage<T extends Identifiable> implements Storage<T, XMLStorage
     }
 
     @Override
+    public void refresh(Object object) throws StorageException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
     public void start() throws StorageCreationException {
         //nothing to do
     }
@@ -94,5 +99,15 @@ public class XMLStorage<T extends Identifiable> implements Storage<T, XMLStorage
     @Override
     public XMLStorageConf getStorageConf() {
         return storageConf;
+    }
+
+    @Override
+    public void registerPostStoreCallback(T object, StorageCallback callback) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void registerPreStoreCallback(T object, StorageCallback callback) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

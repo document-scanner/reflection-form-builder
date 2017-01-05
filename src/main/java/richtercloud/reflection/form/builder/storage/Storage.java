@@ -45,6 +45,8 @@ public interface Storage<T, C extends StorageConf> {
 
     void update(T object) throws StorageException;
 
+    void refresh(Object object) throws StorageException;
+
     /**
      * Starts referenced resources. Needs to be called after creating an
      * instance of any subclass (except if the subclass especially states that
@@ -71,4 +73,21 @@ public interface Storage<T, C extends StorageConf> {
     void shutdown();
 
     C getStorageConf();
+
+    /**
+     * Registers a callback which is executed if {@code object} is stored with
+     * {@link #store(java.lang.Object) }.
+     * @param object the object the callback ought to be registered for
+     * @param callback the callback to register
+     */
+    /*
+    internal implementation notes:
+    - if registery for update, deletion, etc. is added, it might be necessary to
+    make StorageCallback executable repeatedly
+    */
+    void registerPostStoreCallback(T object,
+            StorageCallback callback);
+
+    void registerPreStoreCallback(T object,
+            StorageCallback callback);
 }

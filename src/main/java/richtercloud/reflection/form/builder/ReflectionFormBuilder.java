@@ -290,11 +290,11 @@ public class ReflectionFormBuilder<F extends FieldRetriever> {
         return retValue;
     }
 
-    protected Object prepareInstance(Class<?> entityClass, Object instance) throws InstantiationException,
+    protected Object prepareInstance(Class<?> entityClass, Object entityToUpdate) throws InstantiationException,
             IllegalAccessException,
             IllegalArgumentException,
             InvocationTargetException {
-        Object retValue = instance;
+        Object retValue = entityToUpdate;
         if (retValue == null) {
             Constructor<?> entityClassConstructor = null;
             try {
