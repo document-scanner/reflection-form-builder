@@ -224,7 +224,9 @@ public class ReflectionFormBuilder<F extends FieldRetriever> {
             String fieldDescription;
             FieldInfo fieldInfo = field.getAnnotation(FieldInfo.class);
             if(fieldInfo != null) {
-                fieldName = fieldInfo.name();
+                fieldName = String.format("%s (%s)",
+                        fieldInfo.name(),
+                        field.getName());
                 fieldDescription = fieldInfo.description();
             }else {
                 fieldName = field.getName();
