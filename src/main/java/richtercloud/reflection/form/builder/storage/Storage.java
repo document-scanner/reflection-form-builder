@@ -75,8 +75,13 @@ public interface Storage<T, C extends StorageConf> {
     C getStorageConf();
 
     /**
-     * Registers a callback which is executed if {@code object} is stored with
-     * {@link #store(java.lang.Object) }.
+     * Registers a callback which is executed right after {@code object} is
+     * stored with {@link #store(java.lang.Object) }.
+     *
+     * Note that entities are supposed to be equals in all persistent entity
+     * states transient, attached, detached and removed<ref>https://vladmihalcea.com/2014/07/30/a-beginners-guide-to-jpahibernate-entity-state-transitions/</ref>
+     * and if they're not this method will explicitly has undefined behaviour.
+     *
      * @param object the object the callback ought to be registered for
      * @param callback the callback to register
      */
@@ -86,8 +91,19 @@ public interface Storage<T, C extends StorageConf> {
     make StorageCallback executable repeatedly
     */
     void registerPostStoreCallback(T object,
-            StorageCallback callback);
+            StorageCallback callback) throws StorageException;
 
+    /**
+     * Registers a callback which is executed right before {@code object} is
+     * stored with {@link #store(java.lang.Object) }.
+     *
+     * Note that entities are supposed to be equals in all persistent entity
+     * states transient, attached, detached and removed<ref>https://vladmihalcea.com/2014/07/30/a-beginners-guide-to-jpahibernate-entity-state-transitions/</ref>
+     * and if they're not this method will explicitly has undefined behaviour.
+     *
+     * @param object the object the callback ought to be registered for
+     * @param callback the callback to register
+     */
     void registerPreStoreCallback(T object,
-            StorageCallback callback);
+            StorageCallback callback) throws StorageException;
 }

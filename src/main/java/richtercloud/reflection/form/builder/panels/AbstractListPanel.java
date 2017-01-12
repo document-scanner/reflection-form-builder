@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 import richtercloud.message.handler.Message;
 import richtercloud.message.handler.MessageHandler;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
-import richtercloud.reflection.form.builder.fieldhandler.FieldHandlingException;
+import richtercloud.reflection.form.builder.TransformationException;
 
 /**
  * The superclass of all list panel (both with one or multiple columns). It supports multiple selection, also in multiple intervals of a size >= 1. Provides buttons to add a new item and remove the selected intervals(s). Provides a buttons to move the selected items up and down the list (if multiple items are selected they're moved as if they were the only selected one by one). The up button does nothing for the topmost item if it is selected as does the down button for the bottommost item. The edit button starts editing the item; implementation is up to subclasses (in {@link #editRow() }). The "Select all" and "Invert selection" buttons select all items and invert the selection of items respectively.
@@ -130,7 +130,7 @@ public abstract class AbstractListPanel<T, L extends ListPanelItemListener<T>, M
         this.initialValues = initialValues;
     }
 
-    public void addValue(T value) {
+    public void addValue(T value) throws TransformationException {
         this.getMainListModel().addElement(value);
         for (L listener : this.getItemListeners()) {
             try {
@@ -283,7 +283,11 @@ public abstract class AbstractListPanel<T, L extends ListPanelItemListener<T>, M
         //can't check field annotations, but class annotations and, of course,
         //use field handler
         T newElement = createNewElement();
-        addValue(newElement);
+        try {
+            addValue(newElement);
+        } catch (TransformationException ex) {
+            messageHandler.handle(new Message(ex, JOptionPane.ERROR_MESSAGE));
+        }
     }//GEN-LAST:event_addButtonActionPerformed
 
     private void removeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeButtonActionPerformed
@@ -343,7 +347,14 @@ public abstract class AbstractListPanel<T, L extends ListPanelItemListener<T>, M
     }//GEN-LAST:event_invertSelectionButtonActionPerformed
 
     private void editButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editButtonActionPerformed
-        editRow0();
+        try {
+            editRow0();
+        } catch (TransformationException ex) {
+            messageHandler.handle(new Message(String.format("An exception during editing the row occured: %s",
+                    ExceptionUtils.getRootCauseMessage(ex)),
+                    JOptionPane.ERROR_MESSAGE,
+                    "Exception occured"));
+        }
     }//GEN-LAST:event_editButtonActionPerformed
 
     private void upButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_upButtonActionPerformed
@@ -378,18 +389,11 @@ public abstract class AbstractListPanel<T, L extends ListPanelItemListener<T>, M
         this.updateRowHeights();
     }//GEN-LAST:event_downButtonActionPerformed
 
-    private void editRow0() {
-        try {
-            editRow();
-        } catch (FieldHandlingException ex) {
-            messageHandler.handle(new Message(String.format("An exception during editing the row occured: %s",
-                    ExceptionUtils.getRootCauseMessage(ex)),
-                    JOptionPane.ERROR_MESSAGE,
-                    "Exception occured"));
-        }
+    private void editRow0() throws TransformationException {
+        editRow();
     }
 
-    protected abstract void editRow() throws FieldHandlingException;
+    protected abstract void editRow() throws TransformationException;
 
     protected void updateRowHeights() {
         for (int row = 0; row < this.mainList.getRowCount(); row++) {

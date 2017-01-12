@@ -30,30 +30,40 @@ public abstract class AbstractStorage<T, C extends StorageConf> implements Stora
     private final Map<Object, List<StorageCallback>> preStoreCallbackMap = new HashMap<>();
 
     @Override
-    public void registerPostStoreCallback(T object, StorageCallback callback) {
+    public void registerPostStoreCallback(T object, StorageCallback callback) throws StorageException {
         List<StorageCallback> callbackList = postStoreCallbackMap.get(object);
         if(callbackList == null) {
+            //calling store.update(object) doesn't assign ID (if @GeneratedValue
+            //is used) and most likely causes a duplicate key exception when
+            //calling storage.store for object
             callbackList = new LinkedList<>();
-            postStoreCallbackMap.put(object, callbackList);
+            postStoreCallbackMap.put(object,
+                    callbackList);
         }
         callbackList.add(callback);
     }
 
     protected List<StorageCallback> getPostStoreCallbacks(T object) {
-        return this.postStoreCallbackMap.get(object);
+        List<StorageCallback> retValue = this.postStoreCallbackMap.get(object);
+        return retValue;
     }
 
     @Override
-    public void registerPreStoreCallback(T object, StorageCallback callback) {
+    public void registerPreStoreCallback(T object, StorageCallback callback) throws StorageException {
         List<StorageCallback> callbackList = preStoreCallbackMap.get(object);
         if(callbackList == null) {
+            //calling store.update(object) doesn't assign ID (if @GeneratedValue
+            //is used) and most likely causes a duplicate key exception when
+            //calling storage.store for object
             callbackList = new LinkedList<>();
-            preStoreCallbackMap.put(object, callbackList);
+            preStoreCallbackMap.put(object,
+                    callbackList);
         }
         callbackList.add(callback);
     }
 
     protected List<StorageCallback> getPreStoreCallbacks(T object) {
-        return this.preStoreCallbackMap.get(object);
+        List<StorageCallback> retValue = this.preStoreCallbackMap.get(object);
+        return retValue;
     }
 }

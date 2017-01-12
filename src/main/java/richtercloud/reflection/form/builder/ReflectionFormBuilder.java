@@ -166,7 +166,7 @@ public class ReflectionFormBuilder<F extends FieldRetriever> {
                     public void onUpdate(FieldUpdateEvent event) {
                         try {
                             onFieldUpdate(event, field, instance);
-                        } catch (IllegalArgumentException | IllegalAccessException ex) {
+                        } catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException ex) {
                             throw new RuntimeException(ex);
                         }
                     }
@@ -175,7 +175,9 @@ public class ReflectionFormBuilder<F extends FieldRetriever> {
         return retValue;
     }
 
-    protected void onFieldUpdate(FieldUpdateEvent event, Field field, Object instance) throws IllegalArgumentException, IllegalAccessException {
+    protected void onFieldUpdate(FieldUpdateEvent event, Field field, Object instance) throws IllegalArgumentException,
+            IllegalAccessException,
+            InvocationTargetException {
         field.set(instance, event.getNewValue());
     }
 
@@ -185,12 +187,8 @@ public class ReflectionFormBuilder<F extends FieldRetriever> {
      * @param instance
      * @param fieldMapping
      * @param reflectionFormPanel
-     * @throws InstantiationException
-     * @throws IllegalAccessException
+     * @throws richtercloud.reflection.form.builder.TransformationException
      * @throws IllegalArgumentException
-     * @throws InvocationTargetException
-     * @throws NoSuchMethodException
-     * @throws richtercloud.reflection.form.builder.FieldHandlingException
      */
     /*
     internal implementtion notes:
@@ -202,12 +200,7 @@ public class ReflectionFormBuilder<F extends FieldRetriever> {
             Object instance,
             Map<Field, JComponent> fieldMapping,
             ReflectionFormPanel reflectionFormPanel,
-            FieldHandler fieldHandler) throws IllegalAccessException,
-            FieldHandlingException,
-            IllegalArgumentException,
-            InvocationTargetException,
-            NoSuchMethodException,
-            InstantiationException {
+            FieldHandler fieldHandler) throws TransformationException {
         List<Field> entityClassFields = this.fieldRetriever.retrieveRelevantFields(clazz);
 
         GroupLayout layout = reflectionFormPanel.getLayout();
@@ -216,10 +209,15 @@ public class ReflectionFormBuilder<F extends FieldRetriever> {
         Group horizontalLabelParallelGroup = layout.createParallelGroup(GroupLayout.Alignment.LEADING);
         Group horizontalCompParallelGroup = layout.createParallelGroup(GroupLayout.Alignment.LEADING);
         for (Field field : entityClassFields) {
-            JComponent comp = this.getClassComponent(field,
-                    clazz,
-                    instance,
-                    fieldHandler);
+            JComponent comp;
+            try {
+                comp = this.getClassComponent(field,
+                        clazz,
+                        instance,
+                        fieldHandler);
+            } catch (IllegalAccessException | FieldHandlingException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | InstantiationException ex) {
+                throw new TransformationException(ex);
+            }
             String fieldName;
             String fieldDescription;
             FieldInfo fieldInfo = field.getAnnotation(FieldInfo.class);
@@ -266,18 +264,13 @@ public class ReflectionFormBuilder<F extends FieldRetriever> {
      * instance of {@code entityClass}). {@code null} indicates to create a new
      * instance and write changes of the {@link ReflectionFormPanel} into it.
      * @return
-     * @throws InstantiationException
-     * @throws IllegalAccessException
-     * @throws IllegalArgumentException
-     * @throws InvocationTargetException
-     * @throws NoSuchMethodException
-     * @throws richtercloud.reflection.form.builder.FieldHandlingException
+     * @throws richtercloud.reflection.form.builder.TransformationException
      * @throws IllegalArgumentException if {@code entityClass} doesn't provide a
      * zero-argument-constructor
      */
     public ReflectionFormPanel transformEntityClass(Class<?> entityClass,
             Object entityToUpdate,
-            FieldHandler fieldHandler) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, FieldHandlingException {
+            FieldHandler fieldHandler) throws TransformationException {
         final Map<Field, JComponent> fieldMapping = new HashMap<>();
         Object instance = prepareInstance(entityClass, entityToUpdate);
         ReflectionFormPanel retValue = new ReflectionFormPanel(fieldMapping,
@@ -292,10 +285,7 @@ public class ReflectionFormBuilder<F extends FieldRetriever> {
         return retValue;
     }
 
-    protected Object prepareInstance(Class<?> entityClass, Object entityToUpdate) throws InstantiationException,
-            IllegalAccessException,
-            IllegalArgumentException,
-            InvocationTargetException {
+    protected Object prepareInstance(Class<?> entityClass, Object entityToUpdate) throws TransformationException {
         Object retValue = entityToUpdate;
         if (retValue == null) {
             Constructor<?> entityClassConstructor = null;
@@ -305,7 +295,11 @@ public class ReflectionFormBuilder<F extends FieldRetriever> {
                 throw new IllegalArgumentException(String.format("entityClass %s doesn't provide a zero-argument-constructor (see nested exception for details)", entityClass), ex);
             }
             entityClassConstructor.setAccessible(true);
-            retValue = entityClassConstructor.newInstance();
+            try {
+                retValue = entityClassConstructor.newInstance();
+            } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+                throw new TransformationException(ex);
+            }
         }
         return retValue;
     }
