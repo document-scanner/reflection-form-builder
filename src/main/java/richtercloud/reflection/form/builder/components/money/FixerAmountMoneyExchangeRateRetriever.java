@@ -15,6 +15,7 @@
 package richtercloud.reflection.form.builder.components.money;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -43,8 +44,21 @@ caching responses
 public class FixerAmountMoneyExchangeRateRetriever extends CachedOnlineAmountMoneyExchangeRateRetriever {
     private final static Logger LOGGER = LoggerFactory.getLogger(FixerAmountMoneyExchangeRateRetriever.class);
     private final static String FIXER_URL = "http://api.fixer.io/latest";
+    public final static String INITIAL_RESOURCE_RESOURCE_NAME_DEFAULT = "/fixer-initial-result.xml";
 
-    private FixerJsonResponse retrieveResponse() throws AmountMoneyExchangeRateRetrieverException {
+    public FixerAmountMoneyExchangeRateRetriever(File fileCacheFile) {
+        super(fileCacheFile,
+                INITIAL_RESOURCE_RESOURCE_NAME_DEFAULT);
+    }
+
+    public FixerAmountMoneyExchangeRateRetriever(File fileCacheFile,
+            long fileCacheExpirationMillis) {
+        super(fileCacheFile,
+                fileCacheExpirationMillis,
+                INITIAL_RESOURCE_RESOURCE_NAME_DEFAULT);
+    }
+
+    private FixerJsonResponse retrieveResponse() throws AmountMoneyExchangeRateRetrievalException {
         try {
             URLConnection uRLConnection = new URL(FIXER_URL).openConnection();
             InputStream inputStream = uRLConnection.getInputStream();
@@ -53,12 +67,12 @@ public class FixerAmountMoneyExchangeRateRetriever extends CachedOnlineAmountMon
             FixerJsonResponse response = new ObjectMapper().readValue(responseJsonString, FixerJsonResponse.class);
             return response;
         } catch (IOException ex) {
-            throw new AmountMoneyExchangeRateRetrieverException(ex);
+            throw new AmountMoneyExchangeRateRetrievalException(ex);
         }
     }
 
     @Override
-    protected Pair<Map<Currency, Double>, Currency> fetchResult() throws AmountMoneyExchangeRateRetrieverException {
+    protected Pair<Map<Currency, Double>, Currency> fetchResult() throws AmountMoneyExchangeRateRetrievalException {
         Map<Currency, Double> exchangeRates = new HashMap<>();
         FixerJsonResponse fixerJsonResponse = retrieveResponse();
         for(String currencyCode : fixerJsonResponse.getRates().keySet()) {

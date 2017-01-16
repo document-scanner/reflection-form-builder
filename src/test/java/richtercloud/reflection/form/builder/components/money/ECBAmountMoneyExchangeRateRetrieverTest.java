@@ -14,7 +14,9 @@
  */
 package richtercloud.reflection.form.builder.components.money;
 
+import java.io.File;
 import java.util.Map;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jscience.economics.money.Currency;
 import static org.junit.Assert.*;
@@ -31,8 +33,11 @@ public class ECBAmountMoneyExchangeRateRetrieverTest {
      */
     @Test
     public void testFetchCache() throws Exception {
-        ECBAmountMoneyExchangeRateRetriever instance = new ECBAmountMoneyExchangeRateRetriever();
-        Pair<Map<Currency, Double>, Currency> result = instance.fetchResult();
+        File tmpFile = File.createTempFile(ECBAmountMoneyExchangeRateRetrieverTest.class.getSimpleName(),
+                null);
+        FileUtils.deleteQuietly(tmpFile);
+        ECBAmountMoneyExchangeRateRetriever instance = new ECBAmountMoneyExchangeRateRetriever(tmpFile);
+        Pair<Map<Currency, Double>, Currency> result = instance.getResult();
         //Since the service doesn't guarantee to return a specific set of values
         //just make sure that it does return any values
         assertFalse(result.getKey().isEmpty());

@@ -14,10 +14,13 @@
  */
 package richtercloud.reflection.form.builder.components.money;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
+import org.apache.commons.io.FileUtils;
 import org.jscience.economics.money.Currency;
 
 /**
@@ -51,14 +54,50 @@ public class FailsafeAmountMoneyExchangeRateRetriever implements AmountMoneyExch
      */
     private final int availableRetrieverMin;
 
-    public FailsafeAmountMoneyExchangeRateRetriever() {
-        this(AVAILABLE_RETRIEVER_MIN_DEFAULT);
+    public FailsafeAmountMoneyExchangeRateRetriever(File fileCacheFileDir) throws IOException {
+        this(AVAILABLE_RETRIEVER_MIN_DEFAULT,
+                fileCacheFileDir,
+                CachedOnlineAmountMoneyExchangeRateRetriever.FILE_CACHE_EXPIRATION_MILLIS_DEFAULT);
     }
 
-    public FailsafeAmountMoneyExchangeRateRetriever(int availableRetrieverMin) {
+    public FailsafeAmountMoneyExchangeRateRetriever(File fileCacheFileDir,
+            long fileCacheExpirationMillis) throws IOException {
+        this(AVAILABLE_RETRIEVER_MIN_DEFAULT,
+                fileCacheFileDir,
+                fileCacheExpirationMillis);
+    }
+
+    /**
+     *
+     * @param availableRetrieverMin
+     * @param fileCacheFileDir Since {@code FailsafeAmountMoneyExchangeRateRetriever} will manage
+     * multiple possibly caching retrievers, a directory needs to be used for
+     * cache files.
+     * @param fileCacheExpirationMillis
+     * @throws IOException
+     */
+    public FailsafeAmountMoneyExchangeRateRetriever(int availableRetrieverMin,
+            File fileCacheFileDir,
+            long fileCacheExpirationMillis) throws IOException {
         this.availableRetrieverMin = availableRetrieverMin;
-        FixerAmountMoneyExchangeRateRetriever fixerAmountMoneyExchangeRateRetriever = new FixerAmountMoneyExchangeRateRetriever();
-        ECBAmountMoneyExchangeRateRetriever eCBAmountMoneyExchangeRateRetriever = new ECBAmountMoneyExchangeRateRetriever();
+        if(fileCacheFileDir == null) {
+            throw new IllegalArgumentException("fileCacheFileDir mustn't be null");
+        }
+        if(fileCacheFileDir.exists()) {
+            if(!fileCacheFileDir.isDirectory()) {
+                throw new IllegalArgumentException("fileCacheFileDir exists, but is no directory");
+            }
+        }else {
+            FileUtils.forceMkdir(fileCacheFileDir);
+        }
+        File fixerCacheFile = new File(fileCacheFileDir,
+                "fixer.xml");
+        File eCBCacheFile = new File(fileCacheFileDir,
+                "ecb.xml");
+        FixerAmountMoneyExchangeRateRetriever fixerAmountMoneyExchangeRateRetriever = new FixerAmountMoneyExchangeRateRetriever(fixerCacheFile,
+                fileCacheExpirationMillis);
+        ECBAmountMoneyExchangeRateRetriever eCBAmountMoneyExchangeRateRetriever = new ECBAmountMoneyExchangeRateRetriever(eCBCacheFile,
+                fileCacheExpirationMillis);
         retrieverQueue.add(fixerAmountMoneyExchangeRateRetriever);
         retrieverQueue.add(eCBAmountMoneyExchangeRateRetriever);
     }

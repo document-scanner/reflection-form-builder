@@ -14,6 +14,7 @@
  */
 package richtercloud.reflection.form.builder.components.money;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -44,9 +45,22 @@ public class ECBAmountMoneyExchangeRateRetriever extends CachedOnlineAmountMoney
     private final static Logger LOGGER = LoggerFactory.getLogger(ECBAmountMoneyExchangeRateRetriever.class);
     private final static String ECB_URL = "http://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml";
     private final static Currency REFERENCE_CURRENCY = Currency.EUR;
-    private final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+    private final static DocumentBuilderFactory FACTORY = DocumentBuilderFactory.newInstance();
+    public final static String INITIAL_RESOURCE_RESOURCE_NAME_DEFAULT = "/ecb-initial-result.xml";
 
-    private Map<Currency, Double> retrieveResponse() throws AmountMoneyExchangeRateRetrieverException {
+    public ECBAmountMoneyExchangeRateRetriever(File fileCacheFile) {
+        super(fileCacheFile,
+                INITIAL_RESOURCE_RESOURCE_NAME_DEFAULT);
+    }
+
+    public ECBAmountMoneyExchangeRateRetriever(File fileCacheFile,
+            long fileCacheExpirationMillis) {
+        super(fileCacheFile,
+                fileCacheExpirationMillis,
+                INITIAL_RESOURCE_RESOURCE_NAME_DEFAULT);
+    }
+
+    private Map<Currency, Double> retrieveResponse() throws AmountMoneyExchangeRateRetrieverException, AmountMoneyExchangeRateRetrievalException {
         Map<Currency, Double> retValue = new HashMap<>();
         try {
             URLConnection uRLConnection = new URL(ECB_URL).openConnection();
@@ -55,7 +69,7 @@ public class ECBAmountMoneyExchangeRateRetriever extends CachedOnlineAmountMoney
             LOGGER.debug(String.format("%s replied: %s", ECB_URL, responseXMLString));
             //It's fine to build the tree/load everything into memory since the
             //response is quite small
-            DocumentBuilder builder  = factory.newDocumentBuilder();
+            DocumentBuilder builder  = FACTORY.newDocumentBuilder();
             Document        document = builder.parse(new InputSource(new StringReader(responseXMLString)));
             Node            rootNode = document.getDocumentElement();
             NodeList rootNodeChildren = rootNode.getChildNodes();
@@ -99,13 +113,15 @@ public class ECBAmountMoneyExchangeRateRetriever extends CachedOnlineAmountMoney
                 retValue.put(currency, rate);
             }
             return retValue;
-        } catch (IOException | ParserConfigurationException | SAXException ex) {
+        } catch (IOException ex) {
+            throw new AmountMoneyExchangeRateRetrievalException(ex);
+        } catch (ParserConfigurationException | SAXException ex) {
             throw new AmountMoneyExchangeRateRetrieverException(ex);
         }
     }
 
     @Override
-    protected Pair<Map<Currency, Double>, Currency> fetchResult() throws AmountMoneyExchangeRateRetrieverException {
+    protected Pair<Map<Currency, Double>, Currency> fetchResult() throws AmountMoneyExchangeRateRetrieverException, AmountMoneyExchangeRateRetrievalException {
         Map<Currency, Double> response = retrieveResponse();
         response.put(REFERENCE_CURRENCY,
                 1.0);
