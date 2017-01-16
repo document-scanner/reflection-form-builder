@@ -154,12 +154,20 @@ public class AmountMoneyComponent extends javax.swing.JPanel {
                         throw new RuntimeException(amountMoneyExchangeRateRetrieverException);
                     }
                 }
-                AmountMoneyComponent.this.amountIntegerSpinner.setValue((int)newAmount);
+                //set the decimal spinner first because if the rounding result
+                //is 100 the integer spinner needs to be changed
                 BigDecimal bd = new BigDecimal(newAmount*100);
                 bd = bd.setScale(0, //newScale
                         RoundingMode.HALF_UP //the rounding mode "taught in school"
                 );
-                AmountMoneyComponent.this.amountDecimalSpinner.setValue(bd.intValue()%100);
+                int bdIntValue = bd.intValue();
+                AmountMoneyComponent.this.amountDecimalSpinner.setValue(bdIntValue%100);
+                if(bd.doubleValue() > newAmount*100) {
+                    //rounding up has occured
+                    AmountMoneyComponent.this.amountIntegerSpinner.setValue((int)newAmount+1);
+                }else {
+                    AmountMoneyComponent.this.amountIntegerSpinner.setValue((int)newAmount);
+                }
                 //notify registered update listeners
                 for(AmountMoneyComponentUpdateListener updateListener : AmountMoneyComponent.this.updateListeners) {
                     updateListener.onUpdate(new AmountMoneyComponentUpdateEvent(getValue()));
