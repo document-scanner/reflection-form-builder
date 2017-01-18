@@ -160,6 +160,7 @@ public abstract class CachedOnlineAmountMoneyExchangeRateRetriever extends Onlin
     @Override
     public double fetchConversionRate(Currency currency) throws AmountMoneyExchangeRateRetrieverException {
         Pair<Map<Currency, Double>, Currency> result = getResult();
+        assert result != null;
         if(Currency.getReferenceCurrency() == null) {
             Currency.setReferenceCurrency(result.getValue());
         }else {
@@ -172,7 +173,6 @@ public abstract class CachedOnlineAmountMoneyExchangeRateRetriever extends Onlin
         if(currency.equals(result.getValue())) {
             return 1.0;
         }
-        assert result != null;
         Double retValue = result.getKey().get(currency);
         if(retValue == null) {
             throw new AmountMoneyExchangeRateRetrieverException(String.format("The API response from URL %s didn't contain the key for the currency %s",
