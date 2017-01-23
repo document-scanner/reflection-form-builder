@@ -28,6 +28,19 @@ import java.util.Map;
 public abstract class AbstractStorage<T, C extends StorageConf> implements Storage<T, C> {
     private final Map<Object, List<StorageCallback>> postStoreCallbackMap = new HashMap<>();
     private final Map<Object, List<StorageCallback>> preStoreCallbackMap = new HashMap<>();
+    /**
+     * A flag to improve feedback in case {@link #start() } hasn't been called.
+     */
+    private boolean started = false;
+
+    @Override
+    public void start() throws StorageCreationException {
+        this.started = true;
+    }
+
+    public boolean isStarted() {
+        return started;
+    }
 
     @Override
     public void registerPostStoreCallback(T object, StorageCallback callback) throws StorageException {
