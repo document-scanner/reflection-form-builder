@@ -178,7 +178,9 @@ public class ReflectionFormBuilder<F extends FieldRetriever> {
     protected void onFieldUpdate(FieldUpdateEvent event, Field field, Object instance) throws IllegalArgumentException,
             IllegalAccessException,
             InvocationTargetException {
-        field.set(instance, event.getNewValue());
+        Object eventNewValue = event.getNewValue();
+        field.set(instance,
+                eventNewValue);
     }
 
     /**
