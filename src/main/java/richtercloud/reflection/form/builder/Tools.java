@@ -17,6 +17,7 @@ package richtercloud.reflection.form.builder;
 import java.awt.Component;
 import java.awt.Container;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -25,6 +26,24 @@ import java.util.Queue;
  * @author richter
  */
 public class Tools {
+
+    public final static Comparator<Class<?>> CLASS_COMPARATOR_SUBCLASS_FIRST = (Class<?> o1, Class<?> o2) -> {
+        if(o1.equals(o2)) {
+            return 0;
+        }else if(o1.isAssignableFrom(o2)) {
+            return 1;
+        }
+        return -1;
+    };
+
+    public final static Comparator<Class<?>> CLASS_COMPARATOR_SUPERCLASS_FIRST = (Class<?> o1, Class<?> o2) -> {
+        if(o1.equals(o2)) {
+            return 0;
+        }else if(o1.isAssignableFrom(o2)) {
+            return -1;
+        }
+        return 1;
+    };
 
     public static void disableRecursively(Container container,
             boolean enable) {
