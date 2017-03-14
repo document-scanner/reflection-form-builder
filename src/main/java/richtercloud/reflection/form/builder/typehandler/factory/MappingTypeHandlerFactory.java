@@ -18,6 +18,7 @@ import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import richtercloud.message.handler.IssueHandler;
 import richtercloud.message.handler.MessageHandler;
 import static richtercloud.reflection.form.builder.fieldhandler.factory.MappingFieldHandlerFactory.createAnyTypeListTypeToken;
 import static richtercloud.reflection.form.builder.fieldhandler.factory.MappingFieldHandlerFactory.createBooleanListTypeToken;
@@ -66,24 +67,24 @@ public class MappingTypeHandlerFactory {
         typeHandlerMappingDefault0.put(createSqlDateTypeToken(), SqlDateTypeHandler.getInstance());
         TYPE_HANDLER_MAPPING_DEFAULT = Collections.unmodifiableMap(typeHandlerMappingDefault0);
     }
-    private final MessageHandler messageHandler;
+    private final IssueHandler issueHandler;
 
-    public MappingTypeHandlerFactory(MessageHandler messageHandler) {
-        this.messageHandler = messageHandler;
+    public MappingTypeHandlerFactory(IssueHandler issueHandler) {
+        this.issueHandler = issueHandler;
     }
 
     public MessageHandler getMessageHandler() {
-        return messageHandler;
+        return issueHandler;
     }
 
     public Map<Type, TypeHandler<?, ?,?,?>> generateTypeHandlerMapping() {
         Map<Type, TypeHandler<?, ?,?,?>> typeHandlerMapping0 = new HashMap<>();
         typeHandlerMapping0.putAll(TYPE_HANDLER_MAPPING_DEFAULT);
         //in addition to CLASS_MAPPING_DEFAULT
-        typeHandlerMapping0.put(createBooleanListTypeToken(), new BooleanListTypeHandler(messageHandler));
-        typeHandlerMapping0.put(createIntegerListTypeToken(), new IntegerListTypeHandler(messageHandler));
-        typeHandlerMapping0.put(createAnyTypeListTypeToken(), new SimpleEntityListTypeHandler(messageHandler));
-        typeHandlerMapping0.put(createStringListTypeToken(), new StringListTypeHandler(messageHandler));
+        typeHandlerMapping0.put(createBooleanListTypeToken(), new BooleanListTypeHandler(issueHandler));
+        typeHandlerMapping0.put(createIntegerListTypeToken(), new IntegerListTypeHandler(issueHandler));
+        typeHandlerMapping0.put(createAnyTypeListTypeToken(), new SimpleEntityListTypeHandler(issueHandler));
+        typeHandlerMapping0.put(createStringListTypeToken(), new StringListTypeHandler(issueHandler));
         return typeHandlerMapping0;
     }
 }

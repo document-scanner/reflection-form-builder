@@ -23,7 +23,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import richtercloud.message.handler.MessageHandler;
+import richtercloud.message.handler.IssueHandler;
 import richtercloud.reflection.form.builder.ComponentHandler;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
 import richtercloud.reflection.form.builder.fieldhandler.FieldUpdateEvent;
@@ -39,8 +39,8 @@ import richtercloud.reflection.form.builder.panels.SimpleEntityListPanel;
 public class SimpleEntityListTypeHandler extends AbstractListTypeHandler<List<Object>, FieldUpdateEvent<List<Object>>,ReflectionFormBuilder> {
     private static final Logger LOGGER = LoggerFactory.getLogger(SimpleEntityListTypeHandler.class);
 
-    public SimpleEntityListTypeHandler(MessageHandler messageHandler) {
-        super(messageHandler);
+    public SimpleEntityListTypeHandler(IssueHandler issueHandler) {
+        super(issueHandler);
     }
 
     @Override
@@ -71,7 +71,7 @@ public class SimpleEntityListTypeHandler extends AbstractListTypeHandler<List<Ob
         final SimpleEntityListPanel<Object> retValue = new SimpleEntityListPanel<>(reflectionFormBuilder,
                 fieldValue,
                 entityClass,
-                getMessageHandler());
+                getIssueHandler());
         retValue.addItemListener(new EditableListPanelItemListener<Object>() {
 
             @Override

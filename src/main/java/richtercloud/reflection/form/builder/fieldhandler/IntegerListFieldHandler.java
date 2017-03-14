@@ -15,6 +15,7 @@
 package richtercloud.reflection.form.builder.fieldhandler;
 
 import java.util.List;
+import richtercloud.message.handler.IssueHandler;
 import richtercloud.message.handler.MessageHandler;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
 import richtercloud.reflection.form.builder.panels.AbstractListPanel;
@@ -27,9 +28,9 @@ import richtercloud.reflection.form.builder.typehandler.TypeHandler;
  */
 public class IntegerListFieldHandler extends AbstractListFieldHandler<List<Integer>, FieldUpdateEvent<List<Integer>>, ReflectionFormBuilder> implements FieldHandler<List<Integer>, FieldUpdateEvent<List<Integer>>, ReflectionFormBuilder, AbstractListPanel>{
 
-    public IntegerListFieldHandler(MessageHandler messageHandler) {
-        super(messageHandler,
-                new IntegerListTypeHandler(messageHandler));
+    public IntegerListFieldHandler(IssueHandler issueHandler) {
+        super(issueHandler,
+                new IntegerListTypeHandler(issueHandler));
     }
 
     public IntegerListFieldHandler(MessageHandler messageHandler,

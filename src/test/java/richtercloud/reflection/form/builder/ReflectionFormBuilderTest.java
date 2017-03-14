@@ -29,8 +29,8 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import richtercloud.message.handler.LoggerMessageHandler;
-import richtercloud.message.handler.MessageHandler;
+import richtercloud.message.handler.IssueHandler;
+import richtercloud.message.handler.LoggerIssueHandler;
 import richtercloud.reflection.form.builder.fieldhandler.BooleanListFieldHandler;
 import richtercloud.reflection.form.builder.fieldhandler.FieldHandler;
 import richtercloud.reflection.form.builder.fieldhandler.FieldHandlingException;
@@ -46,7 +46,7 @@ import richtercloud.reflection.form.builder.typehandler.StringTypeHandler;
  */
 public class ReflectionFormBuilderTest {
     private final static Logger LOGGER = LoggerFactory.getLogger(ReflectionFormBuilderTest.class);
-    private final MessageHandler messageHandler = new LoggerMessageHandler(LOGGER);
+    private final IssueHandler issueHandler = new LoggerIssueHandler(LOGGER);
 
     /**
      * Test of getClassComponent method, of class ReflectionFormBuilder.
@@ -59,14 +59,14 @@ public class ReflectionFormBuilderTest {
         Type listAnyType = new TypeToken<List<AnyType>>() {}.getType();
         Type listBooleanType = new TypeToken<List<Boolean>>() {}.getType();
         classMapping.put(listAnyType, StringFieldHandler.getInstance());
-        classMapping.put(listBooleanType, new BooleanListFieldHandler(messageHandler));
+        classMapping.put(listBooleanType, new BooleanListFieldHandler(issueHandler));
         classMapping.put(String.class,
                 new StringFieldHandler(StringTypeHandler.getInstance()));
         FieldHandler fieldHandler = new MappingFieldHandler(classMapping,
                 new HashMap<>());
         ReflectionFormBuilder instance = new ReflectionFormBuilder(
                 "Field description",
-                messageHandler,
+                issueHandler,
                 new CachedFieldRetriever());
         Class<?> entityClass = TestEntity.class;
         Field field = entityClass.getDeclaredField("a");
@@ -80,7 +80,7 @@ public class ReflectionFormBuilderTest {
         Class<? extends TestEntityCollection> entityClassCollection = TestEntityCollection.class;
         TestEntityCollection entityCollection = TestEntityCollection.class.getDeclaredConstructor().newInstance();
         instance = new ReflectionFormBuilder("Field description",
-                messageHandler,
+                issueHandler,
                 new CachedFieldRetriever());
         result = instance.getClassComponent(TestEntityCollection.class.getDeclaredField("gs"), //is a List<Set<Boolean>>
                 entityClassCollection,
@@ -110,7 +110,7 @@ public class ReflectionFormBuilderTest {
         };
         ReflectionFormBuilder instance = new ReflectionFormBuilder(
                 "Field description",
-                messageHandler,
+                issueHandler,
                 new CachedFieldRetriever());
         Class<?> entityClass = TestEntity.class;
         ReflectionFormPanel result = instance.transformEntityClass(entityClass,
@@ -130,7 +130,7 @@ public class ReflectionFormBuilderTest {
 //        classMapping.put(new TypeToken<List<TestEntityCollection>>() {}.getType(),
 //                new SimpleEntityListFieldHandler(messageHandler));
         instance = new ReflectionFormBuilder("Field description",
-                messageHandler,
+                issueHandler,
                 new CachedFieldRetriever());
         result = instance.transformEntityClass(entityClass,
                 null, //entityToUpdate

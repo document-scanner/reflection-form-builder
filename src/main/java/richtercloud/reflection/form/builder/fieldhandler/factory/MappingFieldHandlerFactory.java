@@ -21,6 +21,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import richtercloud.message.handler.IssueHandler;
 import richtercloud.message.handler.MessageHandler;
 import richtercloud.reflection.form.builder.AnyType;
 import richtercloud.reflection.form.builder.fieldhandler.BooleanFieldHandler;
@@ -152,17 +153,17 @@ public class MappingFieldHandlerFactory {
         return new TypeToken<List<String>>() {
         }.getType();
     }
-    private MessageHandler messageHandler;
+    private IssueHandler issueHandler;
 
-    public MappingFieldHandlerFactory(MessageHandler messageHandler) {
-        if(messageHandler == null) {
+    public MappingFieldHandlerFactory(IssueHandler issueHandler) {
+        if(issueHandler == null) {
             throw new IllegalArgumentException("messageHandler mustn't be null");
         }
-        this.messageHandler = messageHandler;
+        this.issueHandler = issueHandler;
     }
 
     public MessageHandler getMessageHandler() {
-        return messageHandler;
+        return issueHandler;
     }
 
     /*
@@ -192,10 +193,10 @@ public class MappingFieldHandlerFactory {
         classMapping0.put(createDateTypeToken(), DateFieldHandler.getInstance());
         classMapping0.put(createSqlDateTypeToken(), SqlDateFieldHandler.getInstance());
         //in addition to CLASS_MAPPING_DEFAULT
-        classMapping0.put(createBooleanListTypeToken(), new BooleanListFieldHandler(messageHandler));
-        classMapping0.put(createIntegerListTypeToken(), new IntegerListFieldHandler(messageHandler));
-        classMapping0.put(createAnyTypeListTypeToken(), new SimpleEntityListFieldHandler(messageHandler));
-        classMapping0.put(createStringListTypeToken(), new StringListFieldHandler(messageHandler));
+        classMapping0.put(createBooleanListTypeToken(), new BooleanListFieldHandler(issueHandler));
+        classMapping0.put(createIntegerListTypeToken(), new IntegerListFieldHandler(issueHandler));
+        classMapping0.put(createAnyTypeListTypeToken(), new SimpleEntityListFieldHandler(issueHandler));
+        classMapping0.put(createStringListTypeToken(), new StringListFieldHandler(issueHandler));
         return classMapping0;
     }
 

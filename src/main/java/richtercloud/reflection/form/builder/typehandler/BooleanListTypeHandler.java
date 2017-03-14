@@ -20,7 +20,7 @@ import java.util.List;
 import javax.swing.JComponent;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import richtercloud.message.handler.MessageHandler;
+import richtercloud.message.handler.IssueHandler;
 import richtercloud.reflection.form.builder.ComponentHandler;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
 import richtercloud.reflection.form.builder.fieldhandler.FieldUpdateEvent;
@@ -35,8 +35,8 @@ import richtercloud.reflection.form.builder.panels.ListPanelItemEvent;
  */
 public class BooleanListTypeHandler extends AbstractListTypeHandler<List<Boolean>, FieldUpdateEvent<List<Boolean>>, ReflectionFormBuilder> {
 
-    public BooleanListTypeHandler(MessageHandler messageHandler) {
-        super(messageHandler);
+    public BooleanListTypeHandler(IssueHandler issueHandler) {
+        super(issueHandler);
     }
 
     @Override
@@ -46,7 +46,7 @@ public class BooleanListTypeHandler extends AbstractListTypeHandler<List<Boolean
             ReflectionFormBuilder reflectionFormBuilder) {
         BooleanListPanel retValue = new BooleanListPanel(reflectionFormBuilder,
                 fieldValue,
-                getMessageHandler());
+                getIssueHandler());
         retValue.addItemListener(new EditableListPanelItemListener<Boolean>() {
 
             @Override

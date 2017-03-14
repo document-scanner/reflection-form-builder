@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.jscience.economics.money.Money;
 import org.jscience.physics.amount.Amount;
-import richtercloud.message.handler.MessageHandler;
+import richtercloud.message.handler.IssueHandler;
 import richtercloud.reflection.form.builder.components.money.AmountMoneyCurrencyStorage;
 import richtercloud.reflection.form.builder.components.money.AmountMoneyExchangeRateRetriever;
 import richtercloud.reflection.form.builder.components.money.AmountMoneyUsageStatisticsStorage;
@@ -44,8 +44,8 @@ public class AmountMoneyMappingFieldHandlerFactory extends MappingFieldHandlerFa
     public AmountMoneyMappingFieldHandlerFactory(AmountMoneyUsageStatisticsStorage amountMoneyUsageStatisticsStorage,
             AmountMoneyCurrencyStorage amountMoneyCurrencyStorage,
             AmountMoneyExchangeRateRetriever amountMoneyConversionRateRetriever,
-            MessageHandler messageHandler) {
-        super(messageHandler);
+            IssueHandler issueHandler) {
+        super(issueHandler);
         this.amountMoneyUsageStatisticsStorage = amountMoneyUsageStatisticsStorage;
         this.amountMoneyCurrencyStorage = amountMoneyCurrencyStorage;
         this.amountMoneyConversionRateRetriever = amountMoneyConversionRateRetriever;

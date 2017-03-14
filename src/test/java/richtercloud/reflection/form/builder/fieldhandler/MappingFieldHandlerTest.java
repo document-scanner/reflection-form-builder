@@ -30,6 +30,8 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import richtercloud.message.handler.IssueHandler;
+import richtercloud.message.handler.LoggerIssueHandler;
 import richtercloud.message.handler.LoggerMessageHandler;
 import richtercloud.message.handler.MessageHandler;
 import richtercloud.reflection.form.builder.AnyType;
@@ -44,8 +46,8 @@ import richtercloud.reflection.form.builder.fieldhandler.factory.MappingFieldHan
  */
 public class MappingFieldHandlerTest {
     private final static Logger LOGGER = LoggerFactory.getLogger(MappingFieldHandlerTest.class);
-    private MessageHandler messageHandler = new LoggerMessageHandler(LOGGER);
-    private MappingFieldHandlerFactory classMappingFactory = new MappingFieldHandlerFactory(messageHandler);
+    private IssueHandler issueHandler = new LoggerIssueHandler(LOGGER);
+    private MappingFieldHandlerFactory classMappingFactory = new MappingFieldHandlerFactory(issueHandler);
 
     /**
      * Test of validateMapping method, of class MappingFieldHandler.
@@ -105,9 +107,9 @@ public class MappingFieldHandlerTest {
 
         //check that a generic field type doesn't match a generic type in the classMapping with AnyType in the the generics, but not the same class (e.g. a field of type Amount<Money> should bring a result if List<AnyType> is specified in classMapping)
         classMapping = new HashMap<>();
-        MessageHandler messageHandler = new LoggerMessageHandler(LOGGER);
+        IssueHandler issueHandler = new LoggerIssueHandler(LOGGER);
         classMapping.put(new TypeToken<List<AnyType>>() {}.getType(),
-                new IntegerListFieldHandler(messageHandler) //mapping IntegerListFieldHandler to List<AnyType> shouldn't influence the test case
+                new IntegerListFieldHandler(issueHandler) //mapping IntegerListFieldHandler to List<AnyType> shouldn't influence the test case
         ); //a type without common prefix
         primitiveMapping = new HashMap<>();
         type = (ParameterizedType) TestEntity.class.getDeclaredField("m").getGenericType();

@@ -19,7 +19,7 @@ import java.lang.reflect.Type;
 import java.util.List;
 import javax.swing.JComponent;
 import org.apache.commons.lang3.tuple.Pair;
-import richtercloud.message.handler.MessageHandler;
+import richtercloud.message.handler.IssueHandler;
 import richtercloud.reflection.form.builder.ComponentHandler;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
 import richtercloud.reflection.form.builder.fieldhandler.FieldHandlingException;
@@ -32,14 +32,14 @@ import richtercloud.reflection.form.builder.panels.AbstractListPanel;
  * @author richter
  */
 public abstract class AbstractListTypeHandler<T, E extends FieldUpdateEvent<T>, R extends ReflectionFormBuilder> implements TypeHandler<T, E,R, AbstractListPanel> {
-    private MessageHandler messageHandler;
+    private IssueHandler issueHandler;
 
-    public AbstractListTypeHandler(MessageHandler messageHandler) {
-        this.messageHandler = messageHandler;
+    public AbstractListTypeHandler(IssueHandler issueHandler) {
+        this.issueHandler = issueHandler;
     }
 
-    public MessageHandler getMessageHandler() {
-        return messageHandler;
+    public IssueHandler getIssueHandler() {
+        return issueHandler;
     }
 
     @Override

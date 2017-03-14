@@ -19,8 +19,8 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import richtercloud.message.handler.LoggerMessageHandler;
-import richtercloud.message.handler.MessageHandler;
+import richtercloud.message.handler.IssueHandler;
+import richtercloud.message.handler.LoggerIssueHandler;
 
 /**
  *
@@ -28,7 +28,7 @@ import richtercloud.message.handler.MessageHandler;
  */
 public class MappingFieldHandlerFactoryTest {
     private final static Logger LOGGER = LoggerFactory.getLogger(MappingFieldHandlerFactoryTest.class);
-    private final MessageHandler messageHandler = new LoggerMessageHandler(LOGGER);
+    private final IssueHandler issueHandler = new LoggerIssueHandler(LOGGER);
 
     /**
      * Test of getInstance method, of class MappingFieldHandlerFactory.
@@ -41,7 +41,7 @@ public class MappingFieldHandlerFactoryTest {
         }catch(IllegalArgumentException ex) {
             //expected
         }
-        MappingFieldHandlerFactory result = new MappingFieldHandlerFactory(messageHandler);
+        MappingFieldHandlerFactory result = new MappingFieldHandlerFactory(issueHandler);
         assertNotNull(result);
     }
 }
