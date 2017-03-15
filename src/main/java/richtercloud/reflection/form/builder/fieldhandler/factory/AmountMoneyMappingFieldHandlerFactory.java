@@ -64,7 +64,7 @@ public class AmountMoneyMappingFieldHandlerFactory extends MappingFieldHandlerFa
                 new AmountMoneyFieldHandler(amountMoneyUsageStatisticsStorage,
                         amountMoneyConversionRateRetriever,
                         amountMoneyCurrencyStorage,
-                        getMessageHandler()));
+                        getIssueHandler()));
         return classMapping0;
     }
 }

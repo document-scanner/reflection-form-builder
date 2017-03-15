@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import richtercloud.message.handler.IssueHandler;
-import richtercloud.message.handler.MessageHandler;
 import richtercloud.reflection.form.builder.AnyType;
 import richtercloud.reflection.form.builder.fieldhandler.BooleanFieldHandler;
 import richtercloud.reflection.form.builder.fieldhandler.BooleanListFieldHandler;
@@ -162,7 +161,7 @@ public class MappingFieldHandlerFactory {
         this.issueHandler = issueHandler;
     }
 
-    public MessageHandler getMessageHandler() {
+    public IssueHandler getIssueHandler() {
         return issueHandler;
     }
 
