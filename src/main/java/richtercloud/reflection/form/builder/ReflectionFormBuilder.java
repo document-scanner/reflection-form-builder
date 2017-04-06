@@ -30,6 +30,7 @@ import richtercloud.reflection.form.builder.fieldhandler.FieldHandler;
 import richtercloud.reflection.form.builder.fieldhandler.FieldHandlingException;
 import richtercloud.reflection.form.builder.fieldhandler.FieldUpdateEvent;
 import richtercloud.reflection.form.builder.fieldhandler.FieldUpdateListener;
+import richtercloud.validation.tools.FieldRetriever;
 
 /**
  * Builds a {@link ReflectionFormPanel} by recursing over all fields of all
@@ -74,6 +75,10 @@ impossible to handle it elegantly in the constructor call hierarchy (and it
 perfectly fine to enforce it) -> don't expose the CLASS_MAPPING_DEFAULT
 constant since using it results in a very incomplete setup which raises a lot of
 expections for default use cases
+- Extraction of FieldRetriever interface allows ReflectionFormBuilder to
+concentrate on creating components (which is enforced by forbidding
+ReflectionFormBuilder.getClassComponent to return null). This design follows
+"composition over inheritance"
  */
 public class ReflectionFormBuilder<F extends FieldRetriever> {
     private final static Logger LOGGER = LoggerFactory.getLogger(ReflectionFormBuilder.class);

@@ -14,6 +14,7 @@
  */
 package richtercloud.reflection.form.builder;
 
+import richtercloud.validation.tools.CachedFieldRetriever;
 import com.google.common.reflect.TypeToken;
 import java.awt.Component;
 import java.lang.reflect.Field;
