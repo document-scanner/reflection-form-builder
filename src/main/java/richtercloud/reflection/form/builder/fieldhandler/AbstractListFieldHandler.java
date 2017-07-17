@@ -24,6 +24,7 @@ import richtercloud.reflection.form.builder.ComponentHandler;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
 import richtercloud.reflection.form.builder.panels.AbstractListPanel;
 import richtercloud.reflection.form.builder.typehandler.TypeHandler;
+import richtercloud.validation.tools.FieldRetrievalException;
 
 /**
  *
@@ -47,7 +48,7 @@ public abstract class AbstractListFieldHandler<T, E extends FieldUpdateEvent<T>,
     public JComponent handle(Field field,
             Object instance,
             FieldUpdateListener<E> updateListener,
-            R reflectionFormBuilder) throws IllegalArgumentException, IllegalAccessException, FieldHandlingException, InstantiationException, InvocationTargetException {
+            R reflectionFormBuilder) throws IllegalArgumentException, IllegalAccessException, FieldHandlingException, InstantiationException, InvocationTargetException, FieldRetrievalException {
         Type fieldGenericType = field.getGenericType();
         Pair<JComponent, ComponentHandler<?>> retValue = this.typeHandler.handle(fieldGenericType,
                 (T) field.get(instance), //fieldValue
@@ -59,7 +60,7 @@ public abstract class AbstractListFieldHandler<T, E extends FieldUpdateEvent<T>,
     }
 
     @Override
-    public void reset(AbstractListPanel component) {
+    public void reset(AbstractListPanel component) throws FieldRetrievalException {
         this.typeHandler.reset(component);
     }
 }

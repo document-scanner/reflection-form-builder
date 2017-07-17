@@ -28,6 +28,7 @@ import richtercloud.reflection.form.builder.ReflectionFormBuilder;
 import richtercloud.reflection.form.builder.fieldhandler.FieldHandlingException;
 import richtercloud.reflection.form.builder.fieldhandler.FieldUpdateEvent;
 import richtercloud.reflection.form.builder.fieldhandler.FieldUpdateListener;
+import richtercloud.validation.tools.FieldRetrievalException;
 
 /**
  * A {@link TypeHandler} which allows to check for an exact type match (which is
@@ -83,7 +84,8 @@ public abstract class GenericListTypeHandler<R extends ReflectionFormBuilder, C 
             IllegalAccessException,
             FieldHandlingException,
             InstantiationException,
-            InvocationTargetException {
+            InvocationTargetException,
+            FieldRetrievalException {
         if(fieldValue == null) {
             fieldValue = new LinkedList<>(); //this is legitimate because all
                     //mechanisms will fail if the field value (retrieved with
@@ -144,7 +146,7 @@ public abstract class GenericListTypeHandler<R extends ReflectionFormBuilder, C 
             String fieldName,
             Class<?> declaringClass,
             FieldUpdateListener<FieldUpdateEvent<List<Object>>> updateListener,
-            R reflectionFormBuilder) throws IllegalAccessException;
+            R reflectionFormBuilder) throws IllegalAccessException, FieldRetrievalException;
 
     public Type retrieveTypeGenericType(Type type) {
         Type retValue;

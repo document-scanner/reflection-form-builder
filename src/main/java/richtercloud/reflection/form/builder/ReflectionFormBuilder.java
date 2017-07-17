@@ -25,11 +25,12 @@ import javax.swing.GroupLayout.Group;
 import javax.swing.JComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import richtercloud.message.handler.MessageHandler;
+import richtercloud.message.handler.IssueHandler;
 import richtercloud.reflection.form.builder.fieldhandler.FieldHandler;
 import richtercloud.reflection.form.builder.fieldhandler.FieldHandlingException;
 import richtercloud.reflection.form.builder.fieldhandler.FieldUpdateEvent;
 import richtercloud.reflection.form.builder.fieldhandler.FieldUpdateListener;
+import richtercloud.validation.tools.FieldRetrievalException;
 import richtercloud.validation.tools.FieldRetriever;
 
 /**
@@ -95,7 +96,7 @@ public class ReflectionFormBuilder<F extends FieldRetriever> {
      * Dialog title used for creating {@link ReflectionFormFieldLabel}s.
      */
     private final String fieldDescriptionDialogTitle;
-    private MessageHandler messageHandler;
+    private IssueHandler issueHandler;
 
     private final F fieldRetriever;
 
@@ -103,7 +104,7 @@ public class ReflectionFormBuilder<F extends FieldRetriever> {
      *
      * @param fieldRetriever
      * @param fieldDescriptionDialogTitle
-     * @param messageHandler
+     * @param issueHandler
      */
     /*
      internal implementation notes:
@@ -112,18 +113,18 @@ public class ReflectionFormBuilder<F extends FieldRetriever> {
      mapping and thus passing the argument is enforced in constructor)
      */
     public ReflectionFormBuilder(String fieldDescriptionDialogTitle,
-            MessageHandler messageHandler,
+            IssueHandler issueHandler,
             F fieldRetriever) {
-        if(messageHandler == null) {
+        if(issueHandler == null) {
             throw new IllegalArgumentException("messageHandler mustn't be null");
         }
         this.fieldDescriptionDialogTitle = fieldDescriptionDialogTitle;
-        this.messageHandler = messageHandler;
+        this.issueHandler = issueHandler;
         this.fieldRetriever = fieldRetriever;
     }
 
-    public MessageHandler getMessageHandler() {
-        return messageHandler;
+    public IssueHandler getIssueHandler() {
+        return issueHandler;
     }
 
     protected F getFieldRetriever() {
@@ -157,7 +158,8 @@ public class ReflectionFormBuilder<F extends FieldRetriever> {
             IllegalArgumentException,
             InvocationTargetException,
             NoSuchMethodException,
-            InstantiationException {
+            InstantiationException,
+            FieldRetrievalException {
         if (!field.getDeclaringClass().isAssignableFrom(entityClass)) {
             throw new IllegalArgumentException(String.format("field %s has to be declared by entityClass", field));
         }
@@ -207,8 +209,13 @@ public class ReflectionFormBuilder<F extends FieldRetriever> {
             Object instance,
             Map<Field, JComponent> fieldMapping,
             ReflectionFormPanel reflectionFormPanel,
-            FieldHandler fieldHandler) throws TransformationException {
-        List<Field> entityClassFields = this.fieldRetriever.retrieveRelevantFields(clazz);
+            FieldHandler fieldHandler) throws TransformationException, FieldRetrievalException {
+        List<Field> entityClassFields;
+        try {
+            entityClassFields = this.fieldRetriever.retrieveRelevantFields(clazz);
+        } catch (FieldRetrievalException ex) {
+            throw new TransformationException(ex);
+        }
 
         GroupLayout layout = reflectionFormPanel.getLayout();
         layout.setAutoCreateGaps(true);
@@ -277,7 +284,7 @@ public class ReflectionFormBuilder<F extends FieldRetriever> {
      */
     public ReflectionFormPanel transformEntityClass(Class<?> entityClass,
             Object entityToUpdate,
-            FieldHandler fieldHandler) throws TransformationException {
+            FieldHandler fieldHandler) throws TransformationException, FieldRetrievalException {
         final Map<Field, JComponent> fieldMapping = new HashMap<>();
         Object instance = prepareInstance(entityClass, entityToUpdate);
         ReflectionFormPanel retValue = new ReflectionFormPanel(fieldMapping,

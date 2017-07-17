@@ -24,6 +24,7 @@ import richtercloud.reflection.form.builder.ReflectionFormBuilder;
 import richtercloud.reflection.form.builder.fieldhandler.FieldHandlingException;
 import richtercloud.reflection.form.builder.fieldhandler.FieldUpdateEvent;
 import richtercloud.reflection.form.builder.fieldhandler.FieldUpdateListener;
+import richtercloud.validation.tools.FieldRetrievalException;
 
 /**
  *
@@ -73,6 +74,7 @@ public interface TypeHandler<T, E extends FieldUpdateEvent<T>, R extends Reflect
             FieldUpdateListener<E> updateListener,
             R reflectionFormBuilder) throws IllegalArgumentException,
             IllegalAccessException,
-            FieldHandlingException, InstantiationException, InvocationTargetException;
+            FieldHandlingException, InstantiationException, InvocationTargetException,
+            FieldRetrievalException;
 
 }

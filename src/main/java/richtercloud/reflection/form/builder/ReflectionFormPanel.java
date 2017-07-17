@@ -26,6 +26,7 @@ import javax.swing.JComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import richtercloud.reflection.form.builder.fieldhandler.FieldHandler;
+import richtercloud.validation.tools.FieldRetrievalException;
 
 /**
  *
@@ -159,7 +160,7 @@ public class ReflectionFormPanel<U extends ReflectionFormPanelUpdateListener> ex
         return entityClass;
     }
 
-    public void reset() {
+    public void reset() throws FieldRetrievalException {
         for(Component component : getFieldMapping().values()) {
             getFieldHandler().reset(component);
         }

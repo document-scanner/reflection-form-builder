@@ -32,6 +32,7 @@ import richtercloud.message.handler.MessageHandler;
 import richtercloud.reflection.form.builder.fieldhandler.FieldHandler;
 import richtercloud.reflection.form.builder.fieldhandler.FieldHandlingException;
 import richtercloud.reflection.form.builder.fieldhandler.FieldUpdateListener;
+import richtercloud.validation.tools.FieldRetrievalException;
 
 /**
  *
@@ -47,7 +48,7 @@ public class CachedFieldRetrieverTest {
      */
     @Test
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
-    public void testRetrieveRelevantFields() throws NoSuchFieldException {
+    public void testRetrieveRelevantFields() throws NoSuchFieldException, FieldRetrievalException {
         Class<?> entityClass = TestEntity.class;
         FieldHandler fieldHandler = new FieldHandler() {
             @Override

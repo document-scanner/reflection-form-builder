@@ -24,6 +24,7 @@ import javax.swing.JLabel;
 import org.apache.commons.lang3.tuple.Pair;
 import richtercloud.reflection.form.builder.ComponentHandler;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
+import richtercloud.validation.tools.FieldRetrievalException;
 
 /**
  * Provides reset functionality by making {@link FieldHandler#handle(java.lang.reflect.Field, java.lang.Object, richtercloud.reflection.form.builder.fieldhandler.FieldUpdateListener, richtercloud.reflection.form.builder.ReflectionFormBuilder) } final and enforcing implementation in helper {@link #handle0
@@ -60,7 +61,8 @@ public abstract class ResettableFieldHandler<T, E extends FieldUpdateEvent<T>, R
             FieldHandlingException,
             InvocationTargetException,
             NoSuchMethodException,
-            InstantiationException {
+            InstantiationException,
+            FieldRetrievalException {
         Pair<JComponent, ComponentHandler<?>> retValueEntry = handle0(field, instance, updateListener, reflectionFormBuilder);
         if(retValueEntry == null) {
             JComponent retValue = retrieveDefaultComponent(field);
@@ -89,10 +91,11 @@ public abstract class ResettableFieldHandler<T, E extends FieldUpdateEvent<T>, R
             FieldHandlingException,
             InvocationTargetException,
             NoSuchMethodException,
-            InstantiationException;
+            InstantiationException,
+            FieldRetrievalException;
 
     @Override
-    public void reset(C component) {
+    public void reset(C component) throws FieldRetrievalException {
         ComponentHandler classPartHandler = this.componentMapping.get(component);
         if(classPartHandler == null) {
             throw new IllegalArgumentException(String.format("component '%s' doesn't have a %s mapped in componentMapping", component, ComponentHandler.class));

@@ -26,6 +26,7 @@ import richtercloud.reflection.form.builder.ReflectionFormBuilder;
 import richtercloud.reflection.form.builder.fieldhandler.FieldHandlingException;
 import richtercloud.reflection.form.builder.fieldhandler.FieldUpdateEvent;
 import richtercloud.reflection.form.builder.fieldhandler.FieldUpdateListener;
+import richtercloud.validation.tools.FieldRetrievalException;
 
 /**
  *
@@ -46,7 +47,7 @@ public class MappingTypeHandler<T, E extends FieldUpdateEvent<T>, R extends Refl
             String fieldName,
             Class<?> declaringClass,
             FieldUpdateListener<E> updateListener,
-            R reflectionFormBuilder) throws IllegalArgumentException, IllegalAccessException, FieldHandlingException, InstantiationException, InvocationTargetException {
+            R reflectionFormBuilder) throws IllegalArgumentException, IllegalAccessException, FieldHandlingException, InstantiationException, InvocationTargetException, FieldRetrievalException {
         Pair<JComponent, ComponentHandler<?>> retValueEntry = handle0(type, fieldValue, fieldName, declaringClass, updateListener, reflectionFormBuilder);
         if(retValueEntry == null) {
             throw new IllegalArgumentException("handle0 mustn't return null");
@@ -65,7 +66,7 @@ public class MappingTypeHandler<T, E extends FieldUpdateEvent<T>, R extends Refl
             String fieldName,
             Class<?> declaringClass,
             FieldUpdateListener<E> updateListener,
-            R reflectionFormBuilder) throws IllegalArgumentException, IllegalAccessException, FieldHandlingException, InstantiationException, InvocationTargetException {
+            R reflectionFormBuilder) throws IllegalArgumentException, IllegalAccessException, FieldHandlingException, InstantiationException, InvocationTargetException, FieldRetrievalException {
         TypeHandler<T,E,R, Component> typeHandler = classMapping.get(type);
         if(typeHandler == null) {
             throw new IllegalArgumentException(String.format("Type '%s' isn't mapped.", type));
@@ -80,7 +81,7 @@ public class MappingTypeHandler<T, E extends FieldUpdateEvent<T>, R extends Refl
     }
 
     @Override
-    public void reset(Component component) {
+    public void reset(Component component) throws FieldRetrievalException {
         ComponentHandler componentResettable = this.componentMapping.get(component);
         componentResettable.reset(component);
     }
