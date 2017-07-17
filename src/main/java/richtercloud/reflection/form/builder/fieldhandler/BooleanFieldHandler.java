@@ -21,8 +21,8 @@ import java.util.Map;
 import javax.swing.JComponent;
 import org.apache.commons.lang3.tuple.Pair;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
-import richtercloud.reflection.form.builder.components.money.AmountMoneyPanel;
 import richtercloud.reflection.form.builder.components.BooleanWrapperComboBox;
+import richtercloud.reflection.form.builder.components.money.AmountMoneyPanel;
 import richtercloud.reflection.form.builder.typehandler.BooleanTypeHandler;
 
 /**

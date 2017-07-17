@@ -14,7 +14,6 @@
  */
 package richtercloud.reflection.form.builder;
 
-import richtercloud.validation.tools.CachedFieldRetriever;
 import com.google.common.reflect.TypeToken;
 import java.awt.Component;
 import java.lang.reflect.Field;
@@ -40,6 +39,7 @@ import richtercloud.reflection.form.builder.fieldhandler.MappingFieldHandler;
 import richtercloud.reflection.form.builder.fieldhandler.StringFieldHandler;
 import richtercloud.reflection.form.builder.panels.BooleanListPanel;
 import richtercloud.reflection.form.builder.typehandler.StringTypeHandler;
+import richtercloud.validation.tools.CachedFieldRetriever;
 
 /**
  *

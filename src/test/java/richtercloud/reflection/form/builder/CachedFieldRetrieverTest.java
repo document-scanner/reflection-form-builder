@@ -14,7 +14,6 @@
  */
 package richtercloud.reflection.form.builder;
 
-import richtercloud.validation.tools.CachedFieldRetriever;
 import java.awt.Component;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -32,6 +31,7 @@ import richtercloud.message.handler.MessageHandler;
 import richtercloud.reflection.form.builder.fieldhandler.FieldHandler;
 import richtercloud.reflection.form.builder.fieldhandler.FieldHandlingException;
 import richtercloud.reflection.form.builder.fieldhandler.FieldUpdateListener;
+import richtercloud.validation.tools.CachedFieldRetriever;
 import richtercloud.validation.tools.FieldRetrievalException;
 
 /**
