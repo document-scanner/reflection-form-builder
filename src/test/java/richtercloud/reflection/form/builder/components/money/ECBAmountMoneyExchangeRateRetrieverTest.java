@@ -15,6 +15,7 @@
 package richtercloud.reflection.form.builder.components.money;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.util.Map;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -33,8 +34,7 @@ public class ECBAmountMoneyExchangeRateRetrieverTest {
      */
     @Test
     public void testFetchCache() throws Exception {
-        File tmpFile = File.createTempFile(ECBAmountMoneyExchangeRateRetrieverTest.class.getSimpleName(),
-                null);
+        File tmpFile = Files.createTempDirectory(ECBAmountMoneyExchangeRateRetrieverTest.class.getSimpleName()).toFile();
         FileUtils.deleteQuietly(tmpFile);
         ECBAmountMoneyExchangeRateRetriever instance = new ECBAmountMoneyExchangeRateRetriever(tmpFile);
         Pair<Map<Currency, Double>, Currency> result = instance.getResult();

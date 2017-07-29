@@ -54,45 +54,45 @@ public class FailsafeAmountMoneyExchangeRateRetriever implements AmountMoneyExch
      */
     private final int availableRetrieverMin;
 
-    public FailsafeAmountMoneyExchangeRateRetriever(File fileCacheFileDir) throws IOException {
+    public FailsafeAmountMoneyExchangeRateRetriever(File cacheFileDir) throws IOException {
         this(AVAILABLE_RETRIEVER_MIN_DEFAULT,
-                fileCacheFileDir,
+                cacheFileDir,
                 CachedOnlineAmountMoneyExchangeRateRetriever.FILE_CACHE_EXPIRATION_MILLIS_DEFAULT);
     }
 
-    public FailsafeAmountMoneyExchangeRateRetriever(File fileCacheFileDir,
+    public FailsafeAmountMoneyExchangeRateRetriever(File cacheFileDir,
             long fileCacheExpirationMillis) throws IOException {
         this(AVAILABLE_RETRIEVER_MIN_DEFAULT,
-                fileCacheFileDir,
+                cacheFileDir,
                 fileCacheExpirationMillis);
     }
 
     /**
      *
      * @param availableRetrieverMin
-     * @param fileCacheFileDir Since {@code FailsafeAmountMoneyExchangeRateRetriever} will manage
+     * @param cacheFileDir Since {@code FailsafeAmountMoneyExchangeRateRetriever} will manage
      * multiple possibly caching retrievers, a directory needs to be used for
      * cache files.
      * @param fileCacheExpirationMillis
      * @throws IOException
      */
     public FailsafeAmountMoneyExchangeRateRetriever(int availableRetrieverMin,
-            File fileCacheFileDir,
+            File cacheFileDir,
             long fileCacheExpirationMillis) throws IOException {
         this.availableRetrieverMin = availableRetrieverMin;
-        if(fileCacheFileDir == null) {
+        if(cacheFileDir == null) {
             throw new IllegalArgumentException("fileCacheFileDir mustn't be null");
         }
-        if(fileCacheFileDir.exists()) {
-            if(!fileCacheFileDir.isDirectory()) {
+        if(cacheFileDir.exists()) {
+            if(!cacheFileDir.isDirectory()) {
                 throw new IllegalArgumentException("fileCacheFileDir exists, but is no directory");
             }
         }else {
-            FileUtils.forceMkdir(fileCacheFileDir);
+            FileUtils.forceMkdir(cacheFileDir);
         }
-        File fixerCacheFile = new File(fileCacheFileDir,
+        File fixerCacheFile = new File(cacheFileDir,
                 "fixer.xml");
-        File eCBCacheFile = new File(fileCacheFileDir,
+        File eCBCacheFile = new File(cacheFileDir,
                 "ecb.xml");
         FixerAmountMoneyExchangeRateRetriever fixerAmountMoneyExchangeRateRetriever = new FixerAmountMoneyExchangeRateRetriever(fixerCacheFile,
                 fileCacheExpirationMillis);
