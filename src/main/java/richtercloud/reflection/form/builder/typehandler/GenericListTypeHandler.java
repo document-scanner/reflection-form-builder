@@ -25,10 +25,10 @@ import javax.swing.JComponent;
 import org.apache.commons.lang3.tuple.Pair;
 import richtercloud.reflection.form.builder.ComponentHandler;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
+import richtercloud.reflection.form.builder.ResetException;
 import richtercloud.reflection.form.builder.fieldhandler.FieldHandlingException;
 import richtercloud.reflection.form.builder.fieldhandler.FieldUpdateEvent;
 import richtercloud.reflection.form.builder.fieldhandler.FieldUpdateListener;
-import richtercloud.validation.tools.FieldRetrievalException;
 
 /**
  * A {@link TypeHandler} which allows to check for an exact type match (which is
@@ -85,7 +85,8 @@ public abstract class GenericListTypeHandler<R extends ReflectionFormBuilder, C 
             FieldHandlingException,
             InstantiationException,
             InvocationTargetException,
-            FieldRetrievalException {
+            NoSuchFieldException,
+            ResetException {
         if(fieldValue == null) {
             fieldValue = new LinkedList<>(); //this is legitimate because all
                     //mechanisms will fail if the field value (retrieved with
@@ -132,7 +133,9 @@ public abstract class GenericListTypeHandler<R extends ReflectionFormBuilder, C 
             String fieldName,
             Class<?> declaringClass,
             FieldUpdateListener<FieldUpdateEvent<List<Object>>> updateListener,
-            R reflectionFormBuilder) throws IllegalAccessException, FieldRetrievalException;
+            R reflectionFormBuilder) throws IllegalAccessException,
+            NoSuchFieldException,
+            ResetException;
 
     public Type retrieveTypeGenericType(Type type) {
         Type retValue;

@@ -64,7 +64,8 @@ public class ReflectionFormBuilderTest {
         classMapping.put(String.class,
                 new StringFieldHandler(StringTypeHandler.getInstance()));
         FieldHandler fieldHandler = new MappingFieldHandler(classMapping,
-                new HashMap<>());
+                new HashMap<>(),
+                issueHandler);
         ReflectionFormBuilder instance = new ReflectionFormBuilder(
                 "Field description",
                 issueHandler,

@@ -15,7 +15,6 @@
 package richtercloud.reflection.form.builder;
 
 import java.awt.Component;
-import richtercloud.validation.tools.FieldRetrievalException;
 
 /**
  * A superclass for all handlers of class properties ({@link FieldHandler},
@@ -37,5 +36,5 @@ to separate it.
 */
 public interface ComponentHandler<C extends Component> {
 
-    void reset(C component) throws FieldRetrievalException;
+    void reset(C component) throws ResetException;
 }

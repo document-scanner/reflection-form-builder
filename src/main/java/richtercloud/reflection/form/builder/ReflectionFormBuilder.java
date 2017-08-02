@@ -23,12 +23,12 @@ import java.util.Map;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Group;
 import javax.swing.JComponent;
+import richtercloud.message.handler.ExceptionMessage;
 import richtercloud.message.handler.IssueHandler;
 import richtercloud.reflection.form.builder.fieldhandler.FieldHandler;
 import richtercloud.reflection.form.builder.fieldhandler.FieldHandlingException;
 import richtercloud.reflection.form.builder.fieldhandler.FieldUpdateEvent;
 import richtercloud.reflection.form.builder.fieldhandler.FieldUpdateListener;
-import richtercloud.validation.tools.FieldRetrievalException;
 import richtercloud.validation.tools.FieldRetriever;
 
 /**
@@ -156,7 +156,8 @@ public class ReflectionFormBuilder<F extends FieldRetriever> {
             InvocationTargetException,
             NoSuchMethodException,
             InstantiationException,
-            FieldRetrievalException {
+            NoSuchFieldException,
+            ResetException {
         if (!field.getDeclaringClass().isAssignableFrom(entityClass)) {
             throw new IllegalArgumentException(String.format("field %s has to be declared by entityClass", field));
         }
@@ -171,7 +172,7 @@ public class ReflectionFormBuilder<F extends FieldRetriever> {
                         try {
                             onFieldUpdate(event, field, instance);
                         } catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException ex) {
-                            throw new RuntimeException(ex);
+                            issueHandler.handleUnexpectedException(new ExceptionMessage(ex));
                         }
                     }
                 },
@@ -206,13 +207,11 @@ public class ReflectionFormBuilder<F extends FieldRetriever> {
             Object instance,
             Map<Field, JComponent> fieldMapping,
             ReflectionFormPanel reflectionFormPanel,
-            FieldHandler fieldHandler) throws TransformationException, FieldRetrievalException {
+            FieldHandler fieldHandler) throws TransformationException,
+            NoSuchFieldException,
+            ResetException {
         List<Field> entityClassFields;
-        try {
-            entityClassFields = this.fieldRetriever.retrieveRelevantFields(clazz);
-        } catch (FieldRetrievalException ex) {
-            throw new TransformationException(ex);
-        }
+        entityClassFields = this.fieldRetriever.retrieveRelevantFields(clazz);
 
         GroupLayout layout = reflectionFormPanel.getLayout();
         layout.setAutoCreateGaps(true);
@@ -281,7 +280,9 @@ public class ReflectionFormBuilder<F extends FieldRetriever> {
      */
     public ReflectionFormPanel transformEntityClass(Class<?> entityClass,
             Object entityToUpdate,
-            FieldHandler fieldHandler) throws TransformationException, FieldRetrievalException {
+            FieldHandler fieldHandler) throws TransformationException,
+            NoSuchFieldException,
+            ResetException {
         final Map<Field, JComponent> fieldMapping = new HashMap<>();
         Object instance = prepareInstance(entityClass, entityToUpdate);
         ReflectionFormPanel retValue = new ReflectionFormPanel(fieldMapping,

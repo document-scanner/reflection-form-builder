@@ -93,14 +93,16 @@ public class MappingFieldHandlerTest {
         });// a type with common prefix
         Map<Class<?>, FieldHandler<?,?, ?, ?>> primitiveMapping = new HashMap<>();
         MappingFieldHandler instance = new MappingFieldHandler(classMapping,
-                primitiveMapping);
+                primitiveMapping,
+                issueHandler);
         Type result = instance.retrieveClassMappingBestMatch(type);
         assertEquals(type, result);
         // check that empty class mapping returns null
         classMapping = new HashMap<>();
         primitiveMapping = new HashMap<>();
         instance = new MappingFieldHandler(classMapping,
-                primitiveMapping);
+                primitiveMapping,
+                issueHandler);
         result = instance.retrieveClassMappingBestMatch(type);
         assertEquals(null, result);
         //check that AnyType is matched needs to be in testGetClassComponent
@@ -114,7 +116,8 @@ public class MappingFieldHandlerTest {
         primitiveMapping = new HashMap<>();
         type = (ParameterizedType) TestEntity.class.getDeclaredField("m").getGenericType();
         instance = new MappingFieldHandler(classMapping,
-                primitiveMapping);
+                primitiveMapping,
+                issueHandler);
         result = instance.retrieveClassMappingBestMatch(type);
         assertEquals(null, result);
     }
@@ -124,7 +127,8 @@ public class MappingFieldHandlerTest {
     public void testRetrieveAnyCountRecursively() {
         MessageHandler messageHandler = new LoggerMessageHandler(LOGGER);
         MappingFieldHandler instance = new MappingFieldHandler(classMappingFactory.generateClassMapping(),
-                classMappingFactory.generatePrimitiveMapping());
+                classMappingFactory.generatePrimitiveMapping(),
+                issueHandler);
         //test 0
         int result = instance.retrieveAnyCountRecursively((ParameterizedType) new TypeToken<List<Set<Integer>>>() {
             }.getType());

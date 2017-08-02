@@ -17,6 +17,8 @@ package richtercloud.reflection.form.builder.components.money;
 import java.awt.Frame;
 import javax.swing.DefaultComboBoxModel;
 import org.jscience.economics.money.Currency;
+import richtercloud.message.handler.ExceptionMessage;
+import richtercloud.message.handler.MessageHandler;
 
 /**
  *
@@ -27,6 +29,7 @@ public class AmountMoneyComponentEditDialog extends javax.swing.JDialog {
     private final DefaultComboBoxModel<Currency> referenceCurrencyComboBoxModel = new DefaultComboBoxModel<>();
     private final AmountMoneyExchangeRateRetriever amountMoneyExchangeRateRetriever;
     private Currency currency;
+    private final MessageHandler messageHandler;
 
     /**
      * Creates new form AmountMoneyPanelEditDialog
@@ -45,10 +48,15 @@ public class AmountMoneyComponentEditDialog extends javax.swing.JDialog {
     public AmountMoneyComponentEditDialog(Currency currency,
             AmountMoneyCurrencyStorage amountMoneyCurrencyStorage,
             AmountMoneyExchangeRateRetriever amountMoneyExchangeRateRetriever,
-            Frame parent) throws AmountMoneyCurrencyStorageException {
+            Frame parent,
+            MessageHandler messageHandler) throws AmountMoneyCurrencyStorageException {
         super(parent,
                 true //modal
         );
+        if(messageHandler == null) {
+            throw new IllegalArgumentException("messageHandler mustn't be null");
+        }
+        this.messageHandler = messageHandler;
         if(currency != null) {
             if(!amountMoneyCurrencyStorage.getCurrencies().contains(currency)) {
                 throw new IllegalArgumentException(String.format("Currency '%s' isn't managed in amountMoneyCurrencyStorage and thus can't be edited", currency.getCode()));
@@ -188,7 +196,8 @@ public class AmountMoneyComponentEditDialog extends javax.swing.JDialog {
             try {
                 this.amountMoneyExchangeRateRetriever.retrieveExchangeRate(referenceCurrency);
             } catch (AmountMoneyExchangeRateRetrieverException ex) {
-                throw new RuntimeException(ex);
+                messageHandler.handle(new ExceptionMessage(ex));
+                return;
             }
             exchangeRate = referenceCurrency.getConverterTo(Currency.getReferenceCurrency()).convert(exchangeRate);
         }

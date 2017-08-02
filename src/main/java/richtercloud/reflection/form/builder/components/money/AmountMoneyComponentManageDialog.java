@@ -162,7 +162,8 @@ public class AmountMoneyComponentManageDialog extends javax.swing.JDialog {
             amountMoneyPanelEditDialog = new AmountMoneyComponentEditDialog(null, //currency (null indicates creation of a new currency)
                     this.amountMoneyCurrencyStorage,
                     this.amountMoneyExchangeRateRetriever,
-                    (Frame) SwingUtilities.getWindowAncestor(this) //parent
+                    (Frame) SwingUtilities.getWindowAncestor(this), //parent
+                    messageHandler
             );
         } catch (AmountMoneyCurrencyStorageException ex) {
             this.messageHandler.handle(new Message(String.format(CURRENCY_STORAGE_EXCEPTION_TEMPLATE,
@@ -214,7 +215,8 @@ public class AmountMoneyComponentManageDialog extends javax.swing.JDialog {
             amountMoneyPanelEditDialog = new AmountMoneyComponentEditDialog(selectedCurrency, //currency
                     this.amountMoneyCurrencyStorage,
                     this.amountMoneyExchangeRateRetriever,
-                    (Frame) SwingUtilities.getWindowAncestor(this) //parent
+                    (Frame) SwingUtilities.getWindowAncestor(this), //parent
+                    messageHandler
             );
         } catch (AmountMoneyCurrencyStorageException ex) {
             this.messageHandler.handle(new Message(String.format(CURRENCY_STORAGE_EXCEPTION_TEMPLATE,

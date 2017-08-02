@@ -22,11 +22,11 @@ import org.apache.commons.lang3.tuple.Pair;
 import richtercloud.message.handler.IssueHandler;
 import richtercloud.reflection.form.builder.ComponentHandler;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
+import richtercloud.reflection.form.builder.ResetException;
 import richtercloud.reflection.form.builder.fieldhandler.FieldHandlingException;
 import richtercloud.reflection.form.builder.fieldhandler.FieldUpdateEvent;
 import richtercloud.reflection.form.builder.fieldhandler.FieldUpdateListener;
 import richtercloud.reflection.form.builder.panels.AbstractListPanel;
-import richtercloud.validation.tools.FieldRetrievalException;
 
 /**
  *
@@ -49,7 +49,11 @@ public abstract class AbstractListTypeHandler<T, E extends FieldUpdateEvent<T>, 
             String fieldName,
             Class<?> declaringClass,
             FieldUpdateListener<E> updateListener,
-            R reflectionFormBuilder) throws IllegalArgumentException, IllegalAccessException, FieldHandlingException, FieldRetrievalException {
+            R reflectionFormBuilder) throws IllegalArgumentException,
+            IllegalAccessException,
+            FieldHandlingException,
+            NoSuchFieldException,
+            ResetException {
         if(type instanceof ParameterizedType) {
             ParameterizedType parameterizedType = (ParameterizedType) type;
             if(!parameterizedType.getRawType().equals(List.class)) {
@@ -63,7 +67,10 @@ public abstract class AbstractListTypeHandler<T, E extends FieldUpdateEvent<T>, 
     protected abstract Pair<JComponent, ComponentHandler<?>> handle0(Type type,
             T fieldValue,
             FieldUpdateListener<E> updateListener,
-            ReflectionFormBuilder reflectionFormBuilder) throws IllegalArgumentException, IllegalAccessException, FieldRetrievalException;
+            ReflectionFormBuilder reflectionFormBuilder) throws IllegalArgumentException,
+            IllegalAccessException,
+            NoSuchFieldException,
+            ResetException;
 
     @Override
     public void reset(AbstractListPanel component) {

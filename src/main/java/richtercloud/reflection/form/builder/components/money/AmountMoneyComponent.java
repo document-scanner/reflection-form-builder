@@ -35,6 +35,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.jscience.economics.money.Currency;
 import org.jscience.economics.money.Money;
 import org.jscience.physics.amount.Amount;
+import richtercloud.message.handler.ExceptionMessage;
 import richtercloud.message.handler.Message;
 import richtercloud.message.handler.MessageHandler;
 
@@ -149,7 +150,8 @@ public class AmountMoneyComponent extends javax.swing.JPanel {
                         AmountMoneyComponent.this.amountMoneyExchangeRateRetriever.retrieveExchangeRate(oldCurrency);
                         newAmount = oldCurrency.getConverterTo(newCurrency).convert(getAmount());
                     } catch (AmountMoneyExchangeRateRetrieverException amountMoneyExchangeRateRetrieverException) {
-                        throw new RuntimeException(amountMoneyExchangeRateRetrieverException);
+                        messageHandler.handle(new ExceptionMessage(amountMoneyExchangeRateRetrieverException));
+                        return;
                     }
                 }
                 //set the decimal spinner first because if the rounding result
@@ -334,7 +336,8 @@ public class AmountMoneyComponent extends javax.swing.JPanel {
         try {
             storedCurrencies = amountMoneyCurrencyStorage.getCurrencies();
         } catch (AmountMoneyCurrencyStorageException ex) {
-            throw new RuntimeException(ex);
+            messageHandler.handle(new ExceptionMessage(ex));
+            return;
         }
         for(Currency storedCurrency : storedCurrencies) {
             if(!comboBoxModelContains(currencyComboBoxModel, storedCurrency)) {

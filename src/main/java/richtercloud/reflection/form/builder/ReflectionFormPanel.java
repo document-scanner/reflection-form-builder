@@ -24,7 +24,6 @@ import java.util.Set;
 import javax.swing.GroupLayout;
 import javax.swing.JComponent;
 import richtercloud.reflection.form.builder.fieldhandler.FieldHandler;
-import richtercloud.validation.tools.FieldRetrievalException;
 
 /**
  *
@@ -157,7 +156,7 @@ public class ReflectionFormPanel<U extends ReflectionFormPanelUpdateListener> ex
         return entityClass;
     }
 
-    public void reset() throws FieldRetrievalException {
+    public void reset() throws ResetException {
         for(Component component : getFieldMapping().values()) {
             getFieldHandler().reset(component);
         }

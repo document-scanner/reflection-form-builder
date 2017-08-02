@@ -22,9 +22,9 @@ import org.apache.commons.lang3.tuple.Pair;
 import richtercloud.message.handler.MessageHandler;
 import richtercloud.reflection.form.builder.ComponentHandler;
 import richtercloud.reflection.form.builder.ReflectionFormBuilder;
+import richtercloud.reflection.form.builder.ResetException;
 import richtercloud.reflection.form.builder.panels.AbstractListPanel;
 import richtercloud.reflection.form.builder.typehandler.TypeHandler;
-import richtercloud.validation.tools.FieldRetrievalException;
 
 /**
  *
@@ -48,7 +48,13 @@ public abstract class AbstractListFieldHandler<T, E extends FieldUpdateEvent<T>,
     public JComponent handle(Field field,
             Object instance,
             FieldUpdateListener<E> updateListener,
-            R reflectionFormBuilder) throws IllegalArgumentException, IllegalAccessException, FieldHandlingException, InstantiationException, InvocationTargetException, FieldRetrievalException {
+            R reflectionFormBuilder) throws IllegalArgumentException,
+            IllegalAccessException,
+            FieldHandlingException,
+            InstantiationException,
+            InvocationTargetException,
+            NoSuchFieldException,
+            ResetException {
         Type fieldGenericType = field.getGenericType();
         Pair<JComponent, ComponentHandler<?>> retValue = this.typeHandler.handle(fieldGenericType,
                 (T) field.get(instance), //fieldValue
@@ -60,7 +66,7 @@ public abstract class AbstractListFieldHandler<T, E extends FieldUpdateEvent<T>,
     }
 
     @Override
-    public void reset(AbstractListPanel component) throws FieldRetrievalException {
+    public void reset(AbstractListPanel component) throws ResetException {
         this.typeHandler.reset(component);
     }
 }
