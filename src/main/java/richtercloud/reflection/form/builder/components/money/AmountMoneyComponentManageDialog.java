@@ -29,6 +29,8 @@ import richtercloud.message.handler.MessageHandler;
  */
 public class AmountMoneyComponentManageDialog extends javax.swing.JDialog {
     private static final long serialVersionUID = 1L;
+    private final static String CURRENCY_STORAGE_EXCEPTION_TEMPLATE = "An exception occured during retrieval of currencies from the storage: %s";
+    private final static String CURRENCY_STORAGE_EXCEPTION_SUMMARY = "Exception during currency storage occured";
     private final AmountMoneyCurrencyStorage amountMoneyCurrencyStorage;
     private final AmountMoneyExchangeRateRetriever amountMoneyExchangeRateRetriever;
     private final DefaultListModel<Currency> currencyListModel = new DefaultListModel<>();
@@ -153,19 +155,20 @@ public class AmountMoneyComponentManageDialog extends javax.swing.JDialog {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
         AmountMoneyComponentEditDialog amountMoneyPanelEditDialog;
         try {
             amountMoneyPanelEditDialog = new AmountMoneyComponentEditDialog(null, //currency (null indicates creation of a new currency)
                     this.amountMoneyCurrencyStorage,
                     this.amountMoneyExchangeRateRetriever,
-                    this.messageHandler,
                     (Frame) SwingUtilities.getWindowAncestor(this) //parent
             );
         } catch (AmountMoneyCurrencyStorageException ex) {
-            this.messageHandler.handle(new Message(String.format("An exception occured during retrieval of currencies from the storage: %s", ExceptionUtils.getRootCauseMessage(ex)),
+            this.messageHandler.handle(new Message(String.format(CURRENCY_STORAGE_EXCEPTION_TEMPLATE,
+                    ExceptionUtils.getRootCauseMessage(ex)),
                     JOptionPane.ERROR_MESSAGE,
-                    "Exception occured"));
+                    CURRENCY_STORAGE_EXCEPTION_SUMMARY));
             return;
         }
         amountMoneyPanelEditDialog.pack();
@@ -174,13 +177,16 @@ public class AmountMoneyComponentManageDialog extends javax.swing.JDialog {
         try {
             this.amountMoneyCurrencyStorage.saveCurrency(newCurrency);
         } catch (AmountMoneyCurrencyStorageException ex) {
-            this.messageHandler.handle(new Message(String.format("An exception occured during retrieval of currencies from the storage: %s", ExceptionUtils.getRootCauseMessage(ex)),
+            this.messageHandler.handle(new Message(String.format(CURRENCY_STORAGE_EXCEPTION_TEMPLATE,
+                    ExceptionUtils.getRootCauseMessage(ex)),
                     JOptionPane.ERROR_MESSAGE,
-                    "Exception occured"));
+                    CURRENCY_STORAGE_EXCEPTION_SUMMARY));
+            return;
         }
         currencyListModel.add(0, newCurrency);
     }//GEN-LAST:event_addButtonActionPerformed
 
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     private void removeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeButtonActionPerformed
         Currency selectedCurrency = currencyList.getSelectedValue();
         if(selectedCurrency == null) {
@@ -191,13 +197,16 @@ public class AmountMoneyComponentManageDialog extends javax.swing.JDialog {
             //currencies, simply remove and add the old and new instance
             this.amountMoneyCurrencyStorage.removeCurrency(selectedCurrency);
         } catch (AmountMoneyCurrencyStorageException ex) {
-            this.messageHandler.handle(new Message(String.format("An exception occured during retrieval of currencies from the storage: %s", ExceptionUtils.getRootCauseMessage(ex)),
+            this.messageHandler.handle(new Message(String.format(CURRENCY_STORAGE_EXCEPTION_TEMPLATE,
+                    ExceptionUtils.getRootCauseMessage(ex)),
                     JOptionPane.ERROR_MESSAGE,
-                    "Exception occured"));
+                    CURRENCY_STORAGE_EXCEPTION_SUMMARY));
+            return;
         }
         currencyListModel.remove(currencyList.getSelectedIndex());
     }//GEN-LAST:event_removeButtonActionPerformed
 
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     private void editButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editButtonActionPerformed
         Currency selectedCurrency = this.currencyList.getSelectedValue();
         AmountMoneyComponentEditDialog amountMoneyPanelEditDialog;
@@ -205,13 +214,13 @@ public class AmountMoneyComponentManageDialog extends javax.swing.JDialog {
             amountMoneyPanelEditDialog = new AmountMoneyComponentEditDialog(selectedCurrency, //currency
                     this.amountMoneyCurrencyStorage,
                     this.amountMoneyExchangeRateRetriever,
-                    this.messageHandler,
                     (Frame) SwingUtilities.getWindowAncestor(this) //parent
             );
         } catch (AmountMoneyCurrencyStorageException ex) {
-            this.messageHandler.handle(new Message(String.format("An exception occured during retrieval of currencies from the storage: %s", ExceptionUtils.getRootCauseMessage(ex)),
+            this.messageHandler.handle(new Message(String.format(CURRENCY_STORAGE_EXCEPTION_TEMPLATE,
+                    ExceptionUtils.getRootCauseMessage(ex)),
                     JOptionPane.ERROR_MESSAGE,
-                    "Exception occured"));
+                    CURRENCY_STORAGE_EXCEPTION_SUMMARY));
             return;
         }
         amountMoneyPanelEditDialog.pack();
@@ -223,15 +232,18 @@ public class AmountMoneyComponentManageDialog extends javax.swing.JDialog {
             this.amountMoneyCurrencyStorage.removeCurrency(selectedCurrency);
             this.amountMoneyCurrencyStorage.saveCurrency(editedCurrency);
         } catch (AmountMoneyCurrencyStorageException ex) {
-            this.messageHandler.handle(new Message(String.format("An exception occured during retrieval of currencies from the storage: %s", ExceptionUtils.getRootCauseMessage(ex)),
+            this.messageHandler.handle(new Message(String.format(CURRENCY_STORAGE_EXCEPTION_TEMPLATE,
+                    ExceptionUtils.getRootCauseMessage(ex)),
                     JOptionPane.ERROR_MESSAGE,
-                    "Exception occured"));
+                    CURRENCY_STORAGE_EXCEPTION_SUMMARY));
+            return;
         }
         int selectedCurrencyIndex = currencyListModel.indexOf(selectedCurrency);
         currencyListModel.remove(selectedCurrencyIndex);
         currencyListModel.add(selectedCurrencyIndex, editedCurrency);
     }//GEN-LAST:event_editButtonActionPerformed
 
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     private void closeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_closeButtonActionPerformed
         this.setVisible(false);
     }//GEN-LAST:event_closeButtonActionPerformed

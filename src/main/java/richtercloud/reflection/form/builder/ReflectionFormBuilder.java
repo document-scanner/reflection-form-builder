@@ -23,8 +23,6 @@ import java.util.Map;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Group;
 import javax.swing.JComponent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import richtercloud.message.handler.IssueHandler;
 import richtercloud.reflection.form.builder.fieldhandler.FieldHandler;
 import richtercloud.reflection.form.builder.fieldhandler.FieldHandlingException;
@@ -82,7 +80,6 @@ ReflectionFormBuilder.getClassComponent to return null). This design follows
 "composition over inheritance"
  */
 public class ReflectionFormBuilder<F extends FieldRetriever> {
-    private final static Logger LOGGER = LoggerFactory.getLogger(ReflectionFormBuilder.class);
     private final static int LABEL_WIDTH_MIN = 150;
     public static void validateMapping(Map<?,?> mapping, String argumentName) {
         if (mapping == null) {

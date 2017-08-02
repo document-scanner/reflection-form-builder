@@ -23,7 +23,6 @@ import org.jscience.physics.amount.Amount;
 import richtercloud.message.handler.IssueHandler;
 import richtercloud.reflection.form.builder.components.money.AmountMoneyCurrencyStorage;
 import richtercloud.reflection.form.builder.components.money.AmountMoneyExchangeRateRetriever;
-import richtercloud.reflection.form.builder.components.money.AmountMoneyUsageStatisticsStorage;
 import richtercloud.reflection.form.builder.fieldhandler.AmountMoneyFieldHandler;
 import richtercloud.reflection.form.builder.fieldhandler.FieldHandler;
 
@@ -37,16 +36,13 @@ public class AmountMoneyMappingFieldHandlerFactory extends MappingFieldHandlerFa
     public static Type createAmountMoneyTypeToken() {
         return new TypeToken<Amount<Money>>() {}.getType();
     }
-    private final AmountMoneyUsageStatisticsStorage amountMoneyUsageStatisticsStorage;
     private final AmountMoneyCurrencyStorage amountMoneyCurrencyStorage;
     private final AmountMoneyExchangeRateRetriever amountMoneyConversionRateRetriever;
 
-    public AmountMoneyMappingFieldHandlerFactory(AmountMoneyUsageStatisticsStorage amountMoneyUsageStatisticsStorage,
-            AmountMoneyCurrencyStorage amountMoneyCurrencyStorage,
+    public AmountMoneyMappingFieldHandlerFactory(AmountMoneyCurrencyStorage amountMoneyCurrencyStorage,
             AmountMoneyExchangeRateRetriever amountMoneyConversionRateRetriever,
             IssueHandler issueHandler) {
         super(issueHandler);
-        this.amountMoneyUsageStatisticsStorage = amountMoneyUsageStatisticsStorage;
         this.amountMoneyCurrencyStorage = amountMoneyCurrencyStorage;
         this.amountMoneyConversionRateRetriever = amountMoneyConversionRateRetriever;
     }
@@ -61,8 +57,7 @@ public class AmountMoneyMappingFieldHandlerFactory extends MappingFieldHandlerFa
     public Map<Type, FieldHandler<?, ?, ?, ?>> generateClassMapping() {
         Map<Type, FieldHandler<?, ?, ?, ?>> classMapping0 = new HashMap<>(super.generateClassMapping());
         classMapping0.put(createAmountMoneyTypeToken(),
-                new AmountMoneyFieldHandler(amountMoneyUsageStatisticsStorage,
-                        amountMoneyConversionRateRetriever,
+                new AmountMoneyFieldHandler(amountMoneyConversionRateRetriever,
                         amountMoneyCurrencyStorage,
                         getIssueHandler()));
         return classMapping0;

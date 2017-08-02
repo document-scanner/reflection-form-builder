@@ -103,10 +103,6 @@ public class MappingFieldHandler<T, E extends FieldUpdateEvent<T>, R extends Ref
             InstantiationException,
             FieldRetrievalException {
         JComponent retValue;
-        T fieldValue = (T) field.get(instance);
-        String fieldName = field.getName();
-        Class<?> declaringClass = field.getDeclaringClass();
-
         FieldHandler fieldHandler = null;
             //can't have a generic type because it requires R to be passed down
             //the call hierarchy which requires to redesign the whole mapping

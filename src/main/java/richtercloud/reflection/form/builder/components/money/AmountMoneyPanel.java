@@ -31,12 +31,10 @@ public class AmountMoneyPanel extends NullableComponent<Amount<Money>, AmountMon
 
     public AmountMoneyPanel(Amount<Money> initialValue,
             AmountMoneyCurrencyStorage amountMoneyCurrencyStorage,
-            AmountMoneyUsageStatisticsStorage amountMoneyUsageStatisticsStorage,
             AmountMoneyExchangeRateRetriever amountMoneyExchangeRateRetriever,
             MessageHandler messageHandler) throws AmountMoneyCurrencyStorageException, AmountMoneyExchangeRateRetrieverException {
         super(initialValue,
                 new AmountMoneyComponent(amountMoneyCurrencyStorage,
-                        amountMoneyUsageStatisticsStorage,
                         amountMoneyExchangeRateRetriever,
                         messageHandler));
         getMainComponent().addUpdateListener(new AmountMoneyComponentUpdateListener() {

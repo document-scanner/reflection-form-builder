@@ -93,14 +93,6 @@ public abstract class GenericListTypeHandler<R extends ReflectionFormBuilder, C 
                     //this value which can be passed to updateListener then)
         }
 
-        //unclear whether typeClass can be null in the following scenario
-        Class<?> typeClass = null;
-        if(type instanceof Class) {
-            typeClass = (Class<?>) type;
-        }else if(type instanceof ParameterizedType) {
-            typeClass = (Class<?>) ((ParameterizedType)type).getRawType();
-        }
-
         //check for an exact match (including all nested generics) first
         TypeHandler fieldTypeHandler = this.typeHandlerMapping.get(type);
         if(fieldTypeHandler != null) {
@@ -115,12 +107,6 @@ public abstract class GenericListTypeHandler<R extends ReflectionFormBuilder, C 
 
         Type genericType = retrieveTypeGenericType(type);
         //class annotations can be checked (field annotations not, of course)
-        Class<?> genericTypeClass = null;
-        if(genericType instanceof Class) {
-            genericTypeClass = (Class<?>) genericType;
-        }else if(genericType instanceof ParameterizedType) {
-            genericTypeClass = (Class<?>) ((ParameterizedType)genericType).getRawType();
-        }
 
         TypeHandler genericTypeHandler = this.genericsTypeHandlerMapping.get(genericType);
         if(genericTypeHandler != null) {

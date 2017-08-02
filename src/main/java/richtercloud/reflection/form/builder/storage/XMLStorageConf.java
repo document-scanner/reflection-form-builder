@@ -18,7 +18,6 @@ import com.thoughtworks.xstream.XStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -43,7 +42,7 @@ public class XMLStorageConf implements StorageConf {
     public void validate() throws StorageConfValidationException {
         XStream xStream = new XStream();
         try {
-            List<Object> existingObjects = (List<Object>) xStream.fromXML(new FileInputStream(file));
+            xStream.fromXML(new FileInputStream(file));
         } catch (FileNotFoundException ex) {
             throw new StorageConfValidationException(ex);
         }

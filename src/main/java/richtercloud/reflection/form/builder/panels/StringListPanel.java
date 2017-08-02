@@ -61,7 +61,7 @@ public class StringListPanel extends AbstractSingleColumnListPanel<String, Edita
 
     @Override
     protected String createNewElement() {
-        return new String();
+        return String.valueOf("");
     }
 
 }

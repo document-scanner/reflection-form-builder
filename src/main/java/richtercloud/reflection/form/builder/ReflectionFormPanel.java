@@ -23,8 +23,6 @@ import java.util.Map;
 import java.util.Set;
 import javax.swing.GroupLayout;
 import javax.swing.JComponent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import richtercloud.reflection.form.builder.fieldhandler.FieldHandler;
 import richtercloud.validation.tools.FieldRetrievalException;
 
@@ -47,7 +45,6 @@ ReflectionFormPanel if it only delegates to the ReflectionFormPanel i
 */
 public class ReflectionFormPanel<U extends ReflectionFormPanelUpdateListener> extends javax.swing.JPanel {
     private static final long serialVersionUID = 1L;
-    private final static Logger LOGGER = LoggerFactory.getLogger(ReflectionFormPanel.class);
 
     public static String generateExceptionMessage(Throwable ex) {
         String retValue = ex.getMessage();

@@ -27,6 +27,7 @@ import java.util.List;
  * @param <T> allows enforcing subtypes of {@link Identifiable}
  */
 public class XMLStorage<T extends Identifiable> implements Storage<T, XMLStorageConf> {
+    private final static String NOT_SUPPORTED = "Not supported yet.";
     private File file;
     private final XMLStorageConf storageConf;
 
@@ -73,17 +74,17 @@ public class XMLStorage<T extends Identifiable> implements Storage<T, XMLStorage
 
     @Override
     public void update(T object) throws StorageException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException(NOT_SUPPORTED);
     }
 
     @Override
     public void delete(T object) throws StorageException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException(NOT_SUPPORTED);
     }
 
     @Override
     public void refresh(Object object) throws StorageException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(NOT_SUPPORTED);
     }
 
     @Override
@@ -103,11 +104,11 @@ public class XMLStorage<T extends Identifiable> implements Storage<T, XMLStorage
 
     @Override
     public void registerPostStoreCallback(T object, StorageCallback callback) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(NOT_SUPPORTED);
     }
 
     @Override
     public void registerPreStoreCallback(T object, StorageCallback callback) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(NOT_SUPPORTED);
     }
 }

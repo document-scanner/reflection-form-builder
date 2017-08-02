@@ -187,6 +187,7 @@ public abstract class NumberPanel<N extends Number> extends JPanel {
         return (GroupLayout) super.getLayout();
     }
 
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     private void nullCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {
         if(nullCheckBox.isSelected()) {
             this.valueSpinner.setEnabled(false);

@@ -82,7 +82,6 @@ public abstract class AbstractListPanel<T, L extends ListPanelItemListener<T>, M
      * caller to change the specific type.
      */
     private Set<L> itemListeners = new HashSet<>();
-    private ListPanelTableCellRenderer mainListCellRenderer;
     private ListPanelTableCellEditor mainListCellEditor;
     private M mainListModel;
     private MessageHandler messageHandler;
@@ -120,7 +119,6 @@ public abstract class AbstractListPanel<T, L extends ListPanelItemListener<T>, M
         //don't add an item initially because that is most certainly
         //unintentional
         this.mainListCellEditor = mainListCellEditor;
-        this.mainListCellRenderer = mainListCellRenderer;
         this.mainListModel = mainListModel;
         initComponents();
         this.mainList.setTableHeader(tableHeader);
@@ -276,6 +274,7 @@ public abstract class AbstractListPanel<T, L extends ListPanelItemListener<T>, M
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
         this.mainListCellEditor.stopCellEditing();
         this.mainListCellEditor.resetCellEditorValue(); //avoid value of
@@ -291,6 +290,7 @@ public abstract class AbstractListPanel<T, L extends ListPanelItemListener<T>, M
         }
     }//GEN-LAST:event_addButtonActionPerformed
 
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     private void removeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeButtonActionPerformed
         LOGGER.debug("removing selected rows {}", this.mainList.getSelectedRows());
         //- TableModel doesn't expose methods which allow smart iteration
@@ -329,12 +329,14 @@ public abstract class AbstractListPanel<T, L extends ListPanelItemListener<T>, M
         this.updateRowHeights();
     }//GEN-LAST:event_removeButtonActionPerformed
 
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     private void selectAllButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectAllButtonActionPerformed
         this.mainListSelectionModel.addSelectionInterval(0, this.mainList.getRowCount() - 1);
         this.mainListModel.fireTableDataChanged();
         this.updateRowHeights();
     }//GEN-LAST:event_selectAllButtonActionPerformed
 
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     private void invertSelectionButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_invertSelectionButtonActionPerformed
         for (int i = 0; i < this.mainListModel.getRowCount(); i++) {
             if (this.mainListSelectionModel.isSelectedIndex(i)) {
@@ -347,6 +349,7 @@ public abstract class AbstractListPanel<T, L extends ListPanelItemListener<T>, M
         this.updateRowHeights();
     }//GEN-LAST:event_invertSelectionButtonActionPerformed
 
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     private void editButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editButtonActionPerformed
         try {
             editRow0();
@@ -358,6 +361,7 @@ public abstract class AbstractListPanel<T, L extends ListPanelItemListener<T>, M
         }
     }//GEN-LAST:event_editButtonActionPerformed
 
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     private void upButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_upButtonActionPerformed
         this.mainListCellEditor.stopCellEditing();
         for(int selectedRow : this.mainList.getSelectedRows()) {
@@ -374,6 +378,7 @@ public abstract class AbstractListPanel<T, L extends ListPanelItemListener<T>, M
         this.updateRowHeights();
     }//GEN-LAST:event_upButtonActionPerformed
 
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     private void downButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_downButtonActionPerformed
         this.mainListCellEditor.stopCellEditing();
         for(int selectedRow : this.mainList.getSelectedRows()) {

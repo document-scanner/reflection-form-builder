@@ -17,7 +17,6 @@ package richtercloud.reflection.form.builder.components.money;
 import java.awt.Frame;
 import javax.swing.DefaultComboBoxModel;
 import org.jscience.economics.money.Currency;
-import richtercloud.message.handler.MessageHandler;
 
 /**
  *
@@ -26,9 +25,7 @@ import richtercloud.message.handler.MessageHandler;
 public class AmountMoneyComponentEditDialog extends javax.swing.JDialog {
     private static final long serialVersionUID = 1L;
     private final DefaultComboBoxModel<Currency> referenceCurrencyComboBoxModel = new DefaultComboBoxModel<>();
-    private final AmountMoneyCurrencyStorage amountMoneyCurrencyStorage;
     private final AmountMoneyExchangeRateRetriever amountMoneyExchangeRateRetriever;
-    private final MessageHandler messageHandler;
     private Currency currency;
 
     /**
@@ -48,12 +45,10 @@ public class AmountMoneyComponentEditDialog extends javax.swing.JDialog {
     public AmountMoneyComponentEditDialog(Currency currency,
             AmountMoneyCurrencyStorage amountMoneyCurrencyStorage,
             AmountMoneyExchangeRateRetriever amountMoneyExchangeRateRetriever,
-            MessageHandler messageHandler,
             Frame parent) throws AmountMoneyCurrencyStorageException {
         super(parent,
                 true //modal
         );
-        this.messageHandler = messageHandler;
         if(currency != null) {
             if(!amountMoneyCurrencyStorage.getCurrencies().contains(currency)) {
                 throw new IllegalArgumentException(String.format("Currency '%s' isn't managed in amountMoneyCurrencyStorage and thus can't be edited", currency.getCode()));
@@ -65,7 +60,6 @@ public class AmountMoneyComponentEditDialog extends javax.swing.JDialog {
             this.referenceCurrencyComboBoxModel.addElement(currency0);
         }
         this.currency = currency;
-        this.amountMoneyCurrencyStorage = amountMoneyCurrencyStorage;
         this.amountMoneyExchangeRateRetriever = amountMoneyExchangeRateRetriever;
         initComponents();
     }
@@ -168,11 +162,13 @@ public class AmountMoneyComponentEditDialog extends javax.swing.JDialog {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
         this.setVisible(false);
         this.dispose(); //reset at close
     }//GEN-LAST:event_cancelButtonActionPerformed
 
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
         String code = this.codeTextField.getText();
         Currency referenceCurrency = (Currency) this.referenceCurrencyComboBox.getSelectedItem();

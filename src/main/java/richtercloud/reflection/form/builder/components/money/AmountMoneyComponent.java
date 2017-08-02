@@ -68,7 +68,6 @@ public class AmountMoneyComponent extends javax.swing.JPanel {
     public final static Currency REFERENCE_CURRENCY = Currency.EUR;
     private final Set<AmountMoneyComponentUpdateListener> updateListeners = new HashSet<>();
     private final AmountMoneyCurrencyStorage amountMoneyCurrencyStorage;
-    private final AmountMoneyUsageStatisticsStorage amountMoneyUsageStatisticsStorage;
     private final MessageHandler messageHandler;
     private final AmountMoneyExchangeRateRetriever amountMoneyExchangeRateRetriever;
     private final static float MINIMAL_STEP = 0.01f;
@@ -95,7 +94,6 @@ public class AmountMoneyComponent extends javax.swing.JPanel {
      * @throws AmountMoneyExchangeRateRetrieverException
      */
     public AmountMoneyComponent(AmountMoneyCurrencyStorage amountMoneyCurrencyStorage,
-            AmountMoneyUsageStatisticsStorage amountMoneyUsageStatisticsStorage,
             AmountMoneyExchangeRateRetriever amountMoneyExchangeRateRetriever,
             MessageHandler messageHandler) throws AmountMoneyExchangeRateRetrieverException, AmountMoneyCurrencyStorageException {
         this.messageHandler = messageHandler;
@@ -175,7 +173,6 @@ public class AmountMoneyComponent extends javax.swing.JPanel {
             }
         });
         this.amountMoneyCurrencyStorage = amountMoneyCurrencyStorage;
-        this.amountMoneyUsageStatisticsStorage = amountMoneyUsageStatisticsStorage;
         this.amountMoneyExchangeRateRetriever = amountMoneyExchangeRateRetriever;
     }
 
@@ -312,6 +309,7 @@ public class AmountMoneyComponent extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     private void currencyManageButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_currencyManageButtonActionPerformed
         AmountMoneyComponentManageDialog amountMoneyPanelManageDialog;
         try {

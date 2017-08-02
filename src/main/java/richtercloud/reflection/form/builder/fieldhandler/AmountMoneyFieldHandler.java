@@ -28,7 +28,6 @@ import richtercloud.reflection.form.builder.components.money.AmountMoneyCurrency
 import richtercloud.reflection.form.builder.components.money.AmountMoneyExchangeRateRetriever;
 import richtercloud.reflection.form.builder.components.money.AmountMoneyExchangeRateRetrieverException;
 import richtercloud.reflection.form.builder.components.money.AmountMoneyPanel;
-import richtercloud.reflection.form.builder.components.money.AmountMoneyUsageStatisticsStorage;
 
 /**
  *
@@ -40,16 +39,13 @@ internal implementation notes:
 types
 */
 public class AmountMoneyFieldHandler implements FieldHandler<Amount<Money>, FieldUpdateEvent<Amount<Money>>, ReflectionFormBuilder, AmountMoneyPanel> {
-    private final AmountMoneyUsageStatisticsStorage amountMoneyUsageStatisticsStorage;
     private final AmountMoneyExchangeRateRetriever amountMoneyExchangeRateRetriever;
     private final AmountMoneyCurrencyStorage amountMoneyCurrencyStorage;
     private final MessageHandler messageHandler;
 
-    public AmountMoneyFieldHandler(AmountMoneyUsageStatisticsStorage amountMoneyUsageStatisticsStorage,
-            AmountMoneyExchangeRateRetriever amountMoneyConversionRateRetriever,
+    public AmountMoneyFieldHandler(AmountMoneyExchangeRateRetriever amountMoneyConversionRateRetriever,
             AmountMoneyCurrencyStorage amountMoneyCurrencyStorage,
             MessageHandler messageHandler) {
-        this.amountMoneyUsageStatisticsStorage = amountMoneyUsageStatisticsStorage;
         this.amountMoneyExchangeRateRetriever = amountMoneyConversionRateRetriever;
         this.amountMoneyCurrencyStorage = amountMoneyCurrencyStorage;
         this.messageHandler = messageHandler;
@@ -65,7 +61,6 @@ public class AmountMoneyFieldHandler implements FieldHandler<Amount<Money>, Fiel
             Amount<Money> fieldValue = (Amount<Money>) field.get(instance);
             retValue = new AmountMoneyPanel(fieldValue, //initialValue
                     amountMoneyCurrencyStorage,
-                    amountMoneyUsageStatisticsStorage,
                     amountMoneyExchangeRateRetriever,
                     messageHandler);
         } catch (AmountMoneyExchangeRateRetrieverException | AmountMoneyCurrencyStorageException ex) {
