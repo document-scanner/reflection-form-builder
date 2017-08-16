@@ -23,6 +23,8 @@ import java.util.Map;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Group;
 import javax.swing.JComponent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import richtercloud.message.handler.ExceptionMessage;
 import richtercloud.message.handler.IssueHandler;
 import richtercloud.reflection.form.builder.fieldhandler.FieldHandler;
@@ -80,6 +82,7 @@ ReflectionFormBuilder.getClassComponent to return null). This design follows
 "composition over inheritance"
  */
 public class ReflectionFormBuilder<F extends FieldRetriever> {
+    private final static Logger LOGGER = LoggerFactory.getLogger(ReflectionFormBuilder.class);
     private final static int LABEL_WIDTH_MIN = 150;
     public static void validateMapping(Map<?,?> mapping, String argumentName) {
         if (mapping == null) {
@@ -210,15 +213,18 @@ public class ReflectionFormBuilder<F extends FieldRetriever> {
             FieldHandler fieldHandler) throws TransformationException,
             NoSuchFieldException,
             ResetException {
-        List<Field> entityClassFields;
-        entityClassFields = this.fieldRetriever.retrieveRelevantFields(clazz);
+        List<Field> clazzFields;
+        clazzFields = this.fieldRetriever.retrieveRelevantFields(clazz);
+        LOGGER.trace(String.format("relevant fields for class %s are %s",
+                clazz.getName(),
+                clazzFields));
 
         GroupLayout layout = reflectionFormPanel.getLayout();
         layout.setAutoCreateGaps(true);
         layout.setAutoCreateContainerGaps(true);
         Group horizontalLabelParallelGroup = layout.createParallelGroup(GroupLayout.Alignment.LEADING);
         Group horizontalCompParallelGroup = layout.createParallelGroup(GroupLayout.Alignment.LEADING);
-        for (Field field : entityClassFields) {
+        for (Field field : clazzFields) {
             JComponent comp;
             try {
                 comp = this.getClassComponent(field,
