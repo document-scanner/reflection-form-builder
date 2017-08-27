@@ -29,6 +29,8 @@ import java.util.TreeMap;
 import javax.swing.JComponent;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import richtercloud.message.handler.ExceptionMessage;
 import richtercloud.message.handler.IssueHandler;
 import richtercloud.reflection.form.builder.AnyType;
@@ -42,6 +44,7 @@ import richtercloud.reflection.form.builder.ResetException;
  * @author richter
  */
 public class MappingFieldHandler<T, E extends FieldUpdateEvent<T>, R extends ReflectionFormBuilder, C extends Component> extends ResettableFieldHandler<T, E, R, C> {
+    private final static Logger LOGGER = LoggerFactory.getLogger(MappingFieldHandler.class);
     protected static <K,V> void validateMapping(List<Pair<K, V>> mapping, String argumentName) {
         if(argumentName == null) {
             throw new IllegalArgumentException("argumentName mustn't be null");
@@ -135,6 +138,8 @@ public class MappingFieldHandler<T, E extends FieldUpdateEvent<T>, R extends Ref
                         try {
                             field.set(instance, event.getNewValue());
                         } catch (IllegalArgumentException | IllegalAccessException ex) {
+                            LOGGER.error("unexpected exception during field update occured",
+                                    ex);
                             issueHandler.handleUnexpectedException(new ExceptionMessage(ex));
                         }
                     }

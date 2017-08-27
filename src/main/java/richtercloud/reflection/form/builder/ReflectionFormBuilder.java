@@ -174,7 +174,11 @@ public class ReflectionFormBuilder<F extends FieldRetriever> {
                     public void onUpdate(FieldUpdateEvent event) {
                         try {
                             onFieldUpdate(event, field, instance);
-                        } catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException ex) {
+                        } catch (IllegalArgumentException
+                                | IllegalAccessException
+                                | InvocationTargetException ex) {
+                            LOGGER.error("unexpected exception during field update occured",
+                                    ex);
                             issueHandler.handleUnexpectedException(new ExceptionMessage(ex));
                         }
                     }
