@@ -101,10 +101,18 @@ public abstract class CancelablePanel<P extends CancelablePanelPanel, T> extends
         }
         if(!async) {
             T nonGUIResult = doTaskNonGUI();
+            if(nonGUIResult == null) {
+                    //exception occured in doTaskNonGUI
+                return;
+            }
             doTaskGUI0(nonGUIResult);
         }else {
             Thread backgroundThread = new Thread(() -> {
                 T nonGUIResult = doTaskNonGUI();
+                if(nonGUIResult == null) {
+                    //exception occured in doTaskNonGUI
+                    return;
+                }
                 SwingUtilities.invokeLater(() -> {
                     doTaskGUI0(nonGUIResult);
                 });
