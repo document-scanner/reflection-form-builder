@@ -67,6 +67,8 @@ public interface Storage<T, C extends StorageConf> {
     */
     void start() throws StorageCreationException;
 
+    boolean isStarted();
+
     /**
      * Frees eventually aquired resources.
      */

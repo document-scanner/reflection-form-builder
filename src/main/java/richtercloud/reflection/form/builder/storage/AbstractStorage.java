@@ -38,6 +38,7 @@ public abstract class AbstractStorage<T, C extends StorageConf> implements Stora
         this.started = true;
     }
 
+    @Override
     public boolean isStarted() {
         return started;
     }

@@ -26,7 +26,7 @@ import java.util.List;
  * @author richter
  * @param <T> allows enforcing subtypes of {@link Identifiable}
  */
-public class XMLStorage<T extends Identifiable> implements Storage<T, XMLStorageConf> {
+public class XMLStorage<T extends Identifiable> extends AbstractStorage<T, XMLStorageConf> implements Storage<T, XMLStorageConf> {
     private final static String NOT_SUPPORTED = "Not supported yet.";
     private File file;
     private final XMLStorageConf storageConf;
